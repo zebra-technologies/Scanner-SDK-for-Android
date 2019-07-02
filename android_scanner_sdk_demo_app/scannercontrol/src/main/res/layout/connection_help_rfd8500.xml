@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RFD8500 Pairing instructions"
+            android:textColor="#365F91"
+            android:fontFamily="Times New Roman"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:id="@+id/textTitle"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1. Turn the RFD8500 on and ensure Bluetooth is enabled. "
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" • "
+                android:fontFamily="Times New Roman"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="The RFD8500 is discoverable over Bluetooth for 40 seconds after start up. After that time Bluetooth suspends and is no longer discoverable. To make discoverable again, press the Bluetooth button, located on side of RFD8500."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2. Enable Bluetooth on the device."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3. The device will discover the RFD8500 and display it on the Bluetooth Devices list."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4. Tap the “RFD8500” to initiate pairing from the Bluetooth Devices list."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5. Press the RFD8500 trigger to complete pairing when the Bluetooth LED starts flashing fast."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6. Go to the “Zebra Scanner Control” app / “Connect” tab and select the scanner."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

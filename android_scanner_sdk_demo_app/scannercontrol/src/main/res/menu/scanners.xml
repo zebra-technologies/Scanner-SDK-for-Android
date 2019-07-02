@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zebra.scannercontrol.app.activities.ScannersActivity" >
+    <item android:id="@+id/action_add"
+        android:title="@string/menu_add_scanner"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_refresh"/>
+    <!--<item android:id="@+id/action_get_pairing"-->
+        <!--android:title="@string/menu_get_pairing_barcode"-->
+        <!--android:orderInCategory="100"-->
+        <!--app:showAsAction="always"-->
+        <!--android:icon="@drawable/ic_action_barcode"/>-->
+</menu>

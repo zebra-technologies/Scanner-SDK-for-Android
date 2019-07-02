@@ -1,0 +1,161 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:background="@color/light_gray"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.BeeperActionsActivity"
+    tools:showIn="@layout/app_bar_beeper_actions">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light_gray"
+        android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/light_gray" />
+    <TableRow
+        android:id="@+id/tbl_row_beeper_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_weight="60"
+            android:background="@android:color/transparent"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_beeper_volume"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="wrap_content"
+                android:text="@string/beeper_volume" />
+
+        </LinearLayout>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:background="@android:color/white">
+
+        <SeekBar
+            android:id="@+id/seek_beeper_volume"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="90"
+            android:max="100"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp" />
+
+    </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_weight="30"
+            android:background="@android:color/transparent"
+            android:gravity="center_vertical|left"
+            android:orientation="vertical"
+            android:layout_gravity="right"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:id="@+id/txt_beeper_volume_low"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="wrap_content"
+                android:text="@string/low" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="30"
+            android:background="@android:color/transparent"
+            android:gravity="center_vertical|right"
+            android:orientation="vertical"
+            android:paddingLeft="20dp">
+
+            <TextView
+                android:id="@+id/txt_beeper_volume_high"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:text="@string/high" />
+
+        </LinearLayout>
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+    <TableRow
+        android:id="@+id/tbl_row_beeper_sequence"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_weight="60"
+            android:background="@android:color/transparent"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_beeper_sequence"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="wrap_content"
+                android:text="@string/beeper_sequence" />
+
+        </LinearLayout>
+
+    </TableRow>
+
+    <com.zebra.scannercontrol.app.helpers.ZNumberPicker
+        style="@style/roboto_medium_16dp"
+        android:id="@+id/beeperPicker"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TableRow
+        style="@style/white_background_row"
+        android:layout_height="91dp"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical|center_horizontal">
+        <Button
+            style="@style/style_blue_button"
+            android:text="@string/test_beeper"
+            android:textSize="24sp"
+            android:onClick="beeperAction"
+            android:layout_height="55dp"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="45dp"
+            android:layout_marginBottom="18dp"
+            android:layout_marginTop="18dp" />
+    </TableRow>
+    </LinearLayout>
+</ScrollView>

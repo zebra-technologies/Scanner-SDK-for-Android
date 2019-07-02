@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.zebra.scannercontrol.app"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 119
+        versionName "2.4.6.0"
+		if (project.hasProperty('ADD_BUILD_TO_VERSION')) {
+			versionName = versionName.substring(0,versionName.lastIndexOf(".") + 1) + (System.getenv("BUILD_NUMBER") ?: "0")
+		}
+        vectorDrawables.useSupportLibrary = true
+        archivesBaseName = "scanner_control_app_v$versionName"
+    }
+	
+	signingConfigs {
+        release {
+            storeFile file("../../../keys/AndroidScannerSDK.keystore")
+            if (project.hasProperty('RELEASE_STORE_PASSWORD')) {
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
+        }
+	}
+	
+    buildTypes {
+        release {
+            minifyEnabled false
+			if (project.hasProperty('RELEASE_STORE_PASSWORD')) {
+				signingConfig signingConfigs.release
+			}
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lintOptions {
+        // Don't abort if Lint finds an error, otherwise the Jenkins build
+        // will be marked as failed, and Jenkins won't analyse the Lint output
+        abortOnError false
+    }
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
+    maven {url "https://maven.google.com"}
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':BarcodeScannerLibrary')
+    implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'
+    implementation 'com.android.support:design:28.0.0-alpha3'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+}

@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zebra.scannercontrol.app.activities.UpdateFirmware" >
+    <item android:id="@+id/firmware_help"
+        android:title="@string/menu_firmware_help"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/nav_connection_help_white"/>
+</menu>

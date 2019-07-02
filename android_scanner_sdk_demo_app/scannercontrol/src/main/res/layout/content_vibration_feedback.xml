@@ -1,0 +1,127 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.VibrationFeedback"
+    tools:showIn="@layout/app_bar_vibration_feedback">
+    <TextView
+        android:id="@+id/txt_no_pager_motor"
+        style="@style/roboto_regular_16dp"
+        android:layout_width="wrap_content"
+        android:background="@android:color/transparent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/app_margin_left"
+        android:layout_marginTop="@dimen/app_margin_left"
+        android:text="@string/no_pager_motor" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_vibration_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/light_gray"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@color/light_gray" />
+
+            <TableRow
+                android:id="@+id/tbl_row_vibration_feedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:layout_weight="85"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_vibration"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/vibration" />
+
+                    <!--<TextView-->
+                    <!--style="@style/roboto_regular_14dp"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/on_off"/>-->
+                </LinearLayout>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switch_vibration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+            </TableRow>
+
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white">
+
+                <TextView
+                    android:id="@+id/vibration_duration"
+                    style="@style/roboto_regular_20dp"
+                    android:layout_height="70dp"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:layout_weight="0"
+                    android:text="@string/vibration_duration" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"></LinearLayout>
+
+            </TableRow>
+
+            <com.zebra.scannercontrol.app.helpers.ZNumberPicker
+                android:id="@+id/vibration_duration_picker"
+                style="@style/roboto_medium_16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/white" />
+
+            <TableRow
+                style="@style/white_background_row"
+                android:layout_width="match_parent"
+                android:layout_height="91dp"
+                android:gravity="center_vertical|center_horizontal">
+
+                <Button
+                    android:id="@+id/btn_test_vibration"
+                    style="@style/style_blue_gray_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginRight="45dp"
+                    android:layout_marginTop="18dp"
+                    android:onClick="vibrateScanner"
+                    android:text="@string/test_vibration"
+                    android:textSize="24sp" />
+            </TableRow>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

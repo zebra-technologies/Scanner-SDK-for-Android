@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@android:color/white"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.HomeActivity"
+    tools:showIn="@layout/app_bar_home">
+
+    <TextView
+        style="@style/roboto_medium_16dp"
+        android:text="@string/instruction"
+        android:layout_marginLeft="@dimen/app_margin_left"
+        android:layout_marginRight="@dimen/app_margin_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:gravity="center_vertical|center_horizontal">
+    <FrameLayout
+        android:id="@+id/scan_to_connect_barcode"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:orientation="horizontal" >
+    <TextView
+        android:text="Barcode Type: "
+        android:id="@+id/scan_to_connect_barcode_type"
+        android:textSize="@dimen/barcode_font_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <!--<TextView-->
+        <!--android:textSize="@dimen/barcode_font_size"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1" />-->
+    <!--<TextView-->
+        <!--android:text=""-->
+        <!--android:id="@+id/scan_to_connect_scanner_config"-->
+        <!--android:textSize="@dimen/barcode_font_size"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"/>-->
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:text=""
+            android:id="@+id/scan_to_connect_scanner_config"
+            android:textSize="@dimen/barcode_font_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</LinearLayout>

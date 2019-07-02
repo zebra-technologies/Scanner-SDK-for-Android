@@ -1,0 +1,113 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/hint_message"
+        android:layout_width="match_parent"
+        android:layout_weight="0"
+        android:layout_height="40dp"
+        android:paddingLeft="40dp"
+        android:gravity="center_vertical"
+        android:background="@color/txt_background"
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:text="@string/top_hint" />
+
+    <TextView
+        android:id="@+id/info_top_message"
+        android:layout_width="match_parent"
+        android:layout_weight="0"
+        android:layout_height="@dimen/info_message_height"
+        android:paddingTop="5dp"
+        android:paddingLeft="10dp"
+        android:background="@android:color/white"
+        android:textSize="@dimen/info_message_font_size"
+        android:text="@string/info_top" />
+
+       <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:gravity="right">
+
+           <ImageView
+            android:id="@+id/img_bth_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/bt"
+            android:contentDescription="@string/bt_logo"/>
+
+    </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+        <FrameLayout
+            android:id="@+id/barcode_layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/info_bottom_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:background="@android:color/white"
+        android:textSize="@dimen/info_message_font_size"
+        android:text="@string/info_bottom"
+        android:layout_marginBottom="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white">
+
+
+        <!--TextView
+            android:id="@+id/copyright_message"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="40dp"
+            android:background="@color/txt_background"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+             android:text="@string/copyright" /-->
+
+        <!---TextView
+            android:id="@+id/version_message"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_weight="0"
+            android:gravity="center_vertical"
+            android:paddingRight="50dp"
+            android:background="@color/txt_background"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:text="@string/version" /-->
+
+        </LinearLayout>
+
+</LinearLayout>

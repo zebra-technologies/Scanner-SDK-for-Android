@@ -1,0 +1,434 @@
+<resources>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+    <string name="app_name">Scanner Control</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_home">Scanner Control</string>
+    <string name="home_list_content_desc">Right Chevron</string>
+
+    <string-array name="home_items">
+        <item>Devices</item>
+        <item>Connection Help</item>
+        <item>Application Settings</item>
+        <item>About</item>
+
+    </string-array>
+    <string-array name="scanner_configs">
+        <item>Set Factory Defaults</item>
+        <item>Battery Off</item>
+        <item>Cradle Host</item>
+        <item>SPP Client</item>
+        <item>SPP Server</item>
+        <item>HID Server</item>
+        <item>Low Beeper Volume</item>
+        <item>Medium Beeper Volume</item>
+        <item>High Beeper Volume</item>
+    </string-array>
+    <string-array name="beeper_actions">
+        <item>One high short beep</item>
+        <item>Two high short beeps</item>
+        <item>Three high short beeps</item>
+        <item>Four high short beeps</item>
+        <item>Five high short beeps</item>
+        <item>One low short beep</item>
+        <item>Two low short beeps</item>
+        <item>Three low short beeps</item>
+        <item>Four low short beeps</item>
+        <item>Five low short beeps</item>
+        <item>One high long beep</item>
+        <item>Two high long beeps</item>
+        <item>Three high long beeps</item>
+        <item>Four high long beeps</item>
+        <item>Five high long beeps</item>
+        <item>One low long beep</item>
+        <item>Two low long beeps</item>
+        <item>Three low long beeps</item>
+        <item>Four low long beeps</item>
+        <item>Five low long beeps</item>
+        <item>Fast warble beep</item>
+        <item>Slow warble beep</item>
+        <item>High-low beep</item>
+        <item>Low-high beep</item>
+        <item>High-low-high beep</item>
+        <item>Low-high-low beep</item>
+        <item>High-high-low-low beep</item>
+    </string-array>
+
+    <string-array name="vibration_durations">
+        <item>150</item>
+        <item>200</item>
+        <item>250</item>
+        <item>300</item>
+        <item>400</item>
+        <item>500</item>
+        <item>600</item>
+        <item>750</item>
+    </string-array>
+
+    <string name="menu_item_device_disconnect">Disconnect Scanner</string>
+    <string name="menu_item_device_pair">Pair Bluetooth Scanner</string>
+    <string name="title_activity_about">App Overview</string>
+    <string name="version">Version</string>
+    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2015 ZIH Corp and/or its affiliates. All rights reserved. Zebra and the stylized Zebra head are trademarks of ZIH Corp., registered in many jurisdictions worldwide. All other trademarks are the property of their respective owners.\n</string>
+    <string name="title_activity_scanners">Available Device List</string>
+    <string name="bt_scanners_not_found">BT scanners not found</string>
+    <string name="bt_no_scanners">No scanner found.</string>
+
+    <string name="menu_firmware_help">Firmware Update Process</string>
+
+    <string name="menu_add_scanner">Add Scanner</string>
+    <string name="menu_get_pairing_barcode">Get Pairing Barcode</string>
+    <string name="menu_refresh_scanners">Refresh</string>
+    <string name="title_activity_scanner_configurations">Connection Help</string>
+    <string name="title_activity_settings">App Settings</string>
+    <string name="scanner_detection_title">Scanner Detection</string>
+    <string name="auto_detection">Auto Detection</string>
+    <string name="pairing_barcode_title">Pair New Scanner (STC) Barcode</string>
+    <string name="pairing_barcode_type">Barcode Type</string>
+    <string name="pairing_barcode_configuration">Set Factory Defaults</string>
+
+    <string name="reset_app_defaults">Reset App Defaults</string>
+    <string name="btn_reset_factory_defaults">Reset Defaults</string>
+
+    <string name="events_title">Background Notifications</string>
+    <string name="available_scanner">Available Scanner</string>
+    <string name="active_scanner">Active Scanner</string>
+    <string name="assertinfo">Asset Information</string>
+    <string name="barcode_event">Barcode Event</string>
+    <string name="image_event">Image Event</string>
+    <string name="video_event">Video Event</string>
+    <string name="background_mode_title">BACKGROUND MODE</string>
+    <string name="notifications">Notifications</string>
+    <string name="title_activity_notifications">Notifications</string>
+    <string name="notifications_title">NOTIFICATIONS</string>
+    <string name="title_activity_battery_off">Battery Off</string>
+    <string name="battery_off_content_desc">Barcode to be scanned</string>
+    <string name="battery_off_text">Scan the presented barcode to configure [battery off] mode</string>
+    <string name="no_items">No Items</string>
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="paired_devices_title">Selected Scanners</string>
+    <string name="available_readers_title">Available Readers</string>
+    <string name="none_paired">No Devices Paired</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_barcode">BarcodeActivity</string>
+    <string name="title_activity_zxing_barcode">ZxingBarcodeActivity</string>
+    <string name="title_activity_active_scanner">Active Scanner</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Disconnect">Disconnect</string>
+    <string name="info_title">INFORMATION</string>
+    <string name="title_activity_beeper_actions">Beeper Settings</string>
+    <string name="title_activity_led">LED Control</string>
+    <string name="title_activity_assert">Asset Information</string>
+    <string name="title_activity_symbologies">Symbology Settings (ON/OFF)</string>
+    <string name="title_activity_beeper_settings">Beeper Settings</string>
+    <string name="title_activity_splash_screen">Splash</string>
+    <string name="title_activity_available_scanner">Available Scanner</string>
+    <string name="title_activity_barcode_details">Barcode Details</string>
+    <string name="title_activity_navigate_scan_speed_analytics">Scan Speed Analytics(SSA)</string>
+    <string name="title_activity_slowest_decode_image_settings">Slowest Decode Image Settings</string>
+    <string name="title_activity_scan_speed_analytics">Scan Speed Analytics</string>
+    <string name="title_activity_ssa_barcode_type">Barcode Type For SSA</string>
+    <string name="connect_title">Connect</string>
+    <string name="information">INFORMATION</string>
+    <string name="id">ID</string>
+    <string name="name">Name</string>
+    <string name="scanner_id">Scanner ID: </string>
+    <string name="barcode_type">Barcode Type: </string>
+    <string name="barcode_data">Barcode Data:</string>
+    <string name="beeper_volume">Beeper Volume</string>
+    <string name="threshold_value">Only Save Image Slower Than : </string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="high">High</string>
+    <string name="beeper_frequency">BEEPER FREQUENCY</string>
+    <string name="green_led_control">Green LED</string>
+    <string name="green_led_on">Green LED ON</string>
+    <string name="green_led_off">Green LED OFF</string>
+    <string name="amber_led_control">Amber/Blue LED</string>
+    <string name="amber_led_on">Amber/Blue LED ON</string>
+    <string name="amber_led_off">Amber/Blue LED OFF</string>
+    <string name="red_led_control">Red LED</string>
+    <string name="red_led_on">Red LED ON</string>
+    <string name="red_led_off">Red LED OFF</string>
+    <string name="splash_content_desc">Splash Screen</string>
+    <string name="upc_a">UPC-A</string>
+    <string name="upc_e">UPC-E</string>
+    <string name="upc_e1">UPC-E1</string>
+    <string name="ean_8">EAN-8/JAN8</string>
+    <string name="ean">EANJAN</string>
+    <string name="ean_13">EAN-13/JAN13</string>
+    <string name="bookland">Bookland EAN</string>
+    <string name="code128">Code 128</string>
+    <string name="composite">Composite</string>
+    <string name="ucc">UCC/EAN-128</string>
+    <string name="code39">Code 39</string>
+    <string name="code93">Code 93</string>
+    <string name="code11">Code 11</string>
+    <string name="actions">ACTIONS</string>
+    <string name="pull_trigger">Pull Trigger</string>
+    <string name="release_trigger">Release Trigger</string>
+    <string name="barcode_list">BARCODE LIST</string>
+    <string name="no_barcode">No barcode received</string>
+    <string name="connection">CONNECTION</string>
+    <string name="auto_reconnection">Reconnect to Scanner</string>
+    <string name="beeper">Beeper</string>
+    <string name="scanning_control">Scanning</string>
+    <string name="content_desc">Indicating Navigation</string>
+    <string name="led">LED</string>
+    <string name="nav_desc">Indicating Navigation</string>
+    <string name="symbologies">Symbologies</string>
+    <string name="enable_scanning">Enable scanning</string>
+    <string name="disable_scanning">Disable scanning</string>
+    <string name="persist_settings">   Persist Settings</string>
+    <string name="model">Model Number:</string>
+    <string name="serial">Serial Number:</string>
+    <string name="firmware">Firmware:</string>
+    <string name="config">Configuration Filename:</string>
+    <string name="dateofmanufactured">Manufacture Date:</string>
+    <string name="aimon">AIM On</string>
+    <string name="aimoff">AIM Off</string>
+    <string name="vibration_feedback">Vibration Feedback</string>
+    <string name="title_activity_barcode_configuration">Connection Help</string>
+    <string name="slowest_decode_image">Slowest Decode Image:</string>
+    <string name="weight_measured">Weight Measured :</string>
+    <string name="weight_Unit">Weight Unit :</string>
+    <string name="weight_Status">Weight Status :</string>
+
+
+    <string name="top_hint">ScanToConnect</string>
+    <string name="bt_logo">BT Logo</string>
+    <string name="info_top">Scan the bar code below to pair your cordless scanner to this tablet/phone</string>
+    <string name="info_bottom">This on-screen bar code replaces the need for a paper pairing bar code.</string>
+    <string name="clearList">CLEAR LIST</string>
+    <string name="scale">Scale</string>
+    <string name="title_activity_scanner_list">ScannerListActivity</string>
+    <string name="title_activity_connection_help">Connection Help</string>
+    <string name="GS1128">GS1-128</string>
+    <string name="GS1Datamatrix">GS1-Datamatrix</string>
+    <string name="GS1QRCode">GS1-QR Code</string>
+    <string name="operationmode_dialog_title">Select Operation Mode</string>
+    <string name="ok">OK</string>
+    <string name="cancel_upper">CANCEL</string>
+    <string name="cancel">Cancel</string>
+    <string name="continue_txt">Continue</string>
+    <string name="instruction_snapi">Attach your cabled scanner to your device and scan the barcode to connect with this app.</string>
+    <string name="instruction">Scan barcode to pair your cordless scanner to this app.</string>
+    <string name="pick_list_mode">Picklist Mode</string>
+    <string name="scanning">Scanning Control</string>
+    <string name="title_activity_connection_help_cs4070">ConnectionHelpCS4070</string>
+    <string name="title_activity_connection_help_li4278">ConnectionHelpLI4278</string>
+    <string name="title_activity_connection_help_rfd8500">ConnectionHelpRFD8500</string>
+    <string name="updateFirmware">Update Firmware</string>
+    <string name="start_new_firmware">Start New Firmware</string>
+    <string name="abort_update_firmware">Abort Firmware Update</string>
+    <string name="title_activity_update_firmware">Update Firmware</string>
+    <string name="update_firmware_confimation">Confirm that you want to update the following scanner</string>
+    <string name="scanSpeedAnalytics">Scan Speed Analytics</string>
+    <string name="configure_ssa">Configure SSA</string>
+    <string name="view_ssa">View SSA</string>
+    <string name="trigger">Trigger</string>
+    <string name="led_control">LED Control</string>
+    <string name="enable_disable">ENABLE/DISABLE</string>
+    <string name="aim_guide">Aim Guide</string>
+    <string name="scale_enable">Scale Enable</string>
+    <string name="test_beeper">Test Beeper</string>
+    <string name="test_imager">Test Image Mode</string>
+    <string name="read_Weight">Read Weight</string>
+    <string name="zero_scale">Zero Scale</string>
+    <string name="reset_scale">Reset Scale</string>
+    <string name="i2of5">Interleaved 2 of 5</string>
+    <string name="_2of5">Interleaved 2 of 5</string>
+    <string name="d2of5">Discrete 2 of 5</string>
+    <string name="c2of5">Chinese 2 of 5</string>
+    <string name="ocr">OCR</string>
+    <string name="codebar">Codebar</string>
+    <string name="msi">MSI</string>
+    <string name="code32">Code 32</string>
+    <string name="datamatrix">Datamatrix</string>
+    <string name="pdf417">PDF417</string>
+    <string name="pdf">PDF</string>
+    <string name="isbn">ISBN</string>
+    <string name="_other1D">Other 1D</string>
+    <string name="_other2D">Other 2D</string>
+    <string name="coupon">Coupon</string>
+    <string name="digimarc_upc">Digimarc UPC</string>
+    <string name="digimarc_ean_jan">Digimarc EAN/JAN</string>
+    <string name="digimarc_other">Digimarc Other</string>
+    <string name="other">Other</string>
+    <string name="ucc_coupon_extended">UCC Coupon Extended Code</string>
+    <string name="issn_ean">ISSN EAN</string>
+    <string name="isbt_128">ISBT 128</string>
+    <string name="trioptic_code39">Trioptic Code 39</string>
+    <string name="m2of5">Matrix 2 of 5</string>
+    <string name="k3of5">Korean 3 of 5</string>
+    <string name="gs1databar">GS1 DataBar</string>
+    <string name="gs1databar14">GS1 DataBar-14</string>
+    <string name="gs1databar_limited">GS1 DataBar Limited</string>
+    <string name="gs1databar_expanded">GS1 DataBar Expanded</string>
+    <string name="micro_pdf417">MicroPDF417</string>
+    <string name="maxicode">Maxicode</string>
+    <string name="qr">QR</string>
+    <string name="qrcode">QR Code</string>
+    <string name="microqr">MicroQR</string>
+    <string name="aztec">Aztec</string>
+    <string name="hanxin_code">Han Xin Code</string>
+    <string name="au_post">Australian Post</string>
+    <string name="us_planet">US PLANET</string>
+    <string name="us_postnet">US POSTNET</string>
+    <string name="kixcode">Netherlands KIX</string>
+    <string name="usps4cb">USPS 4CB</string>
+    <string name="postalcodes">Postalcodes</string>
+    <string name="uk_postal">UK Postal</string>
+    <string name="jp_postal">Japan Post</string>
+    <string name="fics">UPU FICS</string>
+    <string name="title_activity_vibration_feedback">Vibration Feedback</string>
+    <string name="vibration">Vibration</string>
+    <string name="on_off">ON/OFF</string>
+    <string name="vibration_duration">Vibration Duration (ms)</string>
+    <string name="test_vibration">TEST VIBRATION</string>
+    <string name="battery_statistics">Battery Statistics</string>
+    <string name="scanner_name">Scanner Name:</string>
+    <string name="title_activity_battery_statistics">Battery Statistics</string>
+    <string name="battery_asset_info">Battery Asset Information</string>
+    <string name="no_battery_stats">This scanner does not have a PowerPrecision+ smart battery</string>
+    <string name="no_scale">This scanner does not have a Scale</string>
+    <string name="bat_manufacture_date">Manufacture Date:</string>
+    <string name="bat_serial">Serial Number:</string>
+    <string name="bat_firmware_version">Firmware Version:</string>
+    <string name="bat_design_cap">Design Capacity:</string>
+    <string name="bat_state_of_health">State of Health:</string>
+    <string name="battery_life_stat">Battery Life Statistics</string>
+    <string name="bat_charge_cycles_consumed">Charge Cycles Consumed:</string>
+    <string name="battery_status">Battery Status</string>
+    <string name="bat_full_charge_cap">Full Charge Capacity:</string>
+    <string name="bat_state_of_charge">State of Charge:</string>
+    <string name="bat_remaining_cap">Remaining Capacity:</string>
+    <string name="bat_charge_status">Charge Status:</string>
+    <string name="bat_remaining_time_to_complete_charging">Remaining Time to Complete Charging:</string>
+    <string name="bat_voltage">Battery Voltage</string>
+    <string name="bat_current">Battery Current:</string>
+    <string name="battery_temperature">Battery Temperature</string>
+    <string name="bat_present">Present:</string>
+    <string name="bat_highest">Highest:</string>
+    <string name="bat_lowest">Lowest:</string>
+    <string name="release_notes">Release Notes:</string>
+    <string name="no_plugin">No Plug-in Found</string>
+    <string name="no_plugin_msg_1"><![CDATA[Put the correct plugin in the Device Storage > Download folder.]]></string>
+    <string name="no_plugin_msg_2">For instructions, click the help icon on the top right.</string>
+    <string name="mismatch">Plug-in / Scanner Mismatch</string>
+    <string name="mismatch_plugin_msg_1"><![CDATA[1. Delete the incorrect plug-in from the Device Storage > Download folder.]]></string>
+    <string name="mismatch_plugin_msg_2">2. Load the correct plug-in for your scanner model into the folder.</string>
+    <string name="firmware_not_support_ssa">This scanner does not have Scan Speed Analytics capabilities</string>
+    <string name="com_protocol_not_support_ssa">Scan Speed Analytics is not supported in this communication protocol</string>
+    <string name="firmware_not_support_ssa_msg_1"><![CDATA[Update Scanner to a firmware which supports Scan Speed Analytics.]]></string>
+    <string name="fw_update_process">Firmware Update Process Help</string>
+    <string name="fw_update_process_msg_1">Copy the correct 123Scan plug-in for your scanner to your phone:</string>
+    <string name="fw_update_process_msg_1_1">1. Load 123Scan onto a Windows computer from:</string>
+    <string name="fw_update_process_url">www.Zebra.com/123Scan</string>
+    <string name="fw_update_process_msg_1_2">2. From your Windows PC with 123Scan, access your scanner’s plug-in (.scnplg file) from C:\\ProgramData\\123Scan2\\Plug-ins</string>
+    <string name="fw_update_process_msg_1_3"><![CDATA[3. Put a copy of the plug-in into your phone\'s download folder (Device Storage > Download)]]></string>
+    <string name="fw_update_process_msg_2">Start the firmware update by clicking the \"Update Firmware\" button:</string>
+    <string name="close">CLOSE</string>
+    <string name="updating_firmware">Updating Firmware</string>
+    <string name="rebooting_scanner">Rebooting Scanner</string>
+    <string name="update_failed">Update Failed</string>
+    <string name="firmware_updated">✓ Firmware Updated</string>
+    <string name="last_connected_scanner">Last Connected Scanner</string>
+    <string name="other_scanners">Other Scanners</string>
+    <string name="txt_continue">CONTINUE</string>
+    <string name="launch_instruction">This app supports Scan-To-Connect technology for 1-step pairing. </string>
+    <string name="launch_instruction_item_2">•         \tEnable / disable symbologies</string>
+    <string name="launch_instruction_item_1">•         \tProgram beeper and LEDs</string>
+    <string name="launch_instruction_item_3">•         \tRemotely trigger a scan</string>
+    <string name="launch_instruction_remaining">It displays scanned bar code data.</string>
+    <string name="launch_instruction_remaining_2">It can query scanner asset information &amp; battery health statistics.</string>
+    <string name="dont_show_this_again">Don\'t show this message again.</string>
+    <string name="com_protocol">Communication Protocol</string>
+    <string name="reconnect_scanner">Reconnect Scanner</string>
+    <string name="launch_instruction2">It allows you to control your scanner:</string>
+    <string name="supported_scanners">Supported Scanners</string>
+    <string name="pairing_help_all_scanners">Pairing Help - All Scanners</string>
+    <string name="pairing_help_rfd8500">Pairing Help - RFD8500 Only</string>
+    <string name="title_activity_supported_scanners">Supported Scanners</string>
+    <string name="supported_scanners_title">The following scanners can be used with this application:</string>
+    <string name="title_activity_supported_scanners_cordless_1">Cordless (</string>
+    <string name="title_activity_supported_scanners_cordless_2"> > Pair New Bluetooth)</string>
+    <string name="title_activity_supported_scanners_corded_1">Corded Scanners* (</string>
+    <string name="title_activity_supported_scanners_corded_2"> > Find Cabled Scanner)</string>
+    <string name="details_activity_supported_scanners_corded">* For corded scanner support a fully powered USB Master Port is required</string>
+    <string name="supported_scanners_li3678">•         \tLI3678</string>
+    <string name="supported_scanners_rfd8500">•         \tRFD8500</string>
+    <string name="supported_scanners_ds3678">•         \tDS3678</string>
+    <string name="supported_scanners_cs4070">•         \tCS4070 (Rev E firmware and newer)</string>
+    <string name="supported_scanners_ds8178">•         \tDS8178</string>
+    <string name="supported_scanners_ds2278">•         \tDS2278</string>
+    <string name="supported_scanners_mp6000">•         \tMP6000</string>
+    <string name="supported_scanners_mp7000">•         \tMP7000</string>
+    <string name="supported_scanners_mx101">•         \tMP6/7000 and MX101</string>
+    <string name="supported_scanners_ds8178_mp6010">•         \tMP6/7000 and DS8178 via CR8178</string>
+    <string name="supported_scanners_ds3608">•         \tDS3608</string>
+    <string name="supported_scanners_ds8108">•         \tDS8108</string>
+    <string name="supported_scanners_ds9808">•         \tDS9808</string>
+    <string name="supported_scanners_ds4308">•         \tDS4308</string>
+    <string name="supported_scanners_ds2208">•         \tDS2208</string>
+    <string name="supported_scanners_ds7708">•         \tDS7708</string>
+    <string name="supported_scanners_ls2208">•         \tLS2208 (MFD > 1/2015)</string>
+    <string name="supported_scanners_se4757">•         \tSE4757</string>
+
+    <string name="title_activity_pairing_instructions_all">Pairing Instructions</string>
+    <string name="all_scanners_pairing_instructions_title">All Scanners - Pairing Instructions</string>
+    <string name="all_scanners_pairing_instructions_1">1. Scan the \"Set Factory Defaults\" barcode</string>
+    <string name="all_scanners_pairing_instructions_2">2. Re-scan the bar code on the “Pair New Scanner” screen</string>
+    <string name="all_scanners_pairing_instructions_3">3.\tScan the “Pair New Scanner” bar code</string>
+    <string name="set_factory_defaults">Set Factory Defaults</string>
+    <string name="title_activity_pairing_instructions_rfd8500">Pairing Instructions</string>
+    <string name="rfd8500_pairing_instructions_title">RFD8500 Pairing instructions</string>
+    <string name="rfd8500_pairing_instructions_1">1.\tTurn the RFD8500 on and ensure Bluetooth is enabled.</string>
+    <string name="rfd8500_pairing_instructions_2">2.\tEnable Bluetooth on the Android device.</string>
+    <string name="rfd8500_pairing_instructions_3">3.\tThe Android device will discover the RFD8500 and display it on the Bluetooth Devices list.</string>
+    <string name="rfd8500_pairing_instructions_1_1">•\tThe RFD8500 is discoverable over Bluetooth for 40 seconds after start up. After that time Bluetooth suspends and is no longer discoverable. To make discoverable again, press the Bluetooth button, located on side of RFD8500.</string>
+    <string name="rfd8500_pairing_instructions_4">4.\tTap the “RFD8500” to initiate pairing from the Bluetooth Devices list.</string>
+    <string name="rfd8500_pairing_instructions_5">5.\tPress the RFD8500 trigger to complete pairing when the Bluetooth LED starts flashing fast.</string>
+    <string name="rfd8500_pairing_instructions_6">6.\tLaunch the “Scanner Control” app / Menu / “Available Device List” and select the RFD8500.</string>
+    <string name="multiple_dat_files">Multiple DAT files</string>
+    <string name="multiple_plugin_files">Multiple Plug-in files</string>
+    <string name="multiple_dat_files_msg_1">Multiple DAT files found in Download folder. Please keep only one DAT file and try again.</string>
+    <string name="no_pager_motor">This scanner does not have a pager motor.</string>
+    <string name="title_activity_find_cabled_scanner">Find Cabled Scanner</string>
+    <string name="multiple_snapi_devices">You are already in the SNAPI protocol. To pick a device click Continue.</string>
+    <string name="find_scanner">FIND SCANNER</string>
+    <string name="sample_barcodes">Sample Barcodes for Scanning</string>
+    <string name="title_activity_sample_barcodes">SampleBarcodes</string>
+    <string name="sample_barcodes_instructions">Scan a sample barcode from the list below, or scan your own barcode.</string>
+    <string name="upc">UPC:</string>
+    <string name="gs1_data_bar_stacked">GS1 - DataBar Stacked</string>
+    <string name="multiple_plug_in_files_msg_1">Multiple Plug-in files found in Download folder. Please keep only one Plug-in file and try again.</string>
+    <string name="beeper_sequence">Beeper Sequence</string>
+    <string name="selct_code">Select Code Type</string>
+    <string name="get_bt_address_instruction1">Please Enter Your Bluetooth Address.</string>
+    <string name="get_bt_address_instruction_item_1"> Navigate to \"Settings > General > About > Bluetooth Address\" or </string>
+    <string name="get_bt_address_instruction_item_2">Then write down the Bluetooth address.</string>
+    <string name="get_bt_address_instruction_item_3">Hit back button until return to this screen.</string>
+    <string name="get_bt_address_instruction_item_4">Then type address below.</string>
+    <string name="about_phone">GO TO ABOUT PHONE</string>
+    <string name="cancel2">Cancel</string>
+    <string name="bluetooth_address">Bluetooth Address</string>
+    <string name="clear">Clear</string>
+
+
+    <!-- Scan speed analytics-->
+    <string name="enable">Enable</string>
+    <string name="ssa_slowest_decode_image">Slowest Decode Image:</string>
+    <string name="ssa_slowest_decode_time">Slowest Decode Time (ms):</string>
+    <string name="ssa_slowest_decode_data">Slowest Decode Data:</string>
+    <string name="ssa_scan_speed_histogram">Scan Speed Histogram</string>
+    <string name="ssa_total_scans">Total Scans:</string>
+    <string name="ssa_char_x_axis_title">Decode Time (milliseconds)</string>
+    <string name="ssa_char_y_axis_title">Number of Scans</string>
+    <string name="ssa_reset_analytics">Reset Analytics</string>
+    <string name="ssa_no_data_text">Start Scanning\n Barcodes for\n Analysis</string>
+    <string name="ssa_resetting">Resetting Analytics</string>
+    <string name="ssa_image_transfer_not_supported">Image transfer not currently supported in Bluetooth Low Energy.</string>
+
+</resources>

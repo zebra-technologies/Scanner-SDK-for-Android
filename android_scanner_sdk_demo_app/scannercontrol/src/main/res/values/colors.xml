@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#00445B</color>
+    <color name="colorPrimaryDark">#00445B</color>
+    <color name="colorAccent">#007CB0</color>
+
+
+    <item name="font_color" type="color">#333D47</item>
+    <item name="dark_gray" type="color">#333D47</item>
+    <item name="medium_gray" type="color">#7E868C</item>
+    <item name="light_gray" type="color">#DBD8D6</item>
+    <item name="tbl_row_gray" type="color">#DBD9D6</item>
+    <item name="white" type="color">#FFFFFF</item>
+    <item name="inactive_background" type="color">#F2F2F2</item>
+    <item name="inactive_text" type="color">#7E868C</item>
+    <item name="light_blue" type="color">#e3f2fd</item>
+    <item name="slowestDecodeImage_background" type="color">#F1F1F1</item>
+    <color name="txt_background">#FF0000FF</color>
+    <color name="blue">#007CB0</color>
+    <color name="transparent_blue">#25007CB0</color>
+    <color name="yellow">#FFD200</color>
+    <color name="enable_disable_color">#333D47</color>
+    <color name="firmware_updated" >#8cc34b</color>
+
+</resources>

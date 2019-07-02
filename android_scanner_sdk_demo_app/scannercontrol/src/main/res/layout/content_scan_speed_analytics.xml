@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:background="@color/light_gray"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.ScanSpeedAnalyticsActivity"
+    tools:showIn="@layout/app_bar_scan_speed_analytics">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light_gray"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/light_gray" />
+<!--
+        <TableRow
+            android:id="@+id/tbl_row_SSA_symbology_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:layout_weight="60"
+                android:background="@android:color/transparent"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txt_SSA_symbology_name"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="@android:color/white" >
+
+            <TextView
+                android:id="@+id/txt_ssa_symbology_name"
+                style="@style/roboto_medium_16dp"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:layout_height="match_parent" />
+        </TableRow>
+-->
+
+
+        <TableRow
+            android:id="@+id/tbl_row_slowest_decode_image_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:layout_weight="60"
+                android:background="@android:color/transparent"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtSlowestDecodeImageLabel"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:enabled="false"
+                    android:text="@string/ssa_slowest_decode_image" />
+
+            </LinearLayout>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tbl_row_slowest_decode_image"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:background="@android:color/white">
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_marginLeft="@dimen/app_margin_left"-->
+            <!--android:layout_weight="60"-->
+            <!--android:background="@android:color/transparent"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:orientation="vertical">-->
+
+            <!--<ImageView-->
+            <!--android:id="@+id/imageview_slowest_decode_image"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
+
+            <!--</LinearLayout>-->
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:layout_marginRight="@dimen/app_margin_right">
+
+                <ImageView
+                    android:id="@+id/imgViewSlowestDecodeImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:background="@color/slowestDecodeImage_background"
+                    app:srcCompat="@drawable/ic_no_camera" />
+
+                <TextView
+                    android:id="@+id/txt_startScanHelpMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="@string/ssa_no_data_text"
+                    android:textColor="@android:color/black"
+                    android:textSize="40sp" />
+
+                <com.zebra.scannercontrol.app.helpers.DotsProgressBar
+                    android:id="@+id/dotProgressbar_slowestDecodeImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:paddingTop="15dp" />
+
+                <ImageButton
+                    android:id="@+id/imgbtn_saveImage"
+                    style="@style/style_blue_button"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="36dp"
+                    android:layout_marginEnd="24dp"
+                    android:alpha="0.5"
+                    android:background="@color/blue"
+                    android:elevation="0dp"
+                    android:onClick="slowestImageSaveEvent"
+                    app:srcCompat="@drawable/ic_save"
+                    tools:targetApi="lollipop" />
+            </RelativeLayout>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/txtSlowestDecodeTimeLabel"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:enabled="false"
+                android:text="@string/ssa_slowest_decode_time" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/white"
+                android:orientation="vertical"></LinearLayout>
+
+            <TextView
+                android:id="@+id/txtSlowestDecodeTime"
+                style="@style/roboto_regular_16dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:text="-" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/txtSlowestDecodeDataLabel"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:text="@string/ssa_slowest_decode_data" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/white"
+                android:orientation="vertical"></LinearLayout>
+
+            <TextView
+                android:id="@+id/txtSlowestDecodeData"
+                style="@style/roboto_regular_16dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:text="-" />
+
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@android:color/white"
+            android:paddingBottom="1dp">
+
+            <TextView
+                android:id="@+id/txtScanSpeedHistogramLabel"
+                style="@style/roboto_medium_16dp"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:layout_marginTop="18dp"
+                android:paddingBottom="1dp"
+                android:text="@string/ssa_scan_speed_histogram" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/white"
+                android:orientation="horizontal"></LinearLayout>
+
+            <TextView
+                android:id="@+id/txtTotalScanCountLabel"
+                style="@style/roboto_regular_16dp"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_marginTop="18dp"
+                android:paddingBottom="1dp"
+                android:text="@string/ssa_total_scans" />
+
+            <TextView
+                android:id="@+id/txtTotalScanCount"
+                style="@style/roboto_regular_16dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_marginTop="18dp"
+                android:paddingBottom="1dp"
+                android:text="-" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.zebra.scannercontrol.app.helpers.VerticalTextView
+                    android:id="@+id/txtBarchartXAxisName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:gravity="bottom|center"
+                    android:text="@string/ssa_char_y_axis_title" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <!--<TextView-->
+                        <!--android:layout_width="100dp"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:gravity="center|right"-->
+                        <!--android:layout_gravity="center"-->
+                        <!--android:text=""/>-->
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/barchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:gravity="center|right"
+                        android:layout_marginRight="18dp"
+                        tools:layout_editor_absoluteX="0dp"
+                        tools:layout_editor_absoluteY="0dp" />
+
+
+                    <TextView
+                        android:id="@+id/txtBarchartYAxisName"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="@string/ssa_char_x_axis_title"
+                        android:layout_marginBottom="18dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </TableRow>
+
+        <TableRow
+            style="@style/light_gray_background_row"
+            android:layout_width="match_parent"
+            android:layout_height="91dp"
+            android:gravity="center_horizontal|center_vertical">
+
+            <Button
+                android:id="@+id/btn_reset_analytics"
+                style="@style/style_blue_button"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="18dp"
+                android:layout_marginLeft="45dp"
+                android:layout_marginRight="45dp"
+                android:layout_marginTop="18dp"
+                android:onClick="resetSSAStatisticsAction"
+                android:text="@string/ssa_reset_analytics"
+                android:textSize="24sp" />
+
+        </TableRow>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:orientation="vertical"
+    tools:context=".fragments.SettingsFragment">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/light_gray" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:onClick="loadBeeperActions">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="0"
+                    android:text="@string/beeper"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center|right"
+                    android:layout_marginRight="18dp"
+                    android:layout_weight="0"
+                    android:src="@drawable/right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:onClick="loadLedActions">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="0"
+                    android:text="@string/led_control"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center|right"
+                    android:layout_marginRight="18dp"
+                    android:layout_weight="0"
+                    android:src="@drawable/right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <!--Symbologies -->
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:onClick="symbologiesClicked">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="0"
+                    android:text="@string/symbologies"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center|right"
+                    android:layout_marginRight="18dp"
+                    android:layout_weight="0"
+                    android:src="@drawable/right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <!--Scanning Control -->
+
+            <!--<TableRow-->
+                <!--android:id="@+id/tbl_row_scanning"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:background="@android:color/white">-->
+
+                <!--<LinearLayout-->
+                    <!--android:id="@+id/layout_scanning"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="60dp"-->
+                    <!--android:layout_marginLeft="18dp"-->
+                    <!--android:layout_weight="85"-->
+                    <!--android:background="@android:color/white"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:orientation="vertical">-->
+
+                    <!--<TextView-->
+                        <!--android:id="@+id/txt_scanning_control"-->
+                        <!--style="@style/roboto_medium_16dp"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:text="@string/scanning"/>-->
+
+                    <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+                        <!--&lt;!&ndash;style="@style/roboto_regular_14dp"&ndash;&gt;-->
+                        <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                        <!--&lt;!&ndash;android:text="@string/enable_disable"/>&ndash;&gt;-->
+                <!--</LinearLayout>-->
+
+                <!--<android.support.v7.widget.SwitchCompat-->
+                    <!--android:id="@+id/switch_scanning"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:layout_weight="25"-->
+                    <!--android:paddingEnd="18dp" />-->
+            <!--</TableRow>-->
+
+            <!--<include layout="@layout/normal_divider" />-->
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white">
+
+                <TextView
+                    android:id="@+id/trigger_text"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:layout_weight="0"
+                    android:text="@string/trigger"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_pull_trigger"
+                    style="@style/roboto_regular_20dp_blue"
+                    android:layout_height="60dp"
+                    android:layout_weight="0"
+                    android:clickable="true"
+                    android:onClick="pullTrigger"
+                    android:text="Pull"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp" />
+
+                <View
+                    android:layout_width="0.4dip"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="0"
+                    android:background="@color/dark_gray" />
+
+                <TextView
+                    android:id="@+id/txt_release_trigger"
+                    style="@style/roboto_regular_20dp_blue"
+                    android:layout_height="60dp"
+                    android:layout_weight="0"
+                    android:clickable="true"
+                    android:onClick="releaseTrigger"
+                    android:text="Release"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="@dimen/app_margin_right" />
+            </TableRow>
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:id="@+id/tbl_row_picklist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:id="@+id/layout_picklist"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_picklist_mode"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pick_list_mode"/>
+
+                    <!--<TextView-->
+                        <!--style="@style/roboto_regular_14dp"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:text="@string/enable_disable"/>-->
+                </LinearLayout>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switch_picklist_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="18dp" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:text="@string/aim_guide"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_aim_on"
+                    style="@style/roboto_regular_20dp_blue"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0"
+                    android:clickable="true"
+                    android:onClick="aimOn"
+                    android:text="On"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp" />
+
+                <View
+                    android:layout_width="0.4dip"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0"
+                    android:background="@color/dark_gray" />
+
+                <TextView
+                    android:id="@+id/txt_aim_off"
+                    style="@style/roboto_regular_20dp_blue"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0"
+                    android:clickable="true"
+                    android:onClick="aimOff"
+                    android:text="Off"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="@dimen/app_margin_right" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:id="@+id/vibration_feedback_tbl_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:onClick="vibrationFeedback">
+
+                <TextView
+                    android:id="@+id/vibration_feedback_text"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="0"
+                    android:text="@string/vibration_feedback"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center|right"
+                    android:layout_marginRight="18dp"
+                    android:layout_weight="0"
+                    android:src="@drawable/right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="18dp"
+                android:layout_weight="85"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <Button
+                    style="@style/style_bold_font"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="12"
+                    android:background="@android:color/white"
+                    android:onClick="updateFirmware"
+                    android:paddingStart="20dp"
+                    android:text="@string/updateFirmware"
+                    android:textAlignment="textStart" />
+
+                <TextView
+                    android:id="@+id/firmwareUpdateStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="7.19" />
+
+                <include layout="@layout/normal_divider" />
+
+                <Button
+                    style="@style/style_bold_font"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="12"
+                    android:background="@android:color/white"
+                    android:onClick="startFirmware"
+                    android:paddingStart="20dp"
+                    android:text="@string/start_new_firmware"
+                    android:textAlignment="textStart" />
+
+                <include layout="@layout/normal_divider" />
+
+                <Button
+                    style="@style/style_bold_font"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="12"
+                    android:background="@android:color/white"
+                    android:onClick="abortFirmware"
+                    android:paddingStart="20dp"
+                    android:text="@string/abort_update_firmware"
+                    android:textAlignment="textStart" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="45" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_marginLeft="@dimen/app_margin_left"
+    android:layout_marginRight="@dimen/app_margin_right"
+    android:layout_marginTop="@dimen/app_margin_right"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/txt_title"
+        style="@style/roboto_medium_20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/app_margin_right"
+        android:text="@string/multiple_dat_files"/>
+    <TextView
+        android:id="@+id/txt_msg"
+        style="@style/roboto_regular_14dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="@string/multiple_dat_files_msg_1"/>
+
+    <TextView
+        style="@style/roboto_regular_20dp_blue"
+        android:id="@+id/btn_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:text="@string/ok"
+        android:gravity="right"
+        android:layout_gravity="right"
+        android:paddingTop="@dimen/app_margin_right"
+        android:paddingRight="30dp"
+        android:paddingBottom="30dp"
+        android:paddingLeft="30dp" />
+
+
+</LinearLayout>

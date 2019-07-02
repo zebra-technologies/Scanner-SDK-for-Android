@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:background="@color/light_gray"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.AssertActivity"
+    tools:showIn="@layout/app_bar_asset_info">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/light_gray" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/light_gray"
+            android:orientation="vertical">
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/white" >
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:id="@+id/titleModel"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_height="match_parent"
+            android:text="@string/model" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/txtModel"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/app_margin_right"
+            android:text=""/>
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/white" >
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:id="@+id/titleSerial"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_height="match_parent"
+            android:text="@string/serial" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/txtSerial"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/app_margin_right"
+            android:text=""/>
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/white" >
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:id="@+id/titleFW"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_height="match_parent"
+            android:text="@string/firmware" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/txtFW"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/app_margin_right"
+            android:text=""/>
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/white" >
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:id="@+id/titleDOM"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_height="match_parent"
+            android:text="@string/dateofmanufactured" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/txtDOM"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/app_margin_right"
+            android:text=""/>
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/white" >
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:id="@+id/title_name"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_height="match_parent"
+            android:text="@string/scanner_name" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/txt_scanner_name"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/app_margin_right"
+            android:text=""/>
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@android:color/white" >
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:id="@+id/config_file_name"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_height="match_parent"
+            android:text="@string/config" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/txtConfigName"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/app_margin_right"
+            android:text=""/>
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

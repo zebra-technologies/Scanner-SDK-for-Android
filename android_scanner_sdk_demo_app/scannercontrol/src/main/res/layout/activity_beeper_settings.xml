@@ -1,0 +1,112 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:orientation="vertical"
+    tools:context="com.zebra.scannercontrol.app.activities.BeeperSettingsActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="8"
+        android:gravity="bottom"
+        android:text="@string/beeper_volume" />
+
+    <CheckedTextView
+        android:id="@+id/lowVolume"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="13"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        style="@style/style_bold_font"
+        android:gravity="center_vertical"
+        android:text="@string/low" />
+
+    <include layout="@layout/normal_divider" />
+
+    <CheckedTextView
+        android:id="@+id/mediumVolume"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="13"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        style="@style/style_bold_font"
+        android:gravity="center_vertical"
+        android:text="@string/medium" />
+
+    <include layout="@layout/normal_divider" />
+
+    <CheckedTextView
+        android:id="@+id/highVolume"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="13"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        style="@style/style_bold_font"
+        android:gravity="center_vertical"
+        android:text="@string/high" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="8"
+        android:gravity="bottom"
+        android:text="@string/beeper_frequency" />
+
+
+    <CheckedTextView
+        android:id="@+id/lowFrequency"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="13"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        style="@style/style_bold_font"
+        android:gravity="center_vertical"
+        android:text="@string/low" />
+
+    <include layout="@layout/normal_divider" />
+
+    <CheckedTextView
+        android:id="@+id/mediumFrequency"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="13"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        style="@style/style_bold_font"
+        android:gravity="center_vertical"
+        android:text="@string/medium" />
+
+    <include layout="@layout/normal_divider" />
+
+    <CheckedTextView
+        android:id="@+id/highFrequency"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="13"
+        android:background="@android:color/white"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        style="@style/style_bold_font"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:text="@string/high" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6"/>
+</LinearLayout>

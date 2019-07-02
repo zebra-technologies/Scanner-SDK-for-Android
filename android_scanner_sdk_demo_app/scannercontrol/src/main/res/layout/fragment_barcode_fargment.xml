@@ -1,0 +1,127 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/light_gray"
+    tools:context=".fragments.BarcodeFargment">
+
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light_gray">
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/barcodesListCount"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Barcodes Scanned: 0"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="18dp" />
+    </TableRow>
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="85"
+        android:gravity="center_horizontal">
+    <ListView
+        android:id="@+id/barcodesList"
+        android:scrollbars = "vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:layout_weight="85"
+        android:paddingRight="8dp"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollIndicators="right"
+        android:fadeScrollbars="false"
+        android:fastScrollEnabled="false"
+        android:fastScrollAlwaysVisible="false"
+        style ="@style/style_scrollbar"
+        tools:targetApi="m" />
+    </LinearLayout>
+
+    <TableRow
+        style="@style/light_gray_background_row"
+        android:layout_height="91dp"
+        android:layout_width="match_parent"
+        android:weightSum="1"
+        android:gravity="center_vertical|center_horizontal">
+
+        <Button
+            style="@style/style_blue_gray_button"
+            android:text="@string/clearList"
+            android:textSize="24sp"
+            android:id="@+id/btnClearList"
+            android:onClick="clearList"
+            android:layout_height="55dp"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="45dp"
+            android:layout_marginBottom="18dp"
+            android:layout_marginTop="18dp" />
+    </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:onClick="loadSampleBarcodes">
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="18dp"
+            android:layout_weight="0"
+            android:text="@string/sample_barcodes"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="18dp"
+            android:layout_weight="0"
+            android:src="@drawable/right" />
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:onClick="loadScale">
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="18dp"
+            android:layout_weight="0"
+            android:text="@string/scale"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="18dp"
+            android:layout_weight="0"
+            android:src="@drawable/right" />
+    </TableRow>
+
+</LinearLayout>

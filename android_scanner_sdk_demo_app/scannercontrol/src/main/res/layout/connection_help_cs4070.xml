@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+       >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CS4070 Pairing Instructions"
+            android:textColor="#365F91"
+            android:fontFamily="Times New Roman"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:id="@+id/textTitle"
+            android:layout_marginTop="10dp"
+          />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1. Scan the “Reset Factory Defaults” barcode."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/barcode1_disp"
+        android:layout_width="match_parent"
+        android:layout_height="270dp"
+        android:orientation="vertical"
+        android:layout_weight="1">
+
+    <FrameLayout
+            android:id="@+id/frm_barcode1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+          />
+    </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2. Scan the “Bluetooth SSI Profile” barcode to pair."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <LinearLayout
+            android:id="@+id/barcode2_disp"
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:orientation="vertical"
+            android:layout_weight="1">
+        <FrameLayout
+            android:id="@+id/frm_barcode2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            />
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3. Enable Bluetooth on the device."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4. The device will discover the CS4070 and display it on the Bluetooth “Available Device” list."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5. Tap the “CS4070” to pair from the “Available Devices” list."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6. Go to the “Zebra Scanner Control” app / “Connect” tab and select the CS4070."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+
+
+    </LinearLayout>
+</LinearLayout>

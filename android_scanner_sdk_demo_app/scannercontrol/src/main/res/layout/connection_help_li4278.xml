@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+<LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LI4278/DS6878 Pairing Instructions"
+            android:textColor="#365F91"
+            android:fontFamily="Times New Roman"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:id="@+id/textTitle"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1. Scan the “Set Factory Defaults” barcode."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:orientation="vertical"
+            android:id="@+id/barcode3_disp"
+            android:layout_weight="1"
+            >
+            <FrameLayout
+            android:id="@+id/frm_barcode3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2. Scan the “SSI Host Server” barcode to pair."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:id="@+id/barcode4_disp"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            >
+        <FrameLayout
+            android:id="@+id/frm_barcode4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3. Enable Bluetooth on the device."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4. The device will discover the scanner and display it on the Bluetooth “Available Device” list."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5. Tap the scanner to pair from the “Available Devices” list."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6. Go to the “Zebra Scanner Control” app / “Connect” tab and select the scanner."
+            android:fontFamily="Times New Roman"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+    </LinearLayout>
+</LinearLayout>

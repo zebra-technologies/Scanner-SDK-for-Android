@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_pair_device"
+            android:icon="@drawable/nav_pair_new_bt_scanner"
+            android:title="Pair Bluetooth Scanner" />
+        <item
+            android:id="@+id/nav_devices"
+            android:icon="@drawable/nav_available_scanners"
+            android:title="Available Device List" />
+        <item
+            android:id="@+id/nav_find_cabled_scanner"
+            android:icon="@drawable/nav_find_cabled_scanners"
+            android:title="Find Cabled Scanner" />
+        <item
+            android:id="@+id/nav_connection_help"
+            android:icon="@drawable/nav_connection_help"
+            android:title="Connection Help" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/nav_app_settings"
+            android:title="App Settings" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/nav_about"
+            android:title="App Overview" />
+    </group>
+
+</menu>

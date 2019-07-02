@@ -1,0 +1,83 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/app_margin_left"
+    android:paddingLeft="@dimen/app_margin_left"
+    android:paddingRight="@dimen/app_margin_right"
+    android:paddingTop="@dimen/app_margin_left"
+    tools:context="com.zebra.scannercontrol.app.activities.AboutActivity">
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <TextView
+                    style="@style/roboto_regular_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/launch_instruction" />
+            <TextView
+                    style="@style/roboto_regular_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="@string/launch_instruction2" />
+
+            <TextView
+                    style="@style/roboto_regular_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/launch_instruction_item_1" />
+
+            <TextView
+                    style="@style/roboto_regular_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/launch_instruction_item_2" />
+
+            <TextView
+                    style="@style/roboto_regular_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/launch_instruction_item_3" />
+
+            <TextView
+                    style="@style/roboto_regular_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/launch_instruction_remaining" />
+
+            <TextView
+                    style="@style/roboto_regular_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:text="@string/launch_instruction_remaining_2" />
+
+            <TextView
+                    android:id="@+id/about"
+                    style="@style/roboto_regular_12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/version_info" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

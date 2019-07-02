@@ -1,0 +1,1432 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:background="@color/light_gray"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.SymbologiesActivity"
+    tools:showIn="@layout/app_bar_symbologies">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light_gray"
+        android:orientation="vertical">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/tbl_row_gray"
+            android:layout_marginTop="14dp"
+            android:layout_gravity="center_vertical">
+
+            <CheckBox
+                style="@style/roboto_regular_16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/persist_settings"
+                android:layout_marginLeft="12dp"
+                android:id="@+id/checkBoxPermanant"/>
+
+        </TableRow>
+
+
+        <TableRow
+            android:id="@+id/tbl_row_upca"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                style="@style/roboto_medium_16dp"
+                android:id="@+id/upcA_title"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:text="@string/upc_a"
+                android:layout_weight="0"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/upcA"
+                android:tag="UPC-A"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include
+            layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_upce"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/upcETitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/upc_e"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/upcE"
+                android:tag="UPC-E"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_upce1"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/upcE1Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/upc_e1"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/upcE1"
+                android:tag="UPC-E1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_ean8"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/ean8Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/ean_8"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/ean8"
+                android:tag="EAN-8/JAN8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_ean13"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/ean13Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/ean_13"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/ean13"
+                android:tag="EAN-13/JAN13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_bookland"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/booklandTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/bookland"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/bookland"
+                android:tag="Bookland EAN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_code128"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/code128Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/code128"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/code128"
+                android:tag="Code 128"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_ean128"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/ean128Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/GS1128"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/ean128"
+                android:tag="GS1-128"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_code39"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/code39Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/code39"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/code39"
+                android:tag="Code 39"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_code93"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/code93Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/code93"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/code93"
+                android:tag="Code 93"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_code11"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/code11Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/code11"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/code11"
+                android:tag="Code 11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_i2of5"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/interleavedTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/i2of5"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/interleaved"
+                android:tag="Interleaved 2 of 5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_d2of5"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/discreteTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/d2of5"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/discrete"
+                android:tag="Discrete 2 of 5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_c2of5"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/chineseTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/c2of5"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/chinese"
+                android:tag="Chinese 2 of 5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_codabar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/codabarTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/codebar"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/codabar"
+                android:tag="Codabar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_msi"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/msiTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/msi"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/msi"
+                android:tag="MSI"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_code32"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/code32Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/code32"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/code32"
+                android:tag="Code 32"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_datamatrix"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/dataMatrixTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/datamatrix"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/dataMatrix"
+                android:tag="Data Matrix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_pdf"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/pdfTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/pdf417"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/pdf"
+                android:tag="PDF417"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_isbn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/isbnTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/isbn"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/isbn"
+                android:tag="ISBN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_ucc_coupon_ex"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/ucc_coupon_extended_Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/ucc_coupon_extended"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/ucc_coupon_extended"
+                android:tag="UCC Coupon Extended Code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_isssn_ean"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/issn_ean_Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/issn_ean"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/issn_ean"
+                android:tag="ISSN EAN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_isbt128"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/isbt_128Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/isbt_128"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/isbt_128"
+                android:tag="ISBT 128"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_trioptic_code39"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/triopticCode39Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/trioptic_code39"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/triopticCode39"
+                android:tag="Trioptic Code 39"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_m2of5"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/matrix2o5Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/m2of5"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/matrix2o5"
+                android:tag="Matrix 2 of 5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+        android:id="@+id/tbl_row_k3of5"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@android:color/white">
+
+        <TextView
+            android:id="@+id/korean3o5Title"
+            style="@style/roboto_medium_16dp"
+            android:layout_height="match_parent"
+            android:gravity="center|left"
+            android:layout_weight="0"
+            android:text="@string/k3of5"
+            android:layout_marginLeft="@dimen/app_margin_left" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:orientation="vertical"></LinearLayout>
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/korean3o5"
+            android:tag="Korean 3 of 5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="@dimen/app_margin_right"
+            android:layout_weight="0"/>
+    </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_gs1databar14"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/gs1DataBar14Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/gs1databar14"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/gs1DataBar14"
+                android:tag="GS1 DataBar-14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_gs1databar_limited"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/gs1DatabarLimitedTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/gs1databar_limited"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/gs1DatabarLimited"
+                android:tag="GS1 DataBar Limited"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_gs1databar_expanded"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/gs1DatabarExpandedTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/gs1databar_expanded"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/gs1DatabarExpanded"
+                android:tag="GS1 DataBar Expanded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_micro_pdf417"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/microPDF417Title"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/micro_pdf417"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/micropdf417"
+                android:tag="MicroPDF417"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_maxicode"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/maxicodeTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/maxicode"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/maxicode"
+                android:tag="Maxicode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_qrcode"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/qrCodeTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/qrcode"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/qrCode"
+                android:tag="QR Code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_microqr"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/microQrCodeTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/microqr"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/microQRCode"
+                android:tag="MicroQR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_aztec"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/aztecTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/aztec"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/aztec"
+                android:tag="Aztec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_hanxin_code"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/hanXinCodeTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/hanxin_code"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/hanXinCode"
+                android:tag="Han Xin Code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_au_post"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/aupostTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/au_post"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/aupost"
+                android:tag="Australian Post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_us_planet"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/us_planetTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/us_planet"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/us_planet"
+                android:tag="US PLANET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_postnet"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/us_postnetTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/us_postnet"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/us_postnet"
+                android:tag="US POSTNET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+
+        <TableRow
+            android:id="@+id/tbl_row_kix_code"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/kixCodeTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/kixcode"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/kixCode"
+                android:tag="Netherlands KIX"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_usps4cb"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/usps4CBTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/usps4cb"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/usps4CB"
+                android:tag="USPS 4CB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_uk_postal"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/uk_postalTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/uk_postal"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/uk_postal"
+                android:tag="UK Postal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_jp_postal"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/japanPostalTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/jp_postal"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/japanPostal"
+                android:tag="Japan Post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tbl_row_fics"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/ficsTitle"
+                style="@style/roboto_medium_16dp"
+                android:layout_height="match_parent"
+                android:gravity="center|left"
+                android:layout_weight="0"
+                android:text="@string/fics"
+                android:layout_marginLeft="@dimen/app_margin_left" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"></LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/fics"
+                android:tag="UPU FICS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/app_margin_right"
+                android:layout_weight="0"/>
+        </TableRow>
+
+    </LinearLayout>
+</ScrollView>

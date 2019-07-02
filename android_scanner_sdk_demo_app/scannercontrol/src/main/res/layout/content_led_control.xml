@@ -1,0 +1,180 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:background="@color/light_gray"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.LEDActivity"
+    tools:showIn="@layout/app_bar_led_control">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/light_gray" />
+<!--Green LED-->
+    <TableRow
+        android:id="@+id/tbl_row_green_led"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="18dp"
+            android:layout_weight="85"
+            android:text="@string/green_led_control"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_20dp_blue"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:clickable="true"
+            android:onClick="greenLEDOnClicked"
+            android:text="On"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+
+        <View
+            android:layout_width="0.4dip"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="0"
+            android:background="@color/dark_gray" />
+
+        <TextView
+            style="@style/roboto_regular_20dp_blue"
+            android:layout_height="match_parent"
+            android:layout_marginRight="0dp"
+            android:layout_weight="0"
+            android:clickable="true"
+            android:onClick="greenLEDOffClicked"
+            android:text="Off"
+            android:paddingRight="18dp"
+            android:paddingLeft="20dp" />
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+
+
+    <!--Amber/Blue LED-->
+    <TableRow
+        android:id="@+id/tbl_row_amber_led"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="18dp"
+            android:layout_weight="85"
+            android:text="@string/amber_led_control"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_20dp_blue"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:clickable="true"
+            android:onClick="otherLEDOnClicked"
+            android:text="On"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+
+        <View
+            android:layout_width="0.4dip"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="0"
+            android:background="@color/dark_gray" />
+
+        <TextView
+            style="@style/roboto_regular_20dp_blue"
+            android:layout_height="match_parent"
+            android:layout_marginRight="0dp"
+            android:layout_weight="0"
+            android:clickable="true"
+            android:onClick="otherLEDOffClicked"
+            android:text="Off"
+            android:paddingRight="18dp"
+            android:paddingLeft="20dp" />
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+    <!--Red LED-->
+    <TableRow
+        android:id="@+id/tbl_row_red_led"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="18dp"
+            android:layout_weight="85"
+            android:text="@string/red_led_control"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            style="@style/roboto_regular_20dp_blue"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:clickable="true"
+            android:onClick="redLEDOnClicked"
+            android:text="On"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+
+        <View
+            android:layout_width="0.4dip"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="0"
+            android:background="@color/dark_gray" />
+
+        <TextView
+            style="@style/roboto_regular_20dp_blue"
+            android:layout_height="match_parent"
+            android:layout_marginRight="0dp"
+            android:layout_weight="0"
+            android:clickable="true"
+            android:onClick="redLEDOffClicked"
+            android:text="Off"
+            android:paddingRight="18dp"
+            android:paddingLeft="20dp" />
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+</LinearLayout>

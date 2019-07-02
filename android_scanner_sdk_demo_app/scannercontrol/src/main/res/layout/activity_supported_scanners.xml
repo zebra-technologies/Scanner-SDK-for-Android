@@ -1,0 +1,243 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/app_margin_left"
+    android:paddingLeft="@dimen/app_margin_left"
+    android:paddingRight="@dimen/app_margin_right"
+    android:paddingTop="@dimen/app_margin_left"
+    tools:context="com.zebra.scannercontrol.app.activities.SupportedScanners">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/roboto_medium_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="@string/supported_scanners_title" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/roboto_medium_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/title_activity_supported_scanners_cordless_1" />
+
+                <ImageView
+                    android:id="@+id/imageView_nav_menu_1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    app:srcCompat="@mipmap/ic_supportedscanners" />
+
+                <TextView
+                    style="@style/roboto_medium_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/title_activity_supported_scanners_cordless_2" />
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/supported_scanners_ds3678" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_li3678" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_rfd8500" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_cs4070" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds8178" />
+
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds2278" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/roboto_medium_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/title_activity_supported_scanners_corded_1" />
+
+                <ImageView
+                    android:id="@+id/imageView_nav_menu_2"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    app:srcCompat="@mipmap/ic_supportedscanners" />
+
+                <TextView
+                    style="@style/roboto_medium_15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="@string/title_activity_supported_scanners_corded_2" />
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_mp6000" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_mp7000" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_mx101" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds8178_mp6010" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds3608" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds8108" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds9808" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds4308" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds2208" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ds7708" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_ls2208" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_se4757" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/details_activity_supported_scanners_corded" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

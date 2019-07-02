@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/txt_barcode_counter"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+        android:layout_height="match_parent"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:text="1"
+        android:layout_marginBottom="10dp" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="90"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp">
+    <TextView
+        style="@style/roboto_medium_16dp"
+        android:id="@+id/txt_barcode_data"
+        android:layout_marginRight="5dp"
+        android:text="Barcode data 123"
+        android:layout_height="wrap_content"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:background="@android:color/white">
+            <TextView
+                style="@style/roboto_regular_16dp"
+                android:id="@+id/txt_barcode_type"
+                android:paddingRight="5dp"
+                android:layout_marginRight="5dp"
+                android:text="CODE 128"
+                android:layout_height="wrap_content"/>
+            <TextView
+                style="@style/roboto_regular_16dp"
+                android:id="@+id/txt_barcode_length"
+                android:paddingRight="5dp"
+                android:layout_marginRight="5dp"
+                android:text=", Characters = 15"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

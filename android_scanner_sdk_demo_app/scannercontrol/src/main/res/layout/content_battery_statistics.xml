@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.BatteryStatistics"
+    tools:showIn="@layout/app_bar_battery_statistics">
+    <TextView
+        android:id="@+id/txt_no_battery_statistics"
+        style="@style/roboto_regular_16dp"
+        android:layout_width="wrap_content"
+        android:background="@android:color/transparent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/app_margin_left"
+        android:layout_marginTop="@dimen/app_margin_left"
+        android:text="@string/no_battery_stats" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_battery_statistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/light_gray"
+            android:orientation="vertical">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/tbl_row_gray">
+
+                <TextView
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/battery_asset_info" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_manufacture_date" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_manufacture_date"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_serial" />
+
+                <TextView
+                    android:id="@+id/txt_bat_serial"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:textAlignment="viewEnd" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/model" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_model"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <!--<TableRow-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="55dp"-->
+                <!--android:background="@android:color/white">-->
+
+                <!--<TextView-->
+                    <!--style="@style/roboto_medium_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginLeft="@dimen/app_margin_left"-->
+                    <!--android:text="@string/bat_firmware_version" />-->
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:background="@android:color/white"-->
+                    <!--android:orientation="vertical"></LinearLayout>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/txt_bat_firmware_version"-->
+                    <!--style="@style/roboto_regular_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginRight="@dimen/app_margin_right"-->
+                    <!--android:text="" />-->
+
+            <!--</TableRow>-->
+
+            <!--<include layout="@layout/normal_divider" />-->
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_design_cap" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_design_cap"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/tbl_row_gray">
+
+                <TextView
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/battery_life_stat" />
+
+            </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_state_of_health" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_state_of_health"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_charge_cycles_consumed" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_charge_cycles_consumed"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/tbl_row_gray">
+
+                <TextView
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/battery_status" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_full_charge_cap" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_full_charge_cap"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_state_of_charge" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_state_of_charge"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_remaining_cap" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_remaining_cap"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <!--<TableRow-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="55dp"-->
+                <!--android:background="@android:color/white">-->
+
+                <!--<TextView-->
+                    <!--style="@style/roboto_medium_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginLeft="@dimen/app_margin_left"-->
+                    <!--android:text="@string/bat_charge_status" />-->
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:background="@android:color/white"-->
+                    <!--android:orientation="vertical"></LinearLayout>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/txt_bat_charge_status"-->
+                    <!--style="@style/roboto_regular_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginRight="@dimen/app_margin_right"-->
+                    <!--android:text="" />-->
+
+            <!--</TableRow>-->
+
+            <!--<include layout="@layout/normal_divider" />-->
+
+            <!--<TableRow-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="55dp"-->
+                <!--android:background="@android:color/white">-->
+
+                <!--<TextView-->
+                    <!--style="@style/roboto_medium_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginLeft="@dimen/app_margin_left"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_weight="0.6"-->
+                    <!--android:text="@string/bat_remaining_time_to_complete_charging" />-->
+                <!--<TextView-->
+                    <!--android:id="@+id/txt_bat_remaining_time_to_complete_charging"-->
+                    <!--style="@style/roboto_regular_16dp"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_weight="0.4"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginRight="@dimen/app_margin_right"-->
+                    <!--android:textAlignment="viewEnd" />-->
+
+            <!--</TableRow>-->
+
+            <!--<include layout="@layout/normal_divider" />-->
+
+            <!--<TableRow-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="55dp"-->
+                <!--android:background="@android:color/white">-->
+
+                <!--<TextView-->
+                    <!--style="@style/roboto_medium_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginLeft="@dimen/app_margin_left"-->
+                    <!--android:text="@string/bat_voltage" />-->
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:background="@android:color/white"-->
+                    <!--android:orientation="vertical"></LinearLayout>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/txt_bat_voltage"-->
+                    <!--style="@style/roboto_regular_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginRight="@dimen/app_margin_right"-->
+                    <!--android:text="" />-->
+
+            <!--</TableRow>-->
+
+            <!--<include layout="@layout/normal_divider" />-->
+
+            <!--<TableRow-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="55dp"-->
+                <!--android:background="@android:color/white">-->
+
+                <!--<TextView-->
+                    <!--style="@style/roboto_medium_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginLeft="@dimen/app_margin_left"-->
+                    <!--android:text="@string/bat_current" />-->
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:background="@android:color/white"-->
+                    <!--android:orientation="vertical"></LinearLayout>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/txt_bat_current"-->
+                    <!--style="@style/roboto_regular_16dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_marginRight="@dimen/app_margin_right"-->
+                    <!--android:text="" />-->
+
+            <!--</TableRow>-->
+
+            <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/tbl_row_gray">
+
+                <TextView
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/battery_temperature" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_present" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_present"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_highest" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_highest"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/bat_lowest" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_bat_lowest"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

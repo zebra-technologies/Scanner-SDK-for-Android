@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants"
+    android:background="@android:color/white">
+
+    <CheckBox
+        android:id="@+id/chk_connected"
+        android:layout_width="0dp"
+        android:layout_weight="10"
+        android:layout_height="56dp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/app_margin_left"
+        android:layout_marginRight="5dp"
+        android:clickable="false" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="80"
+        android:layout_height="56dp"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:layout_gravity="center"
+        android:layout_marginRight="5dp"
+        android:gravity="center_vertical">
+        <TextView
+            style="@style/roboto_medium_16dp"
+            android:id="@+id/txt_scanner_name"
+            android:layout_marginRight="5dp"
+            android:text="CS4070:XXXXXXXXXXXXXXXX"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            style="@style/roboto_regular_16dp"
+            android:id="@+id/txt_scanner_hw_serial"
+            android:text="CS:DS:DS:DS:DS:DS"
+            android:paddingRight="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/type_icon"
+        android:layout_width="0dp"
+        android:layout_gravity="center"
+        android:layout_height="56dp"
+        android:layout_weight="10"
+        android:layout_marginRight="@dimen/app_margin_right"
+        />
+</LinearLayout>
