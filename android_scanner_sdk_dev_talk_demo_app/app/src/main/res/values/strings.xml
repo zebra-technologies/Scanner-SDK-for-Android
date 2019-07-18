@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ZebraScanner</string>
+    <string name="action_settings">Settings</string>
+    <string name="new_scanner">Pair New Scanner</string>
+    <string name="cancel">Cancel</string>
+    <string name="model">Model #: </string>
+    <string name="serial">Name: </string>
+    <string name="disable">Disable</string>
+    <string name="enable">Enable</string>
+    <string name="beep">Beep</string>
+</resources>

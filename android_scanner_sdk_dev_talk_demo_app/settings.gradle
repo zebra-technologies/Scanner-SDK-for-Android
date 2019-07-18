@@ -1,0 +1,1 @@
+include ':app', ':barcode_scanner_library_v2.0.8.0'
