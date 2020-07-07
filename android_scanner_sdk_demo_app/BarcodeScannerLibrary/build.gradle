@@ -1,2 +1,2 @@
 configurations.create("default")
-artifacts.add("default", file('barcode_scanner_library_v2.4.6.0.aar'))
+artifacts.add("default", file('barcode_scanner_library_v2.5.8.0-release.aar'))
