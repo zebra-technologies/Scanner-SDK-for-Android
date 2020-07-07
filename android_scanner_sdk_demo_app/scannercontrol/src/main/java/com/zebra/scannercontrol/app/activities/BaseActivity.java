@@ -11,14 +11,13 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.DCSScannerInfo;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
-import com.zebra.scannercontrol.IDCConfig;
 import com.zebra.scannercontrol.IDcsSdkApiDelegate;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 import com.zebra.scannercontrol.app.R;
@@ -571,13 +570,13 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
                         }
                     }
                     if(!Application.isFirmwareUpdateInProgress) {
-                        if (Application.CurScannerId != Application.SCANNER_ID_NONE) {
+                        if (Application.currentScannerId != Application.SCANNER_ID_NONE) {
                             Intent intent = new Intent("activities.ActiveScannerActivity");
                             intent.setComponent(new ComponentName(getPackageName(),ActiveScannerActivity.class.getName()));
-                            intent.putExtra(Constants.SCANNER_NAME, Application.CurScannerName);
-                            intent.putExtra(Constants.SCANNER_ADDRESS, Application.CurScannerAddress);
-                            intent.putExtra(Constants.SCANNER_ID, Application.CurScannerId);
-                            intent.putExtra(Constants.AUTO_RECONNECTION, Application.CurAutoReconnectionState);
+                            intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
+                            intent.putExtra(Constants.SCANNER_ADDRESS, Application.currentScannerAddress);
+                            intent.putExtra(Constants.SCANNER_ID, Application.currentScannerId);
+                            intent.putExtra(Constants.AUTO_RECONNECTION, Application.currentAutoReconnectionState);
                             intent.putExtra(Constants.SHOW_BARCODE_VIEW, true);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getApplicationContext().startActivity(intent);

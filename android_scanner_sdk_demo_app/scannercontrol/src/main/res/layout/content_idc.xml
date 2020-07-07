@@ -1,0 +1,165 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:background="@color/light_gray"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.ImageActivity"
+    tools:showIn="@layout/app_bar_scan_speed_analytics">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/light_gray"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/light_gray" />
+
+
+
+        <TableRow
+            android:id="@+id/tbl_row_find_scanner"
+            style="@style/light_gray_background_row"
+            android:layout_width="match_parent"
+            android:layout_height="91dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:weightSum="1">
+
+            <Button
+                android:id="@+id/btn_find_scanner"
+                style="@style/style_blue_gray_button"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginBottom="18dp"
+                android:layout_marginLeft="45dp"
+                android:layout_marginRight="45dp"
+                android:layout_marginTop="18dp"
+                android:onClick="idcMode"
+                android:text="@string/test_idc"
+                android:textSize="24sp" />
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/tbl_row_gray"
+            android:layout_marginTop="14dp"
+            android:layout_gravity="center_vertical">
+
+            <CheckBox
+                style="@style/roboto_regular_16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/iso_file"
+                android:layout_marginLeft="12dp"
+                android:onClick="onCheckboxISOData"
+                android:checked="true"
+                android:id="@+id/checkBoxISO"/>
+
+        </TableRow>
+
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/snapi_idc_barcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <TextView
+                style="@style/roboto_regular_16dp"
+                android:id="@+id/barcodeDataIdc"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text=""
+                android:gravity="center_vertical"
+                android:layout_marginLeft="18dp" />
+
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/snapi_idc_barcode_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <TextView
+                style="@style/roboto_regular_16dp"
+                android:id="@+id/barcodeTypeIdc"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text=""
+                android:gravity="center_vertical"
+                android:layout_marginLeft="18dp" />
+
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/snapi_image"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:background="@android:color/white">
+
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/app_margin_left"
+                android:layout_marginRight="@dimen/app_margin_right">
+
+                <ImageView
+                    android:id="@+id/imgViewSnapiImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:background="@color/slowestDecodeImage_background"
+                    app:srcCompat="@drawable/ic_no_camera" />
+
+
+
+
+            </RelativeLayout>
+
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tr_iso_data"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white">
+
+            <TextView
+                style="@style/roboto_regular_16dp"
+                android:id="@+id/txt_iso_data"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text=""
+                android:gravity="center_vertical"
+                android:inputType="textMultiLine"
+                android:layout_marginLeft="18dp" />
+
+        </TableRow>
+
+
+
+
+
+    </LinearLayout>
+
+</ScrollView>

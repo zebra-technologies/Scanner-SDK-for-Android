@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application
         android:name=".application.Application"
         android:allowBackup="true"
@@ -13,7 +13,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:requestLegacyExternalStorage="true">  <!--Allows Android v10 to use legacy storage  -->
         <activity
             android:name=".activities.HomeActivity"
             android:configChanges="orientation|screenSize"
@@ -92,7 +93,7 @@
         <activity
             android:name=".activities.BeeperActionsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_beeper_actions"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -102,7 +103,7 @@
         <activity
             android:name=".activities.AssertActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_assert"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -112,7 +113,7 @@
         <activity
             android:name=".activities.LEDActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_led"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -122,7 +123,7 @@
         <activity
             android:name=".activities.SymbologiesActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_symbologies"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -132,7 +133,7 @@
         <activity
             android:name=".activities.BeeperSettingsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_beeper_settings"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -150,7 +151,7 @@
         <activity
             android:name=".activities.VibrationFeedback"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_vibration_feedback"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -160,7 +161,7 @@
         <activity
             android:name=".activities.BatteryStatistics"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_battery_statistics"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -170,7 +171,7 @@
         <activity
             android:name=".activities.UpdateFirmware"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:label="@string/title_activity_update_firmware"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -216,7 +217,7 @@
         <activity
             android:name=".activities.SampleBarcodes"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_sample_barcodes"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -226,7 +227,7 @@
         <activity android:name=".activities.SsaSetSymbologyActivity"
             android:noHistory="true"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_scan_speed_analytics"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
@@ -236,7 +237,27 @@
         <activity
             android:name=".activities.ScanSpeedAnalyticsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_scan_speed_analytics"
+            android:label="@string/title_activity_active_scanner"
+            android:parentActivityName=".activities.ActiveScannerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
+        </activity>
+	<activity
+            android:name=".activities.ImageActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_active_scanner"
+            android:parentActivityName=".activities.ActiveScannerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
+        </activity>
+        <activity
+            android:name=".activities.IntelligentImageCaptureActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -246,7 +267,7 @@
         <activity
             android:name=".activities.ScaleActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Scale"
+            android:label="@string/title_activity_active_scanner"
             android:parentActivityName=".activities.ActiveScannerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

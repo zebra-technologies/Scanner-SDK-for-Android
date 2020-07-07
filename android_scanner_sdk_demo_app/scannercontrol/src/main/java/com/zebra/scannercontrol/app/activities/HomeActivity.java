@@ -4,8 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,17 +12,16 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -64,6 +61,11 @@ public class HomeActivity extends BaseActivity
     Menu menu;
     MenuItem pairNewScannerMenu;
     private static final int PERMISSIONS_ACCESS_COARSE_LOCATION = 10;
+    private static final int MAX_ALPHANUMERIC_CHARACTERS = 12;
+    private static final int MAX_BLUETOOTH_ADDRESS_CHARACTERS = 17;
+    private static final String DEFAULT_EMPTY_STRING = "";
+    private static final String COLON_CHARACTER = ":";
+    public static final String BLUETOOTH_ADDRESS_VALIDATOR = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
     static boolean firstRun = true;
     Dialog dialog;
     Dialog dialogBTAddress;
@@ -249,7 +251,7 @@ public class HomeActivity extends BaseActivity
 
                         disconnect(Application.currentConnectedScannerID);
                         Application.barcodeData.clear();
-                        Application.CurScannerId=Application.SCANNER_ID_NONE;
+                        Application.currentScannerId =Application.SCANNER_ID_NONE;
                         finish();
                         Intent intent = new Intent(HomeActivity.this,HomeActivity.class);
                         startActivity(intent);
@@ -443,6 +445,7 @@ public class HomeActivity extends BaseActivity
 
                 final TextView cancelContinueButton = (TextView) dialogBTAddress.findViewById(R.id.cancel_continue);
                 final TextView abtPhoneButton = (TextView) dialogBTAddress.findViewById(R.id.abt_phone);
+                final TextView skipButton = dialogBTAddress.findViewById(R.id.skip);
                 abtPhoneButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -458,6 +461,7 @@ public class HomeActivity extends BaseActivity
                         if (cancelContinueButton.getText().equals(getResources().getString(R.string.cancel))) {
                             finish();
                         } else {
+                            Application.sdkHandler.dcssdkSetSTCEnabledState(true);
                             SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
                             settingsEditor.putString(Constants.PREF_BT_ADDRESS, userEnteredBluetoothAddress).commit();// Commit is required here. So suppressing warning.
                             if (dialogBTAddress != null) {
@@ -469,8 +473,18 @@ public class HomeActivity extends BaseActivity
                     }
                 });
 
+                skipButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Application.sdkHandler.dcssdkSetSTCEnabledState(false);
+                        Intent intent = new Intent(HomeActivity.this, ScannersActivity.class);
+                        startActivity(intent);
+                    }
+                });
+
                 final EditText editTextBluetoothAddress = (EditText) dialogBTAddress.findViewById(R.id.text_bt_address);
                 editTextBluetoothAddress.addTextChangedListener(new TextWatcher() {
+                    String previousMac = null;
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -478,12 +492,24 @@ public class HomeActivity extends BaseActivity
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        String enteredMacAddress = editTextBluetoothAddress.getText().toString().toUpperCase();
+                        String cleanMacAddress = clearNonMacCharacters(enteredMacAddress);
+                        String formattedMacAddress = formatMacAddress(cleanMacAddress);
+
+                        int selectionStart = editTextBluetoothAddress.getSelectionStart();
+                        formattedMacAddress = handleColonDeletion(enteredMacAddress, formattedMacAddress, selectionStart);
+                        int lengthDiff = formattedMacAddress.length() - enteredMacAddress.length();
+
+                        setMacEdit(cleanMacAddress, formattedMacAddress, selectionStart, lengthDiff);
 
                     }
 
                     @Override
                     public void afterTextChanged(Editable s) {
                         userEnteredBluetoothAddress = s.toString();
+                        if(userEnteredBluetoothAddress.length() > MAX_BLUETOOTH_ADDRESS_CHARACTERS)
+                            return;
+
                         if (isValidBTAddress(userEnteredBluetoothAddress)) {
 
                             Drawable dr = getResources().getDrawable(R.drawable.tick);
@@ -497,31 +523,107 @@ public class HomeActivity extends BaseActivity
 
                         }
                     }
-                });
 
-                final ClipboardManager clipBoard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                if(clipBoard!=null) {
-                    clipBoard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
+                    /**
+                     * Strips all characters from a string except A-F and 0-9
+                     * (Keep Bluetooth address allowed characters only).
+                     *
+                     * @param inputMacString User input string.
+                     * @return String containing bluetooth MAC-allowed characters.
+                     */
+                    private String clearNonMacCharacters(String inputMacString) {
+                        return inputMacString.toString().replaceAll("[^A-Fa-f0-9]", DEFAULT_EMPTY_STRING);
+                    }
 
-                        @SuppressLint("ApplySharedPref")
-                        @Override
-                        public void onPrimaryClipChanged() {
-                            ClipData clipData = clipBoard.getPrimaryClip();
-                            ClipData.Item item = clipData.getItemAt(0);
-                            String bluetoothAddress = item.getText().toString();
-                            if (isValidBTAddress(bluetoothAddress)) {
-                                SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
-                                settingsEditor.putString(Constants.PREF_BT_ADDRESS, bluetoothAddress).commit();// Commit is required here. So suppressing warning.
-                                clipBoard.removePrimaryClipChangedListener(this);
-                                if (dialogBTAddress != null) {
-                                    dialogBTAddress.dismiss();
-                                    dialogBTAddress = null;
-                                }
-                                startHomeActivityAgain();
+                    /**
+                     * Adds a colon character to an unformatted bluetooth MAC address after
+                     * every second character (strips full MAC trailing colon)
+                     *
+                     * @param cleanMacAddress Unformatted MAC address.
+                     * @return Properly formatted MAC address.
+                     */
+                    private String formatMacAddress(String cleanMacAddress) {
+                        int groupedCharacters = 0;
+                        String formattedMacAddress = DEFAULT_EMPTY_STRING;
+
+                        for (int i = 0; i < cleanMacAddress.length(); ++i) {
+                            formattedMacAddress += cleanMacAddress.charAt(i);
+                            ++groupedCharacters;
+
+                            if (groupedCharacters == 2) {
+                                formattedMacAddress += COLON_CHARACTER;
+                                groupedCharacters = 0;
                             }
                         }
-                    });
-                }
+
+                        // Removes trailing colon for complete MAC address
+                        if (cleanMacAddress.length() == MAX_ALPHANUMERIC_CHARACTERS)
+                            formattedMacAddress = formattedMacAddress.substring(0, formattedMacAddress.length() - 1);
+
+                        return formattedMacAddress;
+                    }
+
+                    /**
+                     * Upon users colon deletion, deletes bluetooth MAC character preceding deleted colon as well.
+                     *
+                     * @param enteredMacAddress     User input MAC.
+                     * @param formattedMacAddress   Formatted MAC address.
+                     * @param selectionStartPosition MAC EditText field cursor position.
+                     * @return Formatted MAC address.
+                     */
+                    private String handleColonDeletion(String enteredMacAddress, String formattedMacAddress, int selectionStartPosition) {
+                        if (previousMac != null && previousMac.length() > 1) {
+                            int previousColonCount = colonCount(previousMac);
+                            int currentColonCount = colonCount(enteredMacAddress);
+
+                            if (currentColonCount < previousColonCount) {
+                               try {
+                                   formattedMacAddress = formattedMacAddress.substring(0, selectionStartPosition - 1) + formattedMacAddress.substring(selectionStartPosition);
+                               }catch (Exception e){
+                                   e.printStackTrace();
+                               }
+                                String cleanMacAddress = clearNonMacCharacters(formattedMacAddress);
+                                formattedMacAddress = formatMacAddress(cleanMacAddress);
+                            }
+                        }
+                        return formattedMacAddress;
+                    }
+
+                    /**
+                     * Gets bluetooth MAC address current colon count.
+                     *
+                     * @param formattedMacAddress Formatted MAC address.
+                     * @return Current number of colons in MAC address.
+                     */
+                    private int colonCount(String formattedMacAddress) {
+                        return formattedMacAddress.replaceAll("[^:]", DEFAULT_EMPTY_STRING).length();
+                    }
+
+                    /**
+                     * Removes TextChange listener, sets MAC EditText field value,
+                     * sets new cursor position and re-initiates the listener.
+                     *
+                     * @param cleanMacAddress       Clean MAC address.
+                     * @param formattedMacAddress   Formatted MAC address.
+                     * @param selectionStartPosition MAC EditText field cursor position.
+                     * @param characterDifferenceLength     Formatted/Entered MAC number of characters difference.
+                     */
+                    private void setMacEdit(String cleanMacAddress, String formattedMacAddress, int selectionStartPosition, int characterDifferenceLength) {
+                        editTextBluetoothAddress.removeTextChangedListener(this);
+                        if (cleanMacAddress.length() <= MAX_ALPHANUMERIC_CHARACTERS) {
+                            editTextBluetoothAddress.setText(formattedMacAddress);
+
+                            editTextBluetoothAddress.setSelection(selectionStartPosition + characterDifferenceLength);
+                            previousMac = formattedMacAddress;
+                        } else {
+                            editTextBluetoothAddress.setText(previousMac);
+                            editTextBluetoothAddress.setSelection(previousMac.length());
+                        }
+                        editTextBluetoothAddress.addTextChangedListener(this);
+                    }
+
+                });
+
                 dialogBTAddress.setCancelable(false);
                 dialogBTAddress.setCanceledOnTouchOutside(false);
                 dialogBTAddress.show();
@@ -543,7 +645,7 @@ public class HomeActivity extends BaseActivity
     }
 
     public boolean isValidBTAddress(String text) {
-        return text != null && text.matches("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
+        return text != null && text.length() > 0 && text.matches(BLUETOOTH_ADDRESS_VALIDATOR);
     }
 
 

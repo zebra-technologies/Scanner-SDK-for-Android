@@ -1,16 +1,13 @@
 package com.zebra.scannercontrol.app.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.activities.ActiveScannerActivity;

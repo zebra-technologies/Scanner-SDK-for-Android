@@ -3,9 +3,8 @@ package com.zebra.scannercontrol.app.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.github.chrisbanes.photoview.PhotoView;
@@ -80,7 +79,7 @@ public class DecodeImageActivity extends BaseActivity implements ScannerAppEngin
     public boolean scannerHasDisconnected(int scannerID) {
         Application.barcodeData.clear();
         this.finish();
-        Application.CurScannerId=Application.SCANNER_ID_NONE;
+        Application.currentScannerId =Application.SCANNER_ID_NONE;
         Intent intent = new Intent(DecodeImageActivity.this,HomeActivity.class);
         startActivity(intent);
         return true;

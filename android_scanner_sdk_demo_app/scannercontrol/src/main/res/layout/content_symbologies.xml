@@ -56,7 +56,7 @@
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/upcA"
                 android:tag="UPC-A"
                 android:layout_width="wrap_content"
@@ -89,7 +89,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/upcE"
                 android:tag="UPC-E"
                 android:layout_width="wrap_content"
@@ -121,7 +121,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/upcE1"
                 android:tag="UPC-E1"
                 android:layout_width="wrap_content"
@@ -154,7 +154,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/ean8"
                 android:tag="EAN-8/JAN8"
                 android:layout_width="wrap_content"
@@ -186,7 +186,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/ean13"
                 android:tag="EAN-13/JAN13"
                 android:layout_width="wrap_content"
@@ -219,7 +219,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/bookland"
                 android:tag="Bookland EAN"
                 android:layout_width="wrap_content"
@@ -252,7 +252,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/code128"
                 android:tag="Code 128"
                 android:layout_width="wrap_content"
@@ -284,7 +284,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/ean128"
                 android:tag="GS1-128"
                 android:layout_width="wrap_content"
@@ -317,7 +317,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/code39"
                 android:tag="Code 39"
                 android:layout_width="wrap_content"
@@ -349,7 +349,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/code93"
                 android:tag="Code 93"
                 android:layout_width="wrap_content"
@@ -381,7 +381,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/code11"
                 android:tag="Code 11"
                 android:layout_width="wrap_content"
@@ -413,7 +413,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/interleaved"
                 android:tag="Interleaved 2 of 5"
                 android:layout_width="wrap_content"
@@ -446,7 +446,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/discrete"
                 android:tag="Discrete 2 of 5"
                 android:layout_width="wrap_content"
@@ -479,7 +479,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/chinese"
                 android:tag="Chinese 2 of 5"
                 android:layout_width="wrap_content"
@@ -511,7 +511,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/codabar"
                 android:tag="Codabar"
                 android:layout_width="wrap_content"
@@ -543,7 +543,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/msi"
                 android:tag="MSI"
                 android:layout_width="wrap_content"
@@ -576,7 +576,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/code32"
                 android:tag="Code 32"
                 android:layout_width="wrap_content"
@@ -608,7 +608,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/dataMatrix"
                 android:tag="Data Matrix"
                 android:layout_width="wrap_content"
@@ -641,7 +641,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/pdf"
                 android:tag="PDF417"
                 android:layout_width="wrap_content"
@@ -673,7 +673,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/isbn"
                 android:tag="ISBN"
                 android:layout_width="wrap_content"
@@ -705,7 +705,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/ucc_coupon_extended"
                 android:tag="UCC Coupon Extended Code"
                 android:layout_width="wrap_content"
@@ -737,7 +737,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/issn_ean"
                 android:tag="ISSN EAN"
                 android:layout_width="wrap_content"
@@ -769,7 +769,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/isbt_128"
                 android:tag="ISBT 128"
                 android:layout_width="wrap_content"
@@ -801,7 +801,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/triopticCode39"
                 android:tag="Trioptic Code 39"
                 android:layout_width="wrap_content"
@@ -833,7 +833,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/matrix2o5"
                 android:tag="Matrix 2 of 5"
                 android:layout_width="wrap_content"
@@ -866,7 +866,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:orientation="vertical"></LinearLayout>
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/korean3o5"
             android:tag="Korean 3 of 5"
             android:layout_width="wrap_content"
@@ -898,7 +898,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/gs1DataBar14"
                 android:tag="GS1 DataBar-14"
                 android:layout_width="wrap_content"
@@ -930,7 +930,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/gs1DatabarLimited"
                 android:tag="GS1 DataBar Limited"
                 android:layout_width="wrap_content"
@@ -962,7 +962,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/gs1DatabarExpanded"
                 android:tag="GS1 DataBar Expanded"
                 android:layout_width="wrap_content"
@@ -995,7 +995,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/micropdf417"
                 android:tag="MicroPDF417"
                 android:layout_width="wrap_content"
@@ -1027,7 +1027,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/maxicode"
                 android:tag="Maxicode"
                 android:layout_width="wrap_content"
@@ -1060,7 +1060,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/qrCode"
                 android:tag="QR Code"
                 android:layout_width="wrap_content"
@@ -1093,7 +1093,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/microQRCode"
                 android:tag="MicroQR"
                 android:layout_width="wrap_content"
@@ -1126,7 +1126,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/aztec"
                 android:tag="Aztec"
                 android:layout_width="wrap_content"
@@ -1158,7 +1158,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/hanXinCode"
                 android:tag="Han Xin Code"
                 android:layout_width="wrap_content"
@@ -1191,7 +1191,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/aupost"
                 android:tag="Australian Post"
                 android:layout_width="wrap_content"
@@ -1224,7 +1224,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/us_planet"
                 android:tag="US PLANET"
                 android:layout_width="wrap_content"
@@ -1257,7 +1257,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/us_postnet"
                 android:tag="US POSTNET"
                 android:layout_width="wrap_content"
@@ -1290,7 +1290,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/kixCode"
                 android:tag="Netherlands KIX"
                 android:layout_width="wrap_content"
@@ -1322,7 +1322,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/usps4CB"
                 android:tag="USPS 4CB"
                 android:layout_width="wrap_content"
@@ -1354,7 +1354,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/uk_postal"
                 android:tag="UK Postal"
                 android:layout_width="wrap_content"
@@ -1386,7 +1386,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/japanPostal"
                 android:tag="Japan Post"
                 android:layout_width="wrap_content"
@@ -1418,7 +1418,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"></LinearLayout>
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/fics"
                 android:tag="UPU FICS"
                 android:layout_width="wrap_content"

@@ -1,6 +1,6 @@
 package com.zebra.scannercontrol.app.helpers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.DCSScannerInfo;

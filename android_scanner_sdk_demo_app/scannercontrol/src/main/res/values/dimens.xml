@@ -13,4 +13,6 @@
     <dimen name="app_margin_right">18dp</dimen>
     <dimen name="app_margin_left">18dp</dimen>
     <dimen name="circle_indicator_radius">8dp</dimen>
+    <dimen name="app_padding_top">36dp</dimen>
+    <dimen name="app_padding_bottom">40dp</dimen>
 </resources>

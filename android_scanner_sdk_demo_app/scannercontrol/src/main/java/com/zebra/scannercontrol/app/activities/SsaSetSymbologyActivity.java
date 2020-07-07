@@ -7,14 +7,14 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,7 +86,7 @@ public class SsaSetSymbologyActivity extends BaseActivity implements AdapterView
         if(actionBar!=null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setTitle("Active Scanner");
+            actionBar.setTitle(R.string.title_activity_scan_speed_analytics);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -338,7 +338,7 @@ public class SsaSetSymbologyActivity extends BaseActivity implements AdapterView
         if (id == R.id.nav_pair_device) {
             disconnect(scannerID);
             Application.barcodeData.clear();
-            Application.CurScannerId = Application.SCANNER_ID_NONE;
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
             finish();
             intent = new Intent(SsaSetSymbologyActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -356,7 +356,7 @@ public class SsaSetSymbologyActivity extends BaseActivity implements AdapterView
 
                     disconnect(scannerID);
                     Application.barcodeData.clear();
-                    Application.CurScannerId = Application.SCANNER_ID_NONE;
+                    Application.currentScannerId = Application.SCANNER_ID_NONE;
                     finish();
                     Intent intent = new Intent(SsaSetSymbologyActivity.this, FindCabledScanner.class);
                     startActivity(intent);
@@ -407,7 +407,7 @@ public class SsaSetSymbologyActivity extends BaseActivity implements AdapterView
         Application.barcodeData.clear();
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
         this.finish();
-        Application.CurScannerId=Application.SCANNER_ID_NONE;
+        Application.currentScannerId =Application.SCANNER_ID_NONE;
         Intent intent = new Intent(SsaSetSymbologyActivity.this,HomeActivity.class);
         startActivity(intent);
         return true;

@@ -3,6 +3,8 @@ package com.zebra.scannercontrol.app.activities;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -11,18 +13,24 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
+import androidx.annotation.NonNull;
+
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
+
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
@@ -60,6 +68,8 @@ import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -182,7 +192,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
         if(actionBar!=null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setTitle("Active Scanner");
+            actionBar.setTitle(R.string.title_activity_scan_speed_analytics);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -437,11 +447,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
 
                     if (!FLAG_NO_SSA_DATA) {
                         addSelfToDevEventsDelegate();
-                        if(ssaStatus!=2) {
-                            getSlowestDecodeImage();
-                        }else{
-                            noSlowestImageTextView.setText(getResources().getString(R.string.ssa_image_transfer_not_supported));
-                        }
+                        getSlowestDecodeImage();
                     }
                     updateUI();
                 }
@@ -920,7 +926,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
         barChart.invalidate();
     }
 
-    public class MyXAxisValueFormatter implements IAxisValueFormatter {
+    public class MyXAxisValueFormatter extends ValueFormatter {
 
         private String[] mValues;
 
@@ -928,15 +934,15 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
             this.mValues = values;
         }
         @Override
-        public String getFormattedValue(float value, AxisBase axis) {
+        public String getFormattedValue(float value) {
             return mValues[(int) value];
         }
     }
 
-    public class IntValueFormatter implements IValueFormatter {
+    public class IntValueFormatter extends ValueFormatter {
 
         @Override
-        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+        public String getFormattedValue(float value) {
             return String.valueOf((int) value);
         }
     }
@@ -949,19 +955,66 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
     private boolean saveToInternalStorage(Bitmap finalBitmap) {
 
         boolean retVal =  false;
-        try {
-            File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            String fileName = getImageFileName();
-            File file = new File (directory, fileName);
-            FileOutputStream out = new FileOutputStream(file);
-            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            out.flush();
-            out.close();
-            retVal = true;
+        if (finalBitmap != null && android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        {
+            final String relativeLocation = Environment.DIRECTORY_PICTURES;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, getImageFileName());
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, relativeLocation);
+
+            final ContentResolver resolver = this.getContentResolver();
+
+            OutputStream stream = null;
+            Uri uri = null;
+
+            try {
+                final Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                uri = resolver.insert(contentUri, contentValues);
+
+                if (uri == null) {
+                    throw new IOException("Failed to create new MediaStore record.");
+                }
+
+                stream = resolver.openOutputStream(uri);
+
+                if (stream == null) {
+                    throw new IOException("Failed to get output stream.");
+                }
+
+                if (finalBitmap.compress(Bitmap.CompressFormat.JPEG, 95, stream) == false) {
+                    throw new IOException("Failed to save bitmap.");
+                }
+
+                retVal = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        else
+        {
+            try {
+                FileOutputStream outStream = null;
+                File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+                String fileName = String.format("%d.jpg", System.currentTimeMillis());
+                File outFile = new File(directory, fileName);
+                outStream = new FileOutputStream(outFile);
+                finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+                outStream.flush();
+                outStream.close();
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                intent.setData(Uri.fromFile(outFile));
+                sendBroadcast(intent);
+                retVal = true;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
         return retVal;
     }
 
@@ -1164,7 +1217,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
                         PERMISSIONS_REQUEST_WRITE_EX_STORAGE);
             } else {
                 if (saveToInternalStorage(retrievedSlowestDecodeImage)) {
-                    Toast.makeText(this, "Image saved to \'Download\' folder successfully!" ,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Image saved to \'Pictures\' folder successfully!" ,Toast.LENGTH_SHORT).show();
                     saveImageButton.setVisibility(View.GONE);
                 } else {
                     Toast.makeText(this, "Image Saved Failed!" ,Toast.LENGTH_SHORT).show();
@@ -1224,7 +1277,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
         if (id == R.id.nav_pair_device) {
             disconnect(scannerID);
             Application.barcodeData.clear();
-            Application.CurScannerId = Application.SCANNER_ID_NONE;
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
             finish();
             intent = new Intent(ScanSpeedAnalyticsActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -1242,7 +1295,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
 
                     disconnect(scannerID);
                     Application.barcodeData.clear();
-                    Application.CurScannerId = Application.SCANNER_ID_NONE;
+                    Application.currentScannerId = Application.SCANNER_ID_NONE;
                     finish();
                     Intent intent = new Intent(ScanSpeedAnalyticsActivity.this, FindCabledScanner.class);
                     startActivity(intent);
@@ -1294,7 +1347,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
         Application.barcodeData.clear();
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
         this.finish();
-        Application.CurScannerId=Application.SCANNER_ID_NONE;
+        Application.currentScannerId =Application.SCANNER_ID_NONE;
         Intent intent = new Intent(ScanSpeedAnalyticsActivity.this,HomeActivity.class);
         startActivity(intent);
         return true;

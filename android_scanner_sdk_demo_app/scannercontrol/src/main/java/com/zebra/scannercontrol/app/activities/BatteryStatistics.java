@@ -7,13 +7,13 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
@@ -72,7 +72,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
         if(actionBar!=null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("Active Scanner");
+            getSupportActionBar().setTitle(R.string.title_activity_battery_statistics);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -421,7 +421,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
         if (id == R.id.nav_pair_device) {
             disconnect(scannerID);
             Application.barcodeData.clear();
-            Application.CurScannerId = Application.SCANNER_ID_NONE;
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
             finish();
             intent = new Intent(BatteryStatistics.this, HomeActivity.class);
             startActivity(intent);
@@ -439,7 +439,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
 
                     disconnect(scannerID);
                     Application.barcodeData.clear();
-                    Application.CurScannerId = Application.SCANNER_ID_NONE;
+                    Application.currentScannerId = Application.SCANNER_ID_NONE;
                     finish();
                     Intent intent = new Intent(BatteryStatistics.this, FindCabledScanner.class);
                     startActivity(intent);

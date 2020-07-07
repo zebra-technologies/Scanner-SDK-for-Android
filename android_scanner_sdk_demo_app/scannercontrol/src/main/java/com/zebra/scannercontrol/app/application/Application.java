@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Created by mfv347 on 7/2/2014.
- *
  * Application class to maintain global state
  */
 public class Application extends android.app.Application {
@@ -52,10 +50,10 @@ public class Application extends android.app.Application {
     public static volatile int INTENT_ID = 0xFFFF;
 
     public static int SCANNER_ID_NONE=  -1;
-    public static String CurScannerName="";
-    public static String CurScannerAddress="";
-    public static int CurScannerId=SCANNER_ID_NONE;
-    public static boolean CurAutoReconnectionState=true;
+    public static String currentScannerName ="";
+    public static String currentScannerAddress ="";
+    public static int currentScannerId =SCANNER_ID_NONE;
+    public static boolean currentAutoReconnectionState =true;
     public static boolean isAnyScannerConnected = false; //True, if currently connected to any scanner
     public static int currentConnectedScannerID = -1; //Track scannerId of currently connected Scanner
     public static boolean isFirmwareUpdateInProgress = false;
@@ -74,19 +72,7 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         Foreground.init(this);
-        sdkHandler = new SDKHandler(this);
-//        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Download/scanner_sdk_demo_"+System.currentTimeMillis()+".log";
-//        File filename = new File(path);
-//        try {
-//            filename.createNewFile();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        String cmd = "logcat -d -f"+filename.getAbsolutePath();
-//        try {
-//            Runtime.getRuntime().exec(cmd);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        //this keyword referring to Context of the sample application
+        sdkHandler = new SDKHandler(this, true);
     }
 }

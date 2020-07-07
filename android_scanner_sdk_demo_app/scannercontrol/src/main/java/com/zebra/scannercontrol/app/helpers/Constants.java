@@ -79,30 +79,30 @@ public class Constants {
     public static final String SCANNER_ADDRESS = "avail_scanner_address";
     public static final String SCANNER_ID = "active_scanner_id";
     public static final String SELECTED_BARCODE_SSA = "selected_barcode_ssa";
-    public static final String AUTO_RECONNECTION="auto_reconnection";
-    public static final String PICKLIST_MODE="picklist+mode";
-    public static final String PAGER_MOTOR_STATUS="pager_motor_status";
-    public static final String CONNECTED="connected";
-    public static final String SHOW_BARCODE_VIEW="barcode_view";
-    public static final String FW_REBOOT="fw_reboot";
+    public static final String AUTO_RECONNECTION = "auto_reconnection";
+    public static final String PICKLIST_MODE = "picklist+mode";
+    public static final String PAGER_MOTOR_STATUS = "pager_motor_status";
+    public static final String CONNECTED = "connected";
+    public static final String SHOW_BARCODE_VIEW = "barcode_view";
+    public static final String FW_REBOOT = "fw_reboot";
     public static final String BATTERY_STATUS = "battery_status";
     public static final String SYMBOLOGY_SSA = "symbology_ssa";
     public static final String SYMBOLOGY_SSA_ENABLED = "symbology_ssa_enabled";
     public static final String SYMBOLOGY_SSA_UNSUPPORTED = "symbology_ssa_unsupported";
     public static final String SYMBOLOGY_SSA_STR = "symbology_ssa_str";
-    public static final String BEEPER_VOLUME="beeper_volume";
+    public static final String BEEPER_VOLUME = "beeper_volume";
     public static final String SSA_STATUS = "ssa_status";
     public static final String SCALE_STATUS = "scale_status";
 
-    public static final String CONNECTION_HELP_TYPE="connection_help";
+    public static final String CONNECTION_HELP_TYPE = "connection_help";
     public static final int CONNECTION_HELP_TYPE_CS4070 = 0;
     public static final int CONNECTION_HELP_TYPE_LI4278 = 1;
     public static final int CONNECTION_HELP_TYPE_RFD8500 = 2;
 
-    public static final String CONNECTION_HELP_CS4070_RESET_DEFAULTS="Reset Factory Defaults";
-    public static final String CONNECTION_HELP_CS4070_SSI_PROFILE="Bluetooth SSI Profile";
-    public static final String CONNECTION_HELP_LI4278_SET_DEFAULTS="Set Factory Defaults";
-    public static final String CONNECTION_HELP_LI4278_SSI_HOST_SERVER="SSI Host Server";
+    public static final String CONNECTION_HELP_CS4070_RESET_DEFAULTS = "Reset Factory Defaults";
+    public static final String CONNECTION_HELP_CS4070_SSI_PROFILE = "Bluetooth SSI Profile";
+    public static final String CONNECTION_HELP_LI4278_SET_DEFAULTS = "Set Factory Defaults";
+    public static final String CONNECTION_HELP_LI4278_SSI_HOST_SERVER = "SSI Host Server";
 
     //Error Messages
     public static final String INVALID_SCANNER_ID_MSG = "Invalid Scanner ID";
@@ -120,7 +120,24 @@ public class Constants {
     public static final int VIDEO_RECEIVED = 38;
 
     ///---
-    public static final String BTH_SCAN_TO_CONNECT="[BTH_CONNECT]";
+    public static final String BTH_SCAN_TO_CONNECT = "[BTH_CONNECT]";
+
+    //Xml tags
+    public static final String XMLTAG_SCANNER_ID = "<scannerID>";
+    public static final String XMLTAG_ARGXML = "<inArgs>";
+
+    //Weight status
+    public static final String WEIGHT_XML_ELEMENT = "weight";
+    public static final String WEIGHT_MODE_XML_ELEMENT = "weight_mode";
+    public static final String WEIGHT_STATUS_XML_ELEMENT = "status";
+
+    public static final String SCALE_STATUS_SCALE_NOT_ENABLED = "Scale Not Enabled";
+    public static final String SCALE_STATUS_SCALE_NOT_READY = "Scale Not Ready";
+    public static final String SCALE_STATUS_STABLE_WEIGHT_OVER_LIMIT = "Stable Weight OverLimit";
+    public static final String SCALE_STATUS_STABLE_WEIGHT_UNDER_ZERO = "Stable Weight Under Zero";
+    public static final String SCALE_STATUS_NON_STABLE_WEIGHT = "Non Stable Weight";
+    public static final String SCALE_STATUS_STABLE_ZERO_WEIGHT = "Stable Zero Weight";
+    public static final String SCALE_STATUS_STABLE_NON_ZERO_WEIGHT = "Stable NonZero Weight";
 
     /**
      * Method to be used throughout the app for logging debug messages

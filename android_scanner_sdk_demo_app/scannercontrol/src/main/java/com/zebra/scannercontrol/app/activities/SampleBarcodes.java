@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,7 +54,7 @@ public class SampleBarcodes extends BaseActivity implements NavigationView.OnNav
         if(actionBar!=null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setTitle("Active Scanner");
+            actionBar.setTitle(R.string.title_activity_sample_barcodes);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -88,7 +88,7 @@ public class SampleBarcodes extends BaseActivity implements NavigationView.OnNav
         if (id == R.id.nav_pair_device) {
             disconnect(scannerID);
             Application.barcodeData.clear();
-            Application.CurScannerId = Application.SCANNER_ID_NONE;
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
             finish();
             intent = new Intent(SampleBarcodes.this, HomeActivity.class);
             startActivity(intent);
@@ -106,7 +106,7 @@ public class SampleBarcodes extends BaseActivity implements NavigationView.OnNav
 
                     disconnect(scannerID);
                     Application.barcodeData.clear();
-                    Application.CurScannerId = Application.SCANNER_ID_NONE;
+                    Application.currentScannerId = Application.SCANNER_ID_NONE;
                     finish();
                     Intent intent = new Intent(SampleBarcodes.this, FindCabledScanner.class);
                     startActivity(intent);

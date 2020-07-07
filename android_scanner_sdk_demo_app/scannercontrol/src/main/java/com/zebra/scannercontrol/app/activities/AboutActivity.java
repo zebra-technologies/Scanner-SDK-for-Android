@@ -6,7 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -42,7 +42,7 @@ public class AboutActivity extends AppCompatActivity {
             version = pInfo.versionName;
             ((TextView) findViewById(R.id.about)).setText(getResources().getString(R.string.app_name)+" Application v"+version+"\n\n"+
                     "SDK version "+ Application.sdkHandler.dcssdkGetVersion()+"\n\n"
-                    +"\u00a9 2015 ZIH Corp and/or its affiliates. All rights reserved. Zebra and the stylized Zebra head are trademarks of ZIH Corp., registered in many jurisdictions worldwide. All other trademarks are the property of their respective owners.");
+                    +"\u00a9 2019 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.");
         }
     }
 

@@ -16,15 +16,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.Xml;
@@ -125,7 +125,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         if(actionBar!=null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("Active Scanner");
+            getSupportActionBar().setTitle(R.string.title_activity_update_firmware);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -1040,7 +1040,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         if (id == R.id.nav_pair_device) {
             disconnect(scannerID);
             Application.barcodeData.clear();
-            Application.CurScannerId = Application.SCANNER_ID_NONE;
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
             finish();
             intent = new Intent(UpdateFirmware.this, HomeActivity.class);
             startActivity(intent);
@@ -1058,7 +1058,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
                     disconnect(scannerID);
                     Application.barcodeData.clear();
-                    Application.CurScannerId = Application.SCANNER_ID_NONE;
+                    Application.currentScannerId = Application.SCANNER_ID_NONE;
                     finish();
                     Intent intent = new Intent(UpdateFirmware.this, FindCabledScanner.class);
                     startActivity(intent);

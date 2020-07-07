@@ -78,6 +78,19 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/skip"
+                    style="@style/roboto_medium_16dp_blue"
+                    android:layout_width="0dp"
+                    android:layout_weight="50"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/skip"
+                    android:lines="2"
+                    android:paddingTop="@dimen/app_padding_top"
+                     />
+                <TextView
                     android:id="@+id/cancel_continue"
                     style="@style/roboto_medium_16dp_blue"
                     android:layout_width="0dp"
@@ -86,25 +99,12 @@
                     android:layout_weight="50"
                     android:clickable="true"
                     android:gravity="center"
-                    android:paddingBottom="30dp"
+                    android:paddingBottom="@dimen/app_padding_bottom"
                     android:paddingLeft="@dimen/app_margin_right"
                     android:paddingRight="@dimen/app_margin_right"
-                    android:paddingTop="36dp"
+                    android:paddingTop="@dimen/app_padding_top"
                     android:text="@string/cancel" />
-                <!--<TextView-->
-                    <!--android:id="@+id/abt_phone"-->
-                    <!--style="@style/roboto_medium_16dp_blue"-->
-                    <!--android:layout_width="0dp"-->
-                    <!--android:layout_weight="50"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="right"-->
-                    <!--android:clickable="true"-->
-                    <!--android:gravity="right"-->
-                    <!--android:text="@string/about_phone"-->
-                    <!--android:paddingLeft="@dimen/app_margin_right"-->
-                    <!--android:paddingTop="@dimen/app_margin_right"-->
-                    <!--android:paddingRight="@dimen/app_margin_right"-->
-                    <!--android:paddingBottom="30dp" />-->
+
                 </TableRow>
         </LinearLayout>
 

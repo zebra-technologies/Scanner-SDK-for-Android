@@ -15,247 +15,271 @@
         android:id="@+id/txt_no_scale"
         style="@style/roboto_regular_16dp"
         android:layout_width="wrap_content"
-        android:background="@android:color/transparent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/app_margin_left"
         android:layout_marginTop="@dimen/app_margin_left"
+        android:background="@android:color/transparent"
         android:text="@string/no_scale" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/layout_scale"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/light_gray"
-        android:orientation="vertical">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:background="@color/light_gray" />
-
-
-
-        <TableRow
+        <LinearLayout
+            android:id="@+id/layout_scale"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white">
-
-            <TextView
-                style="@style/roboto_medium_16dp"
-                android:layout_height="60dp"
-                android:layout_marginLeft="18dp"
-                android:layout_weight="85"
-                android:text="@string/scale_enable"/>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"></LinearLayout>
-
-            <TextView
-                android:id="@+id/txt_enable_scale"
-                style="@style/roboto_regular_20dp_blue"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:clickable="true"
-                android:onClick="enableScale"
-                android:text="On"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp" />
+            android:background="@color/light_gray"
+            android:orientation="vertical">
 
             <View
-                android:layout_width="0.4dip"
-                android:layout_height="30dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="15dp"
-                android:layout_weight="0"
-                android:background="@color/dark_gray" />
-
-            <TextView
-                android:id="@+id/txt_disable_scale"
-                style="@style/roboto_regular_20dp_blue"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:clickable="true"
-                android:onClick="disableScale"
-                android:text="Off"
-                android:paddingLeft="20dp"
-                android:paddingRight="@dimen/app_margin_right" />
-
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/read_weight"
-            style="@style/light_gray_background_row"
-            android:layout_width="match_parent"
-            android:layout_height="91dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:weightSum="1">
-
-            <Button
-                style="@style/style_blue_button"
-                android:text="@string/read_Weight"
-                android:textSize="24sp"
-                android:onClick="readWeight"
-                android:layout_height="55dp"
                 android:layout_width="match_parent"
-                android:layout_marginLeft="45dp"
-                android:layout_marginRight="45dp"
-                android:layout_marginBottom="18dp"
-                android:layout_marginTop="18dp" />
+                android:layout_height="10dp"
+                android:background="@color/light_gray" />
 
 
-        </TableRow>
 
-        <include layout="@layout/normal_divider" />
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@android:color/white" >
-
-            <TextView
-                style="@style/roboto_medium_16dp"
-                android:id="@+id/titleWeightMeasured"
-                android:layout_marginLeft="@dimen/app_margin_left"
-                android:layout_height="match_parent"
-                android:text="@string/weight_measured" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@android:color/white"
-                android:orientation="vertical"></LinearLayout>
-
-            <TextView
-                style="@style/roboto_regular_16dp"
-                android:id="@+id/txtWeightMeasured"
-                android:layout_height="match_parent"
-                android:layout_marginRight="@dimen/app_margin_right"
-                android:text=""/>
-
-        </TableRow>
-
-        <include layout="@layout/normal_divider" />
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@android:color/white" >
-
-            <TextView
-                style="@style/roboto_medium_16dp"
-                android:id="@+id/titleWeightUnit"
-                android:layout_marginLeft="@dimen/app_margin_left"
-                android:layout_height="match_parent"
-                android:text="@string/weight_Unit" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@android:color/white"
-                android:orientation="vertical"></LinearLayout>
-
-            <TextView
-                style="@style/roboto_regular_16dp"
-                android:id="@+id/txtWeightUnit"
-                android:layout_height="match_parent"
-                android:layout_marginRight="@dimen/app_margin_right"
-                android:text=""/>
-
-        </TableRow>
-
-        <include layout="@layout/normal_divider" />
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@android:color/white" >
-
-            <TextView
-                style="@style/roboto_medium_16dp"
-                android:id="@+id/titleWeightStatus"
-                android:layout_marginLeft="@dimen/app_margin_left"
-                android:layout_height="match_parent"
-                android:text="@string/weight_Status" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@android:color/white"
-                android:orientation="vertical"></LinearLayout>
-
-            <TextView
-                style="@style/roboto_regular_16dp"
-                android:id="@+id/txtWeightStatus"
-                android:layout_height="match_parent"
-                android:layout_marginRight="@dimen/app_margin_right"
-                android:text=""/>
-
-        </TableRow>
-
-        <include layout="@layout/normal_divider" />
-
-        <TableRow
-            android:id="@+id/zero_scale"
-            style="@style/light_gray_background_row"
-            android:layout_width="match_parent"
-            android:layout_height="91dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:weightSum="1">
-
-            <Button
-                style="@style/style_blue_button"
-                android:text="@string/zero_scale"
-                android:textSize="24sp"
-                android:onClick="zeroScale"
-                android:layout_height="55dp"
+            <TableRow
                 android:layout_width="match_parent"
-                android:layout_marginLeft="45dp"
-                android:layout_marginRight="45dp"
-                android:layout_marginBottom="18dp"
-                android:layout_marginTop="18dp" />
-
-
-        </TableRow>
-
-        <include layout="@layout/normal_divider" />
-
-        <TableRow
-            android:id="@+id/reset_scale"
-            style="@style/light_gray_background_row"
-            android:layout_width="match_parent"
-            android:layout_height="91dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:weightSum="1">
-
-            <Button
-                style="@style/style_blue_button"
-                android:text="@string/reset_scale"
-                android:textSize="24sp"
-                android:onClick="resetScale"
                 android:layout_height="55dp"
+                android:background="@android:color/white"
+                android:weightSum="100">
+
+
+                <Switch
+                    android:id="@+id/scale_enable_switch"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:enabled="true"
+                    android:text="@string/scale_enable" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
                 android:layout_width="match_parent"
-                android:layout_marginLeft="45dp"
-                android:layout_marginRight="45dp"
-                android:layout_marginBottom="18dp"
-                android:layout_marginTop="18dp" />
+                android:layout_height="55dp"
+                android:background="@android:color/white"
+                android:weightSum="100">
 
 
-        </TableRow>
+                <Switch
+                    android:id="@+id/live_weight_enable_switch"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:layout_weight="65"
+                    android:text="@string/live_weight_enable" />
 
-        <include layout="@layout/normal_divider" />
+            </TableRow>
 
-    </LinearLayout>
+            <TableRow
+                android:id="@+id/read_weight"
+                style="@style/light_gray_background_row"
+                android:layout_width="match_parent"
+                android:layout_height="91dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:weightSum="1">
+
+                <Button
+                    android:id="@+id/read_weight_button"
+                    style="@style/style_blue_gray_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginRight="45dp"
+                    android:layout_marginBottom="18dp"
+                    android:enabled="true"
+                    android:onClick="readWeight"
+                    android:text="@string/read_Weight"
+                    android:textSize="24sp" />
+
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    android:id="@+id/titleWeightMeasured"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/weight_measured" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtWeightMeasured"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    android:id="@+id/titleWeightUnit"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/weight_Unit" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtWeightUnit"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    android:id="@+id/titleWeightStatus"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/weight_Status" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtWeightStatus"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@android:color/white"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/titleLiveWeight"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/live_Weight" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtLiveWeight"
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="@dimen/app_margin_right"
+                    android:text="" />
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:id="@+id/zero_scale"
+                style="@style/light_gray_background_row"
+                android:layout_width="match_parent"
+                android:layout_height="91dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:weightSum="1">
+
+                <Button
+                    android:id="@+id/zero_scale_button"
+                    style="@style/style_blue_gray_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginRight="45dp"
+                    android:layout_marginBottom="18dp"
+                    android:onClick="zeroScale"
+                    android:text="@string/zero_scale"
+                    android:textSize="24sp" />
+
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:id="@+id/reset_scale"
+                style="@style/light_gray_background_row"
+                android:layout_width="match_parent"
+                android:layout_height="91dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:weightSum="1">
+
+                <Button
+                    android:id="@+id/reset_scale_button"
+                    style="@style/style_blue_gray_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginRight="45dp"
+                    android:layout_marginBottom="18dp"
+                    android:onClick="resetScale"
+                    android:text="@string/reset_scale"
+                    android:textSize="24sp" />
+
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+        </LinearLayout>
     </ScrollView>
 
 </LinearLayout>

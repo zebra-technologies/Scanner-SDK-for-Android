@@ -10,16 +10,16 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.view.GravityCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
@@ -178,9 +178,9 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
         pagerMotorAvailable = getIntent().getBooleanExtra(Constants.PAGER_MOTOR_STATUS,false);
 
-        Application.CurScannerId = scannerID;
-        Application.CurScannerName = scannerName;
-        Application.CurScannerAddress = address;
+        Application.currentScannerId = scannerID;
+        Application.currentScannerName = scannerName;
+        Application.currentScannerAddress = address;
         // Initilization
         viewPager = (ViewPager) findViewById(R.id.activeScannerPager);
 
@@ -616,7 +616,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         if (id == R.id.nav_pair_device) {
             disconnect(scannerID);
             Application.barcodeData.clear();
-            Application.CurScannerId = Application.SCANNER_ID_NONE;
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
             finish();
             intent = new Intent(ActiveScannerActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -635,7 +635,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
                     disconnect(scannerID);
                     Application.barcodeData.clear();
-                    Application.CurScannerId = Application.SCANNER_ID_NONE;
+                    Application.currentScannerId = Application.SCANNER_ID_NONE;
                     finish();
                     Intent intent = new Intent(ActiveScannerActivity.this, FindCabledScanner.class);
                     startActivity(intent);
@@ -679,6 +679,48 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         startActivity(intent);
     }
 
+    public void ImageVideo(View view) {
+        if(scannerType != 2)
+        {
+            String message = "Video feature not supported in bluetooth scanners.";
+            alertShow(message,false);
+        }
+        else
+        {
+            loadImageVideo();
+        }
+    }
+
+    private void alertShow(String message, boolean error) {
+
+        if (error) {
+        } else {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(ActiveScannerActivity.this);
+            dialog.setTitle("Video not supported")
+                    .setMessage(message)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialoginterface, int i) {
+                            loadImageVideo();
+                        }
+                    }).show();
+        }
+    }
+
+    private void loadImageVideo()
+    {
+        Intent intent = new Intent(this, ImageActivity.class);
+        intent.putExtra(Constants.SCANNER_ID, scannerID);
+        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_TYPE, scannerType);
+        startActivity(intent);
+    }
+
+    public void loadIdc(View view) {
+        Intent intent = new Intent(this, IntelligentImageCaptureActivity.class);
+        intent.putExtra(Constants.SCANNER_ID, scannerID);
+        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        startActivity(intent);
+    }
     public void loadBatteryStatistics(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         new AsyncTaskBatteryAvailable(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL,this,BatteryStatistics.class).execute(new String[]{in_xml});

@@ -6,7 +6,7 @@ import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.activities.ActiveScannerActivity;
@@ -67,11 +67,11 @@ public class NotificationsReceiver extends BroadcastReceiver {
             resultIntent = new Intent(context,HomeActivity.class);
         }
         resultIntent.putExtra(Constants.SCANNER_ID,intent.getIntExtra(Constants.SCANNER_ID,-1));
-        resultIntent.putExtra(Constants.SCANNER_NAME, Application.CurScannerName);
-        resultIntent.putExtra(Constants.SCANNER_ADDRESS, Application.CurScannerAddress);
-        resultIntent.putExtra(Constants.SCANNER_ID, Application.CurScannerId);
+        resultIntent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
+        resultIntent.putExtra(Constants.SCANNER_ADDRESS, Application.currentScannerAddress);
+        resultIntent.putExtra(Constants.SCANNER_ID, Application.currentScannerId);
         resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        resultIntent.putExtra(Constants.AUTO_RECONNECTION, Application.CurAutoReconnectionState);
+        resultIntent.putExtra(Constants.AUTO_RECONNECTION, Application.currentAutoReconnectionState);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         // Adds the back stack
         stackBuilder.addParentStack(ActiveScannerActivity.class);

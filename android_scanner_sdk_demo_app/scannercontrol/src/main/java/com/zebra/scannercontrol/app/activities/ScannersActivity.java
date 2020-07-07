@@ -11,8 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -202,15 +202,15 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
                 if(lastConnectedScannerList.get(0).isConnected()){
                     if(msg.what ==EVENT) {
                         if (cmdExecTask == null || AsyncTask.Status.RUNNING != cmdExecTask.getStatus()) {
-                            Application.CurScannerName = lastConnectedScannerList.get(0).getScannerName();
-                            Application.CurScannerAddress = lastConnectedScannerList.get(0).getScannerAddress();
-                            Application.CurScannerId = lastConnectedScannerList.get(0).getScannerId();
-                            Application.CurAutoReconnectionState = lastConnectedScannerList.get(0).isAutoReconnection();
+                            Application.currentScannerName = lastConnectedScannerList.get(0).getScannerName();
+                            Application.currentScannerAddress = lastConnectedScannerList.get(0).getScannerAddress();
+                            Application.currentScannerId = lastConnectedScannerList.get(0).getScannerId();
+                            Application.currentAutoReconnectionState = lastConnectedScannerList.get(0).isAutoReconnection();
                             Intent intent = new Intent(ScannersActivity.this, ActiveScannerActivity.class);
-                            intent.putExtra(Constants.SCANNER_NAME, Application.CurScannerName);
-                            intent.putExtra(Constants.SCANNER_ADDRESS, Application.CurScannerAddress);
-                            intent.putExtra(Constants.SCANNER_ID, Application.CurScannerId);
-                            intent.putExtra(Constants.AUTO_RECONNECTION, Application.CurAutoReconnectionState);
+                            intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
+                            intent.putExtra(Constants.SCANNER_ADDRESS, Application.currentScannerAddress);
+                            intent.putExtra(Constants.SCANNER_ID, Application.currentScannerId);
+                            intent.putExtra(Constants.AUTO_RECONNECTION, Application.currentAutoReconnectionState);
                             intent.putExtra(Constants.CONNECTED, true);
                             intent.putExtra(Constants.SHOW_BARCODE_VIEW, false);
                             startActivity(intent);
@@ -308,13 +308,10 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
 
         switch (item.getItemId()) {
             case R.id.action_add: {
-                configureNotificationAvailable(true);
-				/*
-				* RHBJ36 03.03.2016
-				* Start discovering available bluetooth devices.
-				*/
-                Application.sdkHandler.dcssdkStartScanForAvailableDevices();
-                Application.sdkHandler.dcssdkStartScanForTopologyChanges();
+                /*
+                 * Show only paired bluetooth devices.
+                 */
+                updateScannersList();
 				return true;
             }
             case android.R.id.home:
@@ -401,10 +398,10 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
                 curAvailableScanner = availableScanner;
                 if (curAvailableScanner.isConnected()) {
 
-                    Application.CurScannerName = availableScanner.getScannerName();
-                    Application.CurScannerAddress = availableScanner.getScannerAddress();
-                    Application.CurAutoReconnectionState = availableScanner.isAutoReconnection();
-                    Application.CurScannerId= availableScanner.getScannerId();
+                    Application.currentScannerName = availableScanner.getScannerName();
+                    Application.currentScannerAddress = availableScanner.getScannerAddress();
+                    Application.currentAutoReconnectionState = availableScanner.isAutoReconnection();
+                    Application.currentScannerId = availableScanner.getScannerId();
                     Intent intent = new Intent(ScannersActivity.this, ActiveScannerActivity.class);
                     intent.putExtra(Constants.SCANNER_NAME, availableScanner.getScannerName());
                     intent.putExtra(Constants.SCANNER_ADDRESS, availableScanner.getScannerAddress());

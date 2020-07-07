@@ -100,9 +100,25 @@
                 style="@style/roboto_regular_15dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:text="@string/supported_scanners_ds2278" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_cs6080" />
+
+            <TextView
+                style="@style/roboto_regular_15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/supported_scanners_rs5100" />
 
             <LinearLayout
                 android:layout_width="match_parent"

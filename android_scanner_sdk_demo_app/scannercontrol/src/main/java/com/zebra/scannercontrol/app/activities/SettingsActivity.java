@@ -1,14 +1,12 @@
 package com.zebra.scannercontrol.app.activities;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.SwitchCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,16 +16,12 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -582,6 +576,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         bluetoothAddress.setText("Bluetooth Address");
         if(Application.sdkHandler !=null){
             Application.sdkHandler.dcssdkClearBTAddress();
+            Application.sdkHandler.dcssdkSetSTCEnabledState(false);
         }
     }
 }

@@ -1,0 +1,268 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/light_gray"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.ImageActivity"
+    tools:showIn="@layout/app_bar_image"
+    android:weightSum="6">
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    >
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/light_gray" />
+
+
+
+
+    <TableRow
+        android:id="@+id/snapi_image_title"
+        style="@style/light_gray_background_row"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/imageMode"
+            style="@style/style_blue_button"
+            android:text="@string/imager_mode"
+            android:textSize="24sp"
+            android:onClick="imageAction"
+            android:layout_height="55dp"
+            android:layout_width="0dp"
+            android:layout_marginLeft="18dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="18dp"
+            android:layout_marginTop="18dp"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/videoMode"
+            style="@style/style_blue_gray_button"
+            android:text="@string/video_mode"
+            android:textSize="24sp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="18dp"
+            android:onClick="videoAction"
+            android:layout_height="55dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="18dp"
+            android:layout_marginTop="18dp"
+            android:enabled="false"
+
+
+            />
+
+    </TableRow>
+    <include layout="@layout/normal_divider" />
+</LinearLayout>
+
+
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="3"
+    android:orientation="vertical"
+    >
+
+
+
+
+
+    <TableRow
+        android:id="@+id/snapi_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/tbl_row_gray">
+
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/app_margin_left"
+            android:layout_marginRight="@dimen/app_margin_right">
+
+            <ImageView
+                android:id="@+id/imgViewSnapiImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:background="@color/tbl_row_gray"
+                app:srcCompat="@drawable/no_image" />
+
+
+
+
+        </RelativeLayout>
+
+    </TableRow>
+
+    <include layout="@layout/normal_divider" />
+
+
+
+
+
+
+</LinearLayout>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="2"
+    android:orientation="vertical"
+   android:weightSum="2"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:weightSum="3">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/tbl_row_gray"
+            android:layout_marginTop="14dp"
+            android:layout_gravity="center_vertical">
+
+            <CheckBox
+                style="@style/roboto_regular_16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/view_finder"
+                android:layout_marginLeft="18dp"
+                android:onClick="onCheckboxViewFinder"
+                android:checked="false"
+                android:id="@+id/checkBoxViewFinder" />
+
+
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+        android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+        android:background="@color/tbl_row_gray"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal"
+
+        >
+        <TextView
+            android:id="@+id/imageTypeTextView"
+            style="@style/roboto_regular_16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:text="Set Image Type"
+            android:layout_marginLeft="18dp"
+            />
+
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/tbl_row_gray"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:gravity="bottom"
+        >
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="24dp"
+            android:id="@+id/radioButtonGroup"
+            android:checkedButton="@+id/selectJPG"
+            >
+            <RadioButton
+                android:id="@+id/selectJPG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:text="JPG"
+                />
+            <RadioButton
+                android:id="@+id/selectTIFF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:text="TIFF"
+                />
+            <RadioButton android:id="@+id/selectBMP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:text="BMP"
+                />
+        </RadioGroup>
+
+
+    </TableRow>
+</LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical">
+
+    <TableRow
+        style="@style/light_gray_background_row"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/saveImageButton"
+            style="@style/style_blue_gray_button"
+            android:text="@string/save_image"
+            android:textSize="24sp"
+            android:onClick="saveImage"
+            android:layout_height="60dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="18dp"
+            android:layout_marginRight="18dp"
+            android:enabled="false"
+            />
+
+
+    </TableRow>
+
+    </LinearLayout>
+
+</LinearLayout>
+
+
+
+
+</LinearLayout>

@@ -1,19 +1,13 @@
 package com.zebra.scannercontrol.app.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Switch;
-import android.widget.TableRow;
-import android.widget.TextView;
 
-import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.app.R;
-import com.zebra.scannercontrol.app.application.Application;
-import com.zebra.scannercontrol.app.helpers.Constants;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -5,13 +5,12 @@ import android.graphics.Canvas;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.widget.TextView;
 
 /**
  * Created by BPallewela on 12/13/2017.
  */
 
-public class VerticalTextView extends android.support.v7.widget.AppCompatTextView {
+public class VerticalTextView extends androidx.appcompat.widget.AppCompatTextView {
 
     final boolean topDown;
 

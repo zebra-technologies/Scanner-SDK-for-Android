@@ -1,8 +1,8 @@
 package com.zebra.scannercontrol.app.adapters;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.app.R;
-import com.zebra.scannercontrol.app.activities.ScannersActivity;
-import com.zebra.scannercontrol.app.barcode.BarcodeTypes;
 import com.zebra.scannercontrol.app.helpers.AvailableScanner;
 import com.zebra.scannercontrol.app.helpers.Barcode;
 
