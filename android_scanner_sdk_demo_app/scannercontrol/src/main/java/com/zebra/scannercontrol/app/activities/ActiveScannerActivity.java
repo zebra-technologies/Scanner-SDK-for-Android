@@ -10,16 +10,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.view.GravityCompat;
-import androidx.viewpager.widget.ViewPager;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
@@ -29,24 +19,37 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
 import com.zebra.scannercontrol.app.R;
-import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.fragments.BarcodeFargment;
 import com.zebra.scannercontrol.app.helpers.ActiveScannerAdapter;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
+import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 import com.zebra.scannercontrol.app.receivers.NotificationsReceiver;
-
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_ACTION_REBOOT_AND_UN_PAIR;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_ACTION_HIGH_HIGH_LOW_LOW_BEEP;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_DECODE_COUNT_2_OF_5;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_DECODE_COUNT_AZTEC;
@@ -104,10 +107,11 @@ import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_HISTOGRA
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_HISTOGRAM_QR;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_HISTOGRAM_UNUSED_ID;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_HISTOGRAM_UPC;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS;
 import static com.zebra.scannercontrol.app.helpers.Constants.DEBUG_TYPE.TYPE_DEBUG;
 
-public class ActiveScannerActivity extends BaseActivity implements  NavigationView.OnNavigationItemSelectedListener,
-        ActionBar.TabListener,ScannerAppEngine.IScannerAppEngineDevEventsDelegate,ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate{
+public class ActiveScannerActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,
+        ActionBar.TabListener, ScannerAppEngine.IScannerAppEngineDevEventsDelegate, ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate {
     private ViewPager viewPager;
     ActiveScannerAdapter mAdapter;
     TabLayout tabLayout;
@@ -115,6 +119,8 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
     Menu menu;
     MenuItem pairNewScannerMenu;
     static int picklistMode;
+    public static final String VIRTUAL_TETHER_FEATURE = "Virtual Tether";
+
 
     public boolean isPagerMotorAvailable() {
         return pagerMotorAvailable;
@@ -125,13 +131,14 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
     private int scannerType;
     TextView barcodeCount;
     int iBarcodeCount;
-    int  BARCODE_TAB = 1;
+    int BARCODE_TAB = 1;
     int ADVANCED_TAB = 2;
-    static MyAsyncTask cmdExecTask=null;
+    static MyAsyncTask cmdExecTask = null;
     Button btnFindScanner = null;
-    static final int ENABLE_FIND_NEW_SCANNER =1;
+    static final int ENABLE_FIND_NEW_SCANNER = 1;
 
     List<Integer> ssaSupportedAttribs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,12 +147,12 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
         Configuration configuration = getResources().getConfiguration();
 
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
+        } else {
+            if (configuration.screenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         }
@@ -176,7 +183,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
         picklistMode = getIntent().getIntExtra(Constants.PICKLIST_MODE, 0);
 
-        pagerMotorAvailable = getIntent().getBooleanExtra(Constants.PAGER_MOTOR_STATUS,false);
+        pagerMotorAvailable = getIntent().getBooleanExtra(Constants.PAGER_MOTOR_STATUS, false);
 
         Application.currentScannerId = scannerID;
         Application.currentScannerName = scannerName;
@@ -184,7 +191,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         // Initilization
         viewPager = (ViewPager) findViewById(R.id.activeScannerPager);
 
-        mAdapter= new ActiveScannerAdapter(getSupportFragmentManager());
+        mAdapter = new ActiveScannerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(mAdapter);
 
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
@@ -208,8 +215,8 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             public void onPageScrollStateChanged(int arg0) {
             }
         });
-        if (getIntent().getBooleanExtra(Constants.SHOW_BARCODE_VIEW,false))
-           viewPager.setCurrentItem(BARCODE_TAB);
+        if (getIntent().getBooleanExtra(Constants.SHOW_BARCODE_VIEW, false))
+            viewPager.setCurrentItem(BARCODE_TAB);
 
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager nMgr = (NotificationManager) this.getSystemService(ns);
@@ -225,7 +232,6 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         getMenuInflater().inflate(R.menu.no_items, menu);
         return true;
     }
-
 
 
     @Override
@@ -249,7 +255,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         navigationView.getMenu().findItem(R.id.nav_connection_help).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_settings).setChecked(false);
 
-        if(waitingForFWReboot){
+        if (waitingForFWReboot) {
             viewPager.setCurrentItem(ADVANCED_TAB);
             Intent intent = new Intent(this, UpdateFirmware.class);
             intent.putExtra(Constants.SCANNER_ID, scannerID);
@@ -260,7 +266,6 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             setWaitingForFWReboot(false);
         }
     }
-
 
 
     @Override
@@ -283,6 +288,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -315,13 +321,13 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
     public void startFirmware(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_START_NEW_FIRMWARE,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_START_NEW_FIRMWARE, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
     public void abortFirmware(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_ABORT_UPDATE_FIRMWARE,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_ABORT_UPDATE_FIRMWARE, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
@@ -335,7 +341,15 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
     public void loadBeeperActions(View view) {
         Intent intent = new Intent(this, BeeperActionsActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.BEEPER_VOLUME,getIntent().getIntExtra(Constants.BEEPER_VOLUME, 0));
+        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.BEEPER_VOLUME, getIntent().getIntExtra(Constants.BEEPER_VOLUME, 0));
+        startActivity(intent);
+    }
+
+    public void loadVirtualTetherConfiguration(View view) {
+        Intent intent = new Intent(this, VirtualTetherSettings.class);
+        intent.putExtra(Constants.SCANNER_ID, scannerID);
+        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
         startActivity(intent);
     }
 
@@ -345,6 +359,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
         startActivity(intent);
     }
+
     public void symbologiesClicked(View view) {
         Intent intent = new Intent(this, SymbologiesActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
@@ -354,27 +369,26 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
     public void enableScanning(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_SCAN_ENABLE,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_SCAN_ENABLE, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
     public void disableScanning(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_SCAN_DISABLE,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_SCAN_DISABLE, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
 
-
     public void aimOn(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_AIM_ON,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_AIM_ON, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
     public void aimOff(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_AIM_OFF,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_AIM_OFF, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
@@ -392,17 +406,53 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
     public void pullTrigger(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_PULL_TRIGGER,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_PULL_TRIGGER, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
     public void releaseTrigger(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_RELEASE_TRIGGER,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_RELEASE_TRIGGER, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
-    public int getPickListMode(){
+    /**
+     * This method is responsible for checking if the connected scanner supports virtual tethering or not
+     *
+     * @return
+     */
+    public boolean virtualTetheringSupported() {
+
+        boolean isVirtualTetheringSupported = false;
+        String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>" + RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS + "</attrib_list></arg-xml></cmdArgs></inArgs>";
+        StringBuilder outXML = new StringBuilder();
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, outXML, VIRTUAL_TETHER_FEATURE);
+        cmdExecTask.execute(new String[]{in_xml});
+        try {
+            cmdExecTask.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        if (outXML.toString().contains("<id>" + RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS + "</id>")) {
+            isVirtualTetheringSupported = true;
+        }
+        return isVirtualTetheringSupported;
+
+
+    }
+
+    //Get the connected scanner communication mode
+    //returns communicationMode Scanner communication mode
+    public int getScannerCommunicationMode()
+    {
+        int communicationMode = -1;
+        communicationMode = getIntent().getIntExtra(Constants.SCANNER_TYPE, -1);
+        return communicationMode;
+    }
+
+    public int getPickListMode() {
 //        String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>402</attrib_list></arg-xml></cmdArgs></inArgs>";
 //        StringBuilder outXML = new StringBuilder();
 //        cmdExecTask = new ExecuteRSMAsync(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET,outXML);
@@ -451,11 +501,11 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         return scannerID;
     }
 
-    private void addMissedBarcodes(){
-        if(Application.barcodeData.size() !=iBarcodeCount){
+    private void addMissedBarcodes() {
+        if (Application.barcodeData.size() != iBarcodeCount) {
 
-            for(int i=iBarcodeCount; i<Application.barcodeData.size();i++){
-                scannerBarcodeEvent(Application.barcodeData.get(i).getBarcodeData(),Application.barcodeData.get(i).getBarcodeType(),Application.barcodeData.get(i).getFromScannerID());
+            for (int i = iBarcodeCount; i < Application.barcodeData.size(); i++) {
+                scannerBarcodeEvent(Application.barcodeData.get(i).getBarcodeData(), Application.barcodeData.get(i).getBarcodeType(), Application.barcodeData.get(i).getFromScannerID());
             }
         }
     }
@@ -483,26 +533,29 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
     }
 
     @Override
-    public void  scannerImageEvent(byte[] imageData) {
+    public void scannerImageEvent(byte[] imageData) {
 
     }
+
     @Override
-    public void  scannerVideoEvent(byte[] videoData) {
+    public void scannerVideoEvent(byte[] videoData) {
     }
+
     public void clearList(View view) {
-        BarcodeFargment barcodeFargment=(BarcodeFargment)mAdapter.getRegisteredFragment(1);
-        if(barcodeFargment!=null ) {
+        BarcodeFargment barcodeFargment = (BarcodeFargment) mAdapter.getRegisteredFragment(1);
+        if (barcodeFargment != null) {
             barcodeFargment.clearList();
-            barcodeCount = (TextView)findViewById(R.id.barcodesListCount);
+            barcodeCount = (TextView) findViewById(R.id.barcodesListCount);
             iBarcodeCount = 0;
             barcodeCount.setText("Barcodes Scanned: " + Integer.toString(iBarcodeCount));
-            Button btnClear = (Button)findViewById(R.id.btnClearList);
+            Button btnClear = (Button) findViewById(R.id.btnClearList);
             btnClear.setEnabled(false);
         }
     }
 
     /**
      * Navigate to Scale view
+     *
      * @param view
      */
     public void loadScale(View view) {
@@ -513,23 +566,23 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
     }
 
 
-
-
     /**
      * scale availability check
      */
-    private class AsyncTaskScaleAvailable extends AsyncTask<String,Integer,Boolean> {
+    private class AsyncTaskScaleAvailable extends AsyncTask<String, Integer, Boolean> {
         int scannerId;
         Context context;
         Class targetClass;
         private CustomProgressDialog progressDialog;
         DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
-        public AsyncTaskScaleAvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass){
-            this.scannerId=scannerId;
-            this.opcode=opcode;
+
+        public AsyncTaskScaleAvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass) {
+            this.scannerId = scannerId;
+            this.opcode = opcode;
             this.context = context;
             this.targetClass = targetClass;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -543,7 +596,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             StringBuilder sb = new StringBuilder();
             boolean result = executeCommand(opcode, strings[0], sb, scannerId);
             if (opcode == DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_READ_WEIGHT) {
-                if (result){
+                if (result) {
                     return true;
                 }
             }
@@ -572,13 +625,14 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             barcodeCount = (TextView) findViewById(R.id.barcodesListCount);
             iBarcodeCount = Application.barcodeData.size();
             barcodeCount.setText("Barcodes Scanned: " + Integer.toString(iBarcodeCount));
-            if(iBarcodeCount>0){
-                Button btnClear = (Button)findViewById(R.id.btnClearList);
+            if (iBarcodeCount > 0) {
+                Button btnClear = (Button) findViewById(R.id.btnClearList);
                 btnClear.setEnabled(true);
             }
         }
 
     }
+
     @Override
     public boolean scannerHasAppeared(int scannerID) {
         return false;
@@ -586,11 +640,9 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
     @Override
     public boolean scannerHasDisappeared(int scannerID) {
-        if(null !=cmdExecTask){
+        if (null != cmdExecTask) {
             cmdExecTask.cancel(true);
         }
-        Application.barcodeData.clear();
-        this.finish();
         return true;
     }
 
@@ -614,9 +666,10 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         int id = item.getItemId();
         Intent intent;
         if (id == R.id.nav_pair_device) {
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
+            Application.intentionallyDisconnected = true;
             disconnect(scannerID);
             Application.barcodeData.clear();
-            Application.currentScannerId = Application.SCANNER_ID_NONE;
             finish();
             intent = new Intent(ActiveScannerActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -625,9 +678,9 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             intent = new Intent(this, ScannersActivity.class);
 
             startActivity(intent);
-        }else if (id == R.id.nav_find_cabled_scanner) {
+        } else if (id == R.id.nav_find_cabled_scanner) {
 
-            AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
+            AlertDialog.Builder dlg = new AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
             dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
@@ -648,7 +701,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
                 }
             });
             dlg.show();
-        }else if (id == R.id.nav_connection_help) {
+        } else if (id == R.id.nav_connection_help) {
             intent = new Intent(this, ConnectionHelpActivity2.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
@@ -666,9 +719,9 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
     }
 
     public void setPickListMode(int picklistInt) {
-        String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>" +402+"</id><datatype>B</datatype><value>" + picklistInt + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
+        String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>" + 402 + "</id><datatype>B</datatype><value>" + picklistInt + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
-        cmdExecTask = new MyAsyncTask(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_SET,outXML);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_SET, outXML);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
@@ -676,19 +729,27 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         Intent intent = new Intent(this, UpdateFirmware.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
         intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_TYPE, scannerType);
         startActivity(intent);
     }
 
     public void ImageVideo(View view) {
-        if(scannerType != 2)
-        {
+        if (scannerType != 2) {
             String message = "Video feature not supported in bluetooth scanners.";
-            alertShow(message,false);
-        }
-        else
-        {
+            alertShow(message, false);
+        } else {
             loadImageVideo();
         }
+    }
+
+    /**
+     * Perform check on unpair and reboot feature availability once the button is clicked
+     *
+     * @param view Button view
+     */
+    public void UnPairAndReboot(View view) {
+        String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
+        new AsyncTaskUnPairAndRebootAvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL, this, UnPairAndRebootActivity.class).execute(new String[]{in_xml});
     }
 
     private void alertShow(String message, boolean error) {
@@ -706,8 +767,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         }
     }
 
-    private void loadImageVideo()
-    {
+    private void loadImageVideo() {
         Intent intent = new Intent(this, ImageActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
         intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
@@ -721,14 +781,16 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
         startActivity(intent);
     }
+
     public void loadBatteryStatistics(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        new AsyncTaskBatteryAvailable(scannerID,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL,this,BatteryStatistics.class).execute(new String[]{in_xml});
+        new AsyncTaskBatteryAvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL, this, BatteryStatistics.class).execute(new String[]{in_xml});
 
     }
 
     /**
      * Navigate to Scan Speed Analytics views
+     *
      * @param view
      */
     public void loadScanSpeedAnalytics(View view) {
@@ -742,7 +804,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             int ssaStatus = 0;
-            if(scannerType !=1){
+            if (scannerType != 1) {
                 ssaStatus = 2;
             }
             intent.putExtra(Constants.SSA_STATUS, ssaStatus);
@@ -756,18 +818,20 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         }
     }
 
-    private class AsyncTaskBatteryAvailable extends AsyncTask<String,Integer,Boolean> {
+    private class AsyncTaskBatteryAvailable extends AsyncTask<String, Integer, Boolean> {
         int scannerId;
         Context context;
         Class targetClass;
         private CustomProgressDialog progressDialog;
         DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
-        public AsyncTaskBatteryAvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass){
-            this.scannerId=scannerId;
-            this.opcode=opcode;
+
+        public AsyncTaskBatteryAvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass) {
+            this.scannerId = scannerId;
+            this.opcode = opcode;
             this.context = context;
             this.targetClass = targetClass;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -781,7 +845,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             StringBuilder sb = new StringBuilder();
             boolean result = executeCommand(opcode, strings[0], sb, scannerId);
             if (opcode == DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL) {
-                if (result){
+                if (result) {
                     try {
                         int i = 0;
                         XmlPullParser parser = Xml.newPullParser();
@@ -800,7 +864,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
                                 case XmlPullParser.END_TAG:
                                     if (name.equals("attribute")) {
-                                        if(text != null && text.trim().equals("30018")){
+                                        if (text != null && text.trim().equals("30018")) {
                                             return true;
                                         }
                                     }
@@ -833,18 +897,20 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
 
     }
 
-    private class AsyncTaskSSASvailable extends AsyncTask<String,Integer,Boolean> {
+    private class AsyncTaskSSASvailable extends AsyncTask<String, Integer, Boolean> {
         int scannerId;
         Context context;
         Class targetClass;
         private CustomProgressDialog progressDialog;
         DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
-        public AsyncTaskSSASvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass){
-            this.scannerId=scannerId;
-            this.opcode=opcode;
+
+        public AsyncTaskSSASvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass) {
+            this.scannerId = scannerId;
+            this.opcode = opcode;
             this.context = context;
             this.targetClass = targetClass;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -852,6 +918,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
+
         @Override
         protected Boolean doInBackground(String... strings) {
             StringBuilder sb = new StringBuilder();
@@ -876,88 +943,88 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
                                     break;
                                 case XmlPullParser.END_TAG:
                                     if (name.equals("attribute")) {
-                                        if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_UPC))){
+                                        if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_UPC))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_UPC);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_EAN_JAN))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_EAN_JAN))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_EAN_JAN);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_2_OF_5))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_2_OF_5))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_2_OF_5);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODEBAR))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODEBAR))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_CODEBAR);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_11))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_11))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_CODE_11);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_128))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_128))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_CODE_128);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_39))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_39))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_CODE_39);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_93))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_CODE_93))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_CODE_93);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_COMPOSITE))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_COMPOSITE))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_COMPOSITE);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_GS1_DATABAR))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_GS1_DATABAR))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_GS1_DATABAR);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_MSI))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_MSI))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_MSI);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DATAMARIX))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DATAMARIX))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_DATAMARIX);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_PDF))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_PDF))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_PDF);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_POSTAL_CODES))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_POSTAL_CODES))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_POSTAL_CODES);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_QR))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_QR))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_QR);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_AZTEC))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_AZTEC))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_AZTEC);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OCR))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OCR))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_OCR);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_MAXICODE))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_MAXICODE))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_MAXICODE);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_GS1_DATAMATRIX))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_GS1_DATAMATRIX))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_GS1_DATAMATRIX);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_GS1_QR_CODE))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_GS1_QR_CODE))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_GS1_QR_CODE);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_COUPON))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_COUPON))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_COUPON);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DIGIMARC_UPC))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DIGIMARC_UPC))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_DIGIMARC_UPC);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DIGIMARC_EAN_JAN))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DIGIMARC_EAN_JAN))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_DIGIMARC_EAN_JAN);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DIGIMARC_OTHER))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_DIGIMARC_OTHER))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_DIGIMARC_OTHER);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OTHER_1D))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OTHER_1D))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_OTHER_1D);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OTHER_2D))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OTHER_2D))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_OTHER_2D);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OTHER))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_OTHER))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_OTHER);
                                             result = true;
-                                        }else if(text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_UNUSED_ID))){
+                                        } else if (text != null && text.trim().equals(Integer.toString(RMD_ATTR_VALUE_SSA_HISTOGRAM_UNUSED_ID))) {
                                             ssaSupportedAttribs.add(RMD_ATTR_VALUE_SSA_DECODE_COUNT_UNUSED_ID);
                                             result = true;
                                         }
@@ -973,6 +1040,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             }
             return result;
         }
+
         @Override
         protected void onPostExecute(Boolean b) {
             super.onPostExecute(b);
@@ -980,10 +1048,9 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
                 progressDialog.dismiss();
             SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
             int ssaStatus = 0;
-            if(ssaSupportedAttribs.size() == 0)
-            {
+            if (ssaSupportedAttribs.size() == 0) {
                 ssaStatus = 1;
-            }else if(scannerType !=1){
+            } else if (scannerType != 1) {
                 ssaStatus = 2;
             }
 
@@ -995,9 +1062,90 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         }
     }
 
+    /**
+     * Check whether the unpair and reboot feature is supported by the scanner
+     */
+    private class AsyncTaskUnPairAndRebootAvailable extends AsyncTask<String, Integer, Boolean> {
+        int scannerId;
+        Context context;
+        Class targetClass;
+        private CustomProgressDialog progressDialog;
+        DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
+
+        public AsyncTaskUnPairAndRebootAvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass) {
+            this.scannerId = scannerId;
+            this.opcode = opcode;
+            this.context = context;
+            this.targetClass = targetClass;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new CustomProgressDialog(ActiveScannerActivity.this, context.getResources().getString(R.string.please_wait_string));
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            StringBuilder sb = new StringBuilder();
+            boolean result = executeCommand(opcode, strings[0], sb, scannerId);
+            if (opcode == DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL) {
+                if (result) {
+                    try {
+                        int i = 0;
+                        XmlPullParser parser = Xml.newPullParser();
+
+                        parser.setInput(new StringReader(sb.toString()));
+                        int event = parser.getEventType();
+                        String text = null;
+                        while (event != XmlPullParser.END_DOCUMENT) {
+                            String name = parser.getName();
+                            switch (event) {
+                                case XmlPullParser.START_TAG:
+                                    break;
+                                case XmlPullParser.TEXT:
+                                    text = parser.getText();
+                                    break;
+
+                                case XmlPullParser.END_TAG:
+                                    if (name.equals(context.getResources().getString(R.string.attribute_string))) {
+                                        if (text != null && text.trim().equals(RMD_ATTR_ACTION_REBOOT_AND_UN_PAIR)) {
+                                            return true;
+                                        }
+                                    }
+                                    break;
+                            }
+                            event = parser.next();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, e.toString());
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            super.onPostExecute(b);
+            if (progressDialog != null && progressDialog.isShowing())
+                progressDialog.dismiss();
+
+            Intent intent = new Intent(context, targetClass);
+            intent.putExtra(Constants.SCANNER_ID, scannerID);
+            intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+            intent.putExtra(Constants.UNPAIR_AND_REBOOT_STATUS, b);
+            startActivity(intent);
+        }
+
+    }
+
     public void findScanner(View view) {
         btnFindScanner = (Button) findViewById(R.id.btn_find_scanner);
-        if(btnFindScanner!=null){
+        if (btnFindScanner != null) {
             btnFindScanner.setEnabled(false);
         }
         new FindScannerTask(scannerID).execute();
@@ -1011,48 +1159,59 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
     }
 
 
-    private class MyAsyncTask extends AsyncTask<String,Integer,Boolean>{
-    int scannerId;
+    private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
+        int scannerId;
         StringBuilder outXML;
-    DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
-    private CustomProgressDialog progressDialog;
+        DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
+        private CustomProgressDialog progressDialog;
+        String scannerFeature = "";
 
-    public MyAsyncTask(int scannerId,  DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode,StringBuilder outXML){
-       this.scannerId = scannerId;
-        this.opcode = opcode;
-        this.outXML = outXML;
-    }
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        progressDialog = new CustomProgressDialog(ActiveScannerActivity.this, "Execute Command...");
-        progressDialog.show();
-    }
+        public MyAsyncTask(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, StringBuilder outXML) {
+            this.scannerId = scannerId;
+            this.opcode = opcode;
+            this.outXML = outXML;
+        }
+
+        public MyAsyncTask(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, StringBuilder outXML, String scannerFeature) {
+            this.scannerId = scannerId;
+            this.opcode = opcode;
+            this.outXML = outXML;
+            this.scannerFeature = scannerFeature;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new CustomProgressDialog(ActiveScannerActivity.this, "Execute Command...");
+
+        }
 
 
-    @Override
-    protected Boolean doInBackground(String... strings) {
-       return  executeCommand(opcode,strings[0],outXML,scannerId);
-    }
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            return executeCommand(opcode, strings[0], outXML, scannerId);
 
-    @Override
-    protected void onPostExecute(Boolean b) {
-        super.onPostExecute(b);
-        if (progressDialog != null && progressDialog.isShowing())
-            progressDialog.dismiss();
-        if(!b){
-            Toast.makeText(ActiveScannerActivity.this, "Cannot perform the action", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            super.onPostExecute(b);
+            if (progressDialog != null && progressDialog.isShowing())
+                progressDialog.dismiss();
+            if (!b &&(null != scannerFeature && scannerFeature.isEmpty())) {
+                Toast.makeText(ActiveScannerActivity.this, "Cannot perform the action" + " " + scannerFeature, Toast.LENGTH_SHORT).show();
+            }
         }
     }
-}
 
 
-    private class FindScannerTask extends AsyncTask<String,Integer,Boolean>{
+    private class FindScannerTask extends AsyncTask<String, Integer, Boolean> {
         int scannerId;
 
-        public FindScannerTask(int scannerId){
+        public FindScannerTask(int scannerId) {
             this.scannerId = scannerId;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1062,7 +1221,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         @Override
         protected Boolean doInBackground(String... strings) {
 
-            long t0 =System.currentTimeMillis();
+            long t0 = System.currentTimeMillis();
 
             TurnOnLEDPattern();
             BeepScanner();
@@ -1071,7 +1230,7 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            while(System.currentTimeMillis()-t0 < 3000) {
+            while (System.currentTimeMillis() - t0 < 3000) {
                 VibrateScanner();
                 try {
                     Thread.sleep(400);
@@ -1104,11 +1263,12 @@ public class ActiveScannerActivity extends BaseActivity implements  NavigationVi
         @Override
         protected void onPostExecute(Boolean b) {
             super.onPostExecute(b);
-            if(btnFindScanner!=null){
+            if (btnFindScanner != null) {
                 btnFindScanner.setEnabled(true);
             }
 
         }
+
         private void TurnOnLEDPattern() {
             String inXML = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-int>" +
                     88 + "</arg-int></cmdArgs></inArgs>";

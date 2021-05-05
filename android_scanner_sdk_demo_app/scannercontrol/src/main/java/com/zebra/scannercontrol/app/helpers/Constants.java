@@ -22,6 +22,7 @@ public class Constants {
     //For shared prefs
     public static final String PREF_OPMODE = "MOT_SETTING_OPMODE";
     public static final String PREF_SCANNER_DETECTION = "MOT_SETTING_SCANNER_DETECTION";
+    public static final String PREF_SCANNER_DISCOVERY = "MOT_SETTING_SCANNER_DISCOVERY";
 
     public static final String PREF_EVENT_ACTIVE = "MOT_SETTING_EVENT_ACTIVE";
     public static final String PREF_EVENT_AVAILABLE = "MOT_SETTING_EVENT_AVAILABLE";
@@ -62,6 +63,22 @@ public class Constants {
     //Data regarding bluetooth
     public static final String DATA_BLUETOOTH_DEVICE = "com.zebra.scannercontrol.data.bluetooth.device";
 
+    //Virtual tether
+    public static final String PREF_VIRTUAL_TETHER_SCANNER_SETTINGS = "MOT_VIRTUAL_TETHER_SCANNER_SETTINGS";
+    public static final String PREF_VIRTUAL_TETHER_HOST_FEEDBACK = "MOT_VIRTUAL_TETHER_HOST_FEEDBACK";
+    public static final String PREF_VIRTUAL_TETHER_HOST_VIBRATION_ALARM = "MOT_VIRTUAL_TETHER_HOST_VIBRATION_ALARM";
+    public static final String PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM = "MOT_VIRTUAL_TETHER_HOST_AUDIO_ALARM";
+    public static final String PREF_VIRTUAL_TETHER_HOST_POPUP_MESSAGE = "MOT_VIRTUAL_TETHER_HOST_POPUP_MESSAGE";
+    public static final String VIRTUAL_TETHER_HOST_BACKGROUND_MODE_NOTIFICATION = "Zebra Virtual Tether alarm activated";
+    public static final String PREF_VIRTUAL_TETHER_HOST_SCREEN_FLASH = "MOT_VIRTUAL_TETHER_HOST_SCREEN_FLASH";
+    public static final int VIRTUAL_TETHER_HOST_NOTIFICATION_CHANNEL_ID = 1111;
+    public static final String VIRTUAL_TETHER_EVENT_NOTIFY = "intent_virtual_tether_event_notify";
+
+
+    public static final String PREF_VIRTUAL_TETHER_HOST_BACKGROUND_COLOR  = "backgroundColor";
+    public static final int VIRTUAL_TETHER_HOST_ANIMATION_DURATION = 1000;
+
+
     //Intent Data
     public static final String INTENT_ACTION = "intent_action";
     public static final String INTENT_DATA = "intent_data";
@@ -93,6 +110,7 @@ public class Constants {
     public static final String BEEPER_VOLUME = "beeper_volume";
     public static final String SSA_STATUS = "ssa_status";
     public static final String SCALE_STATUS = "scale_status";
+    public static final String UNPAIR_AND_REBOOT_STATUS = "unpair_and_reboot_status";
 
     public static final String CONNECTION_HELP_TYPE = "connection_help";
     public static final int CONNECTION_HELP_TYPE_CS4070 = 0;
@@ -138,6 +156,9 @@ public class Constants {
     public static final String SCALE_STATUS_NON_STABLE_WEIGHT = "Non Stable Weight";
     public static final String SCALE_STATUS_STABLE_ZERO_WEIGHT = "Stable Zero Weight";
     public static final String SCALE_STATUS_STABLE_NON_ZERO_WEIGHT = "Stable NonZero Weight";
+
+    //Scanner models
+    public static final String SCANNER_MODEL_CS4070 = "CS4070";
 
     /**
      * Method to be used throughout the app for logging debug messages

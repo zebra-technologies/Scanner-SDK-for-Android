@@ -44,6 +44,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 import static com.zebra.scannercontrol.RMDAttributes.*;
+import static com.zebra.scannercontrol.app.helpers.Constants.SCANNER_MODEL_CS4070;
 
 public class BeeperActionsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate, SeekBar.OnSeekBarChangeListener {
     private NumberPicker beeperPicker;
@@ -53,6 +54,14 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
     Menu menu;
     MenuItem pairNewScannerMenu;
     private int scannerID;
+    private String scannerName;
+    public static final int SEEK_BAR_PROGRESS_MIN = 0;
+    public static final int SEEK_BAR_PROGRESS_MEDIUM = 50;
+    public static final int SEEK_BAR_PROGRESS_MAX = 100;
+    public static final int BEEPER_VOLUME_LOW = 0;
+    public static final int BEEPER_VOLUME_MEDIUM = 1;
+    public static final int BEEPER_VOLUME_HIGH = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +103,7 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
         pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
         scannerID = getIntent().getIntExtra(Constants.SCANNER_ID, -1);
+        scannerName = getIntent().getStringExtra(Constants.SCANNER_NAME);
 
         beeperActions = new ArrayList<>();
         beeperActions.add(RMD_ATTR_VALUE_ACTION_HIGH_SHORT_BEEP_1);
@@ -162,11 +172,11 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
             Log.e(TAG, e.toString());
         }
         if(beeperVolume == 0){
-            return 100;
+            return SEEK_BAR_PROGRESS_MAX;
         }else if(beeperVolume == 1){
-            return 50;
+            return SEEK_BAR_PROGRESS_MEDIUM;
         }else{
-            return 0;
+            return SEEK_BAR_PROGRESS_MIN;
         }
     }
 
@@ -349,18 +359,18 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         int mProgress = seekBar.getProgress();
-        if(mProgress > 0 & mProgress < 26) {
-            seekBar.setProgress(0);
+        if(mProgress >= 0 & mProgress < 26) {
+            seekBar.setProgress(SEEK_BAR_PROGRESS_MIN);
         } else if(mProgress > 25 & mProgress < 76) {
-            seekBar.setProgress(50);
-        } else seekBar.setProgress(100);
+            seekBar.setProgress(SEEK_BAR_PROGRESS_MEDIUM);
+        } else seekBar.setProgress(SEEK_BAR_PROGRESS_MAX);
 
         int i = seekBar.getProgress();
-        int beeperVolume = 0;
+        int beeperVolume = BEEPER_VOLUME_LOW;
         if(i == 50){
-            beeperVolume = 1;
+            beeperVolume = BEEPER_VOLUME_MEDIUM;
         }else if(i==0){
-            beeperVolume = 2;
+            beeperVolume = BEEPER_VOLUME_HIGH;
         }
         String inXML = "<inArgs><scannerID>" + getIntent().getIntExtra(Constants.SCANNER_ID, 0) + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>140</id><datatype>B</datatype><value>" + beeperVolume + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
@@ -387,7 +397,11 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            return  executeCommand(opcode,strings[0],outXML,scannerId);
+            if(scannerName.startsWith(SCANNER_MODEL_CS4070)){
+                return  executeSSICommand(opcode,strings[0],outXML,scannerId);
+            }else {
+                return  executeCommand(opcode,strings[0],outXML,scannerId);
+            }
         }
 
         @Override

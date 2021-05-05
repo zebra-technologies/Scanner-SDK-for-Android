@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.VirtualTetherSettings"
+    tools:showIn="@layout/app_bar_virtual_tether_settings"
+    android:background="@color/light_gray">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/light_gray"
+        android:id="@+id/linearLayoutVirtualThether"
+        android:weightSum="6">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/clear_color"
+            android:layout_weight="2">
+
+            <TextView
+                style="@style/roboto_regular_bold_20dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="18dp"
+                android:textStyle="bold"
+                android:text="@string/virtual_tether_scanner_settings"/>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:id="@+id/virtualTetherAlarm"
+                android:visibility="visible"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        android:id="@+id/txt_virtual_tether"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/virtual_tether_alarm"/>
+
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_enable_virtual_tether"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+
+
+            </TableRow>
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:id="@+id/simulateOutOfRange"
+                android:visibility="visible"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="38dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+
+                    >
+
+                    <TextView
+                        android:id="@+id/txt_simulate_out_of_range"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/simulate_alarm"/>
+
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_simulation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+            </TableRow>
+            <include layout="@layout/normal_divider" />
+
+
+            <TableRow
+                android:background="@android:color/white"
+                android:layout_height="91dp"
+                android:layout_width="match_parent"
+                android:weightSum="1"
+                android:gravity="center_vertical|center_horizontal">
+
+                <Button
+                    style="@style/style_blue_gray_button"
+                    android:id="@+id/btn_pause_alarm"
+                    android:text="@string/btn_virtual_tether_snooze_alarm_on_scanner"
+                    android:textSize="21sp"
+                    android:layout_height="55dp"
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginRight="45dp"
+                    android:layout_marginBottom="18dp"
+                    android:layout_marginTop="18dp"
+                    android:enabled="false"/>
+            </TableRow>
+        </LinearLayout>
+        <include layout="@layout/normal_divider" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/clear_color"
+            android:layout_weight="4">
+            <TextView
+                style="@style/roboto_regular_bold_20dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="18dp"
+                android:textStyle="bold"
+                android:text="@string/virtual_tether_host_settings"/>
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:visibility="visible"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/virtual_tether_host_feedback"
+                        />
+
+
+                </LinearLayout>
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/virtual_tether_host_feedback"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+
+            </TableRow>
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:visibility="visible"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="38dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/virtual_tether_host_vibrate"/>
+
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/virtual_tether_host_vibrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+            </TableRow>
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:visibility="visible"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="38dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/virtual_tether_host_audio_alarm"/>
+
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/virtual_tether_host_audio_alarm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:visibility="visible"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="38dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/virtual_tether_host_flashing_screen"/>
+
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/virtual_tether_host_flashing_screen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:visibility="visible"
+                >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="38dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/virtual_tether_host_pop_up_message"/>
+
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/virtual_tether_host_pop_up_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="@dimen/app_margin_right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:background="@android:color/white"
+                android:layout_height="91dp"
+                android:layout_width="match_parent"
+                android:weightSum="1"
+                android:gravity="center_vertical|center_horizontal">
+
+                <Button
+                    style="@style/style_blue_gray_button"
+                    android:id="@+id/btn_virtual_tether_stop_alarm_on_host"
+                    android:text="@string/btn_virtual_tether_stop_alarm_on_host"
+                    android:textSize="21sp"
+                    android:layout_height="55dp"
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginRight="45dp"
+                    android:layout_marginBottom="18dp"
+                    android:layout_marginTop="18dp"
+                    android:enabled="false"/>
+            </TableRow>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

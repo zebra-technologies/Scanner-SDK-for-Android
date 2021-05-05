@@ -40,6 +40,8 @@ import org.xmlpull.v1.XmlPullParser;
 import android.util.Xml;
 
 import static com.zebra.scannercontrol.RMDAttributes.*;
+import static com.zebra.scannercontrol.app.helpers.Constants.SCANNER_MODEL_CS4070;
+
 import java.io.StringReader;
 import java.util.Stack;
 
@@ -427,7 +429,7 @@ public class SymbologiesActivity extends BaseActivity implements  NavigationView
         View view;
         String outXML;
         String scannerName;
-        
+
 
         public MyAsyncTask(int scannerId, String scannerName,DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, View _view) {
             this.scannerId=scannerId;
@@ -536,7 +538,7 @@ public class SymbologiesActivity extends BaseActivity implements  NavigationView
 							 *when experimented, it observed that CS4070 supports 14-15 Symbologies fetch with best optimized time.
 							 *Following change is to fetch 14 symbologies (can be changed) in single fetch.
 							 */
-                            if (scannerName.startsWith("CS4070")) {
+                            if (scannerName.startsWith(SCANNER_MODEL_CS4070)) {
                                 while(attStack.size()>0){
                                     StringBuilder in_xml = new StringBuilder("<inArgs><scannerID>" + scannerId + " </scannerID><cmdArgs><arg-xml><attrib_list>");
                                     for(int val=0;val<14; val++){

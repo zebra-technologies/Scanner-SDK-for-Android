@@ -28,6 +28,8 @@ import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.R;
 
+import static com.zebra.scannercontrol.app.helpers.Constants.SCANNER_MODEL_CS4070;
+
 public class LEDActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate  {
 
     String scannerName;
@@ -103,7 +105,7 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
     }
 
     public void otherLEDOnClicked(View view) {
-        if(scannerName.startsWith("CS4070")){
+        if(scannerName.startsWith(SCANNER_MODEL_CS4070)){
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_RED_ON);
         }else {
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_OTHER_ON);
@@ -111,7 +113,7 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
     }
 
     public void otherLEDOffClicked(View view) {
-        if(scannerName.startsWith("CS4070")){
+        if(scannerName.startsWith(SCANNER_MODEL_CS4070)){
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_RED_OFF);
         }else {
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_OTHER_OFF);
@@ -119,7 +121,7 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
     }
 
     public void redLEDOnClicked(View view) {
-        if(scannerName.startsWith("CS4070")){
+        if(scannerName.startsWith(SCANNER_MODEL_CS4070)){
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_OTHER_ON);
         }else{
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_RED_ON);
@@ -129,7 +131,7 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
     }
 
     public void redLEDOffClicked(View view) {
-        if(scannerName.startsWith("CS4070")){
+        if(scannerName.startsWith(SCANNER_MODEL_CS4070)){
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_OTHER_OFF);
         }else {
             prepareInXML(RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_RED_OFF);
@@ -259,7 +261,12 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            return  executeCommand(opcode,strings[0],null,scannerId);
+            if(scannerName.startsWith(SCANNER_MODEL_CS4070)){
+                return  executeSSICommand(opcode,strings[0],null,scannerId);
+            }else {
+                return  executeCommand(opcode,strings[0],null,scannerId);
+            }
+
         }
 
         @Override

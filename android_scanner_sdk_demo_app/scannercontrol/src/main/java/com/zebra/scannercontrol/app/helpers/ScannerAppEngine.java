@@ -191,6 +191,12 @@ public interface ScannerAppEngine{
     void enableScannersDetection(boolean enable);
 
     /**
+     * Method to enable/disable discovery of Bluetooth scanners
+     * @param enable enable/disable the Bluetooth scanner discovery
+     */
+    void enableBluetoothScannerDiscovery(boolean enable);
+
+    /**
      * Method to enable/disable 'scanner available' notifications
      * @param enable enable/disable the notifications
      */
@@ -233,5 +239,14 @@ public interface ScannerAppEngine{
      * @param scannerID id of scanner
      */
     boolean executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE opCode, String inXML, StringBuilder outXML, int scannerID);
+
+    /**
+     * Method to execute command for scanner
+     * @param opCode operantional code to be used
+     * @param inXML input xml to scanner
+     * @param outXML output xml from scanner
+     * @param scannerID id of scanner
+     */
+    boolean executeSSICommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE opCode, String inXML, StringBuilder outXML, int scannerID);
 
 }

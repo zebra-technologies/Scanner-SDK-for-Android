@@ -127,6 +127,9 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
                     addToAvailableScannerList(availableScanner);
                 }
             }
+            //-- CDC readers -- TODO: Available CDC device list
+
+            //-- CDC readers --
 
             Collections.sort(scannersList);
 
@@ -144,7 +147,7 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
                     }
 
                     if(Application.currentConnectedScanner != null){
-                        if(Application.currentConnectedScanner.getScannerHWSerialNumber().equals(scanner.getScannerAddress())){
+                        if(null != Application.currentConnectedScanner.getScannerHWSerialNumber() && Application.currentConnectedScanner.getScannerHWSerialNumber().equals(scanner.getScannerAddress())){
                             currentConnectedScannerX = scanner;
                         }
                     }
@@ -471,8 +474,10 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
             super.onPostExecute(b);
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
-            Intent returnIntent = new Intent();
+            Intent returnIntent = new Intent(getApplicationContext(),HomeActivity.class);
             if(!b){
+                returnIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(returnIntent);
                 setResult(RESULT_CANCELED, returnIntent);
                 Toast.makeText(getApplicationContext(),"Unable to communicate with scanner",Toast.LENGTH_SHORT).show();
                 scannersListHasBeenUpdated();

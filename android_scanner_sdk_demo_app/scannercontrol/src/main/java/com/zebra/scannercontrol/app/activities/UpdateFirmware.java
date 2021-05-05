@@ -11,13 +11,17 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -25,6 +29,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
+
+import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.Xml;
@@ -41,16 +47,27 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
+import com.zebra.commoniolib.usbiomgr;
 import com.zebra.scannercontrol.BarCodeView;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.DCSScannerInfo;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
-import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.DotsProgressBar;
+import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -74,12 +91,14 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class UpdateFirmware extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate, ScannerAppEngine.IScannerAppEngineDevEventsDelegate {
+import static android.os.Build.VERSION.SDK_INT;
+
+public class UpdateFirmware extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate, ScannerAppEngine.IScannerAppEngineDevEventsDelegate {
     private NavigationView navigationView;
     Menu menu;
     MenuItem pairNewScannerMenu;
     int scannerID;
-    static MyAsyncTask cmdExecTask=null;
+    static MyAsyncTask cmdExecTask = null;
     static File selectedPlugIn = null;
     static DCSScannerInfo fwUpdatingScanner;
     static final int PERMISSIONS_REQUEST_READ_EX_STORAGE = 10;
@@ -93,6 +112,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     int dialogFWProgessY = 220;
     int dialogFWReconnectionY = 250;
     int dialogFWReconnectionX = 50;
+    int communicationMode = -1;
     ProgressBar progressBar;
     DotsProgressBar dotProgressBar;
     TextView txtPercentage;
@@ -100,18 +120,27 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     BarCodeView barCodeView = null;
     FrameLayout llBarcode = null;
     int fwMax;
+    AlertDialog.Builder alertDialogForValidateFirmwareUpdate;
+    private usbiomgr usbCommonIOManager;
+    final int communicationModeBTLE = 4;
+
+    static final String INTENT_CATEGORY_DEFAULT = "android.intent.category.DEFAULT";
+    static final String PACKAGE_NAME_FORMATTER = "package:%s";
+    static final int PERMISSIONS_REQUEST_MANAGE_ALL_FILES_ACCESS = 2296;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_firmware);
+        alertDialogForValidateFirmwareUpdate = new AlertDialog.Builder(this);
 
         Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
+        } else {
+            if (configuration.screenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         }
@@ -122,7 +151,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         setSupportActionBar(subActionBar);
 
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar!=null){
+        if (actionBar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setTitle(R.string.title_activity_update_firmware);
@@ -140,17 +169,21 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
         pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
         scannerID = getIntent().getIntExtra(Constants.SCANNER_ID, -1);
-        isWaitingForFWUpdateToComplete= false;
+        isWaitingForFWUpdateToComplete = false;
         fwUpdatingScanner = Application.currentConnectedScanner;
         Log.i("ScannerControl", "Adding Update FW IScannerAppEngineDevEventsDelegate into list");
         addDevConnectionsDelegate(this);
         addDevEventsDelegate(this);
+        communicationMode = getIntent().getIntExtra(Constants.SCANNER_TYPE, -1);
+        ShowBLEModeDialog(communicationMode);
+        fwReboot = getIntent().getBooleanExtra(Constants.FW_REBOOT, false);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
-        if(isWaitingForFWUpdateToComplete){
-            Log.i("ScannerControl","onPause Removing Update FW IScannerAppEngineDevEventsDelegate from list");
+        if (isWaitingForFWUpdateToComplete) {
+            Log.i("ScannerControl", "onPause Removing Update FW IScannerAppEngineDevEventsDelegate from list");
             removeDevEventsDelegate(this);
         }
 
@@ -159,7 +192,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i("ScannerControl","onDestroy Removing Update FW IScannerAppEngineDevEventsDelegate from list");
+        Log.i("ScannerControl", "onDestroy Removing Update FW IScannerAppEngineDevEventsDelegate from list");
         removeDevConnectiosDelegate(this);
         removeDevEventsDelegate(this);
         Application.isFirmwareUpdateInProgress = false;
@@ -174,31 +207,70 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         }
         fwReboot = getIntent().getBooleanExtra(Constants.FW_REBOOT, false);
 
-        if(fwReboot){
-            Application.isFirmwareUpdateInProgress =false;
+        if (fwReboot) {
+            Application.isFirmwareUpdateInProgress = false;
         }
 
         if (!fwReboot && isWaitingForFWUpdateToComplete) {
-            Log.i("ScannerControl","Waiting for fw update to be completed");
+            Log.i("ScannerControl", "Waiting for fw update to be completed");
         } else {
             if (dialogFwProgress == null && dialogFwRebooting == null) {
                 if (Application.currentConnectedScanner != null) {
                     LinearLayout updateFirmwarelayout = (LinearLayout) findViewById(R.id.layout_update_firmware);
                     updateFirmwarelayout.setVisibility(View.INVISIBLE);
                     updateFirmwarelayout.setVisibility(View.GONE);
-                    if (ContextCompat.checkSelfPermission(this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        // No explanation needed, we can request the permission.
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                PERMISSIONS_REQUEST_READ_EX_STORAGE);
+
+                    if (SDK_INT >= Build.VERSION_CODES.R) {
+                        // Android R or above
+                        if(Environment.isExternalStorageManager()){
+                            UIUpdater uiUpdater = new UIUpdater(fwReboot);
+                            uiUpdater.execute();
+                        } else {
+                            try {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                                intent.addCategory(INTENT_CATEGORY_DEFAULT);
+                                intent.setData(Uri.parse(String.format(PACKAGE_NAME_FORMATTER,getApplicationContext().getPackageName())));
+                                startActivityForResult(intent, PERMISSIONS_REQUEST_MANAGE_ALL_FILES_ACCESS);
+                            } catch (Exception e) {
+                                Intent intent = new Intent();
+                                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                                startActivityForResult(intent, PERMISSIONS_REQUEST_MANAGE_ALL_FILES_ACCESS);
+                            }
+                        }
+
                     } else {
-                        UIUpdater uiUpdater = new UIUpdater(fwReboot);
-                        uiUpdater.execute();
+                        // below Android R versions
+                        if (ContextCompat.checkSelfPermission(this,
+                                Manifest.permission.READ_EXTERNAL_STORAGE)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            // No explanation needed, we can request the permission.
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    PERMISSIONS_REQUEST_READ_EX_STORAGE);
+                        } else {
+                            UIUpdater uiUpdater = new UIUpdater(fwReboot);
+                            uiUpdater.execute();
+                        }
                     }
+
                 } else {
                     finish();
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PERMISSIONS_REQUEST_MANAGE_ALL_FILES_ACCESS) {
+            if (SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    // permission is given
+                    UIUpdater uiUpdater = new UIUpdater(fwReboot);
+                    uiUpdater.execute();
+                } else {
+                    // permission denied
                 }
             }
         }
@@ -243,7 +315,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
         switch (item.getItemId()) {
             case R.id.firmware_help: {
-                if(!isFinishing()) {
+                if (!isFinishing()) {
                     dialogFWHelp = new Dialog(UpdateFirmware.this);
                     dialogFWHelp.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialogFWHelp.setContentView(R.layout.dialog_firmware_help);
@@ -292,7 +364,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                 }
             });
 
-            if(datFiles.length == 0) {
+            if (datFiles.length == 0) {
                 // No DAT or Plug-in files in Download folder
                 runOnUiThread(new Runnable() {
                     @Override
@@ -303,7 +375,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                         ShowNoPlugInFoundDialog();
                     }
                 });
-            }else if(datFiles.length > 1){
+            } else if (datFiles.length > 1) {
                 // Multiple DAT files.
                 runOnUiThread(new Runnable() {
                     @Override
@@ -314,12 +386,12 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                         ShowMultipleFWFilesFoundDialog(false);
                     }
                 });
-            }else{
-                ProcessPlugIn(datFiles[0],bFwReboot);
+            } else {
+                ProcessPlugIn(datFiles[0], bFwReboot);
             }
 
         } else if (plugInFiles.length > 1) { // Multiple plug-in files.
-            if(processMultiplePlugIn) {
+            if (processMultiplePlugIn) {
                 String scannerModel = getScannerModelNumber(scannerID); // 533
 
                 for (File plugin : plugInFiles) {
@@ -353,7 +425,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                     ScannerPlugIn latestPlugIn = getLatestPlugIn(matchingPlugins);
                     ProcessPlugIn(latestPlugIn.getPath(), bFwReboot);
                 }
-            }else{
+            } else {
                 // Multiple plug-in files.
                 runOnUiThread(new Runnable() {
                     @Override
@@ -366,13 +438,13 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                 });
             }
         } else {
-            ProcessPlugIn(plugInFiles[0],bFwReboot);
+            ProcessPlugIn(plugInFiles[0], bFwReboot);
         }
         return true;
     }
 
     private void ShowMultipleFWFilesFoundDialog(boolean isPlugIn) {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             final Dialog dialog = new Dialog(UpdateFirmware.this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_multiple_dat_files);
@@ -397,11 +469,42 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         }
     }
 
+    /**
+     * Display dialog for ble mode suggesting that firmware update will be much faster with bluetooth classic
+     *
+     * @param communicationMode Communication mode of the scanner
+     */
+    private void ShowBLEModeDialog(int communicationMode) {
+        if (!isFinishing() && communicationMode == communicationModeBTLE && !fwReboot) {
+
+            final Dialog firmwareUpdateClassicModeDialog = new Dialog(UpdateFirmware.this);
+            firmwareUpdateClassicModeDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            firmwareUpdateClassicModeDialog.setContentView(R.layout.dialog_ble_com_mode_detected);
+
+            TextView firmwareUpdateClassicModeMessage = (TextView) firmwareUpdateClassicModeDialog.findViewById(R.id.txt_message_ble_mode);
+            firmwareUpdateClassicModeMessage.setText(R.string.ble_communication_mode_detected);
+            firmwareUpdateClassicModeDialog.setCancelable(false);
+            firmwareUpdateClassicModeDialog.setCanceledOnTouchOutside(false);
+            firmwareUpdateClassicModeDialog.show();
+            TextView declineButton = (TextView) firmwareUpdateClassicModeDialog.findViewById(R.id.btn_ok);
+            // if decline button is clicked, close the custom dialog
+            declineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Close dialog
+                    firmwareUpdateClassicModeDialog.dismiss();
+                }
+            });
+
+        }
+    }
+
+
     private ScannerPlugIn getLatestPlugIn(List<ScannerPlugIn> matchingPlugins) {
         ScannerPlugIn latestPlugIn = matchingPlugins.get(0);
 
-        for (ScannerPlugIn plugIn:matchingPlugins) {
-            if(Integer.valueOf(plugIn.getRevision())>Integer.valueOf(latestPlugIn.getRevision())){
+        for (ScannerPlugIn plugIn : matchingPlugins) {
+            if (Integer.valueOf(plugIn.getRevision()) > Integer.valueOf(latestPlugIn.getRevision())) {
                 latestPlugIn = plugIn;
             }
         }
@@ -504,9 +607,8 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     }
 
 
-
     private boolean isPlugIn(File plugInFile) {
-        if(plugInFile.getAbsolutePath().endsWith(".SCNPLG") || plugInFile.getAbsolutePath().endsWith(".scnplg") ){
+        if (plugInFile.getAbsolutePath().endsWith(".SCNPLG") || plugInFile.getAbsolutePath().endsWith(".scnplg")) {
             return true;
         }
         return false;
@@ -521,9 +623,9 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             }
         }
 
-        if(matchingFWName.equals("")){
+        if (matchingFWName.equals("")) {
             for (String plugInFwName : plugInFwNames) {
-                if (plugInFwName.length()>3 && scannerFirmwareVersion.startsWith(plugInFwName.substring(0, 3))) {
+                if (plugInFwName.length() > 3 && scannerFirmwareVersion.startsWith(plugInFwName.substring(0, 3))) {
                     matchingFWName = plugInFwName;
                     break;
                 }
@@ -540,11 +642,11 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     }
 
     private void UpdateButton() {
-        TableRow tblRowFWSuccess = (TableRow)findViewById(R.id.tbl_row_fw_update_success);
+        TableRow tblRowFWSuccess = (TableRow) findViewById(R.id.tbl_row_fw_update_success);
         if (tblRowFWSuccess != null) {
             tblRowFWSuccess.setVisibility(View.VISIBLE);
         }
-        TableRow tblRowFW = (TableRow)findViewById(R.id.tbl_row_fw_update);
+        TableRow tblRowFW = (TableRow) findViewById(R.id.tbl_row_fw_update);
         if (tblRowFW != null) {
             tblRowFW.setVisibility(View.INVISIBLE);
             tblRowFW.setVisibility(View.GONE);
@@ -562,18 +664,18 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
 
         String toString;
-        String month = String.valueOf(cal.get(Calendar.MONTH)+1);
-        if(month.length()==1){
-            month = "0"+month;
+        String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
+        if (month.length() == 1) {
+            month = "0" + month;
         }
         String date = String.valueOf(cal.get(Calendar.DATE));
-        if(date.length()==1){
-            date = "0"+date;
+        if (date.length() == 1) {
+            date = "0" + date;
         }
-        if(afterFWUpdate){
-            toString = "Current: Release " + plugInRev + " - " + cal.get(Calendar.YEAR)+"."+ month +"."+ date+  " (" + plugInCombinedFwName + ")";
-        }else {
-            toString = "To: Release " + plugInRev + " - " + cal.get(Calendar.YEAR)+"."+ month +"."+ date+ " (" + plugInCombinedFwName + ")";
+        if (afterFWUpdate) {
+            toString = "Current: Release " + plugInRev + " - " + cal.get(Calendar.YEAR) + "." + month + "." + date + " (" + plugInCombinedFwName + ")";
+        } else {
+            toString = "To: Release " + plugInRev + " - " + cal.get(Calendar.YEAR) + "." + month + "." + date + " (" + plugInCombinedFwName + ")";
         }
         TextView textView = (TextView) findViewById(R.id.txt_to_fw_version);
         textView.setText(toString);
@@ -583,10 +685,10 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
         String toString;
 
-        if(afterFWUpdate){
-            toString = "Current: "+datFileName;
-        }else {
-            toString = "To: "+datFileName;
+        if (afterFWUpdate) {
+            toString = "Current: " + datFileName;
+        } else {
+            toString = "To: " + datFileName;
         }
         TextView textView = (TextView) findViewById(R.id.txt_to_fw_version);
         textView.setText(toString);
@@ -594,9 +696,9 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
     private void UpdateScannerFirmwareVersion(String scannerFirmwareVersion, boolean afterFWUdate) {
         TextView textView = (TextView) findViewById(R.id.txt_from_fw_version);
-        if(afterFWUdate){
+        if (afterFWUdate) {
             textView.setText("");
-        }else {
+        } else {
             textView.setText("From: " + scannerFirmwareVersion);
         }
     }
@@ -607,7 +709,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     }
 
     private void UpdateImage(String pngFilePath) {
-        ImageView scanner = (ImageView)findViewById(R.id.image_scanner);
+        ImageView scanner = (ImageView) findViewById(R.id.image_scanner);
         scanner.setImageBitmap(BitmapFactory.decodeFile(pngFilePath));
     }
 
@@ -640,9 +742,8 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     private String extractPng(String extractPath, String zipPath) {
         InputStream is;
         ZipInputStream zis;
-        String unzipFile="";
-        try
-        {
+        String unzipFile = "";
+        try {
             String filename;
             is = new FileInputStream(zipPath);
             zis = new ZipInputStream(new BufferedInputStream(is));
@@ -650,17 +751,15 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             byte[] buffer = new byte[1024];
             int count;
 
-            while ((ze = zis.getNextEntry()) != null)
-            {
+            while ((ze = zis.getNextEntry()) != null) {
                 filename = ze.getName();
-                if(filename.endsWith(".png") || filename.endsWith(".PNG")){
+                if (filename.endsWith(".png") || filename.endsWith(".PNG")) {
                     unzipFile = extractPath + filename;
 
                     FileOutputStream fout = new FileOutputStream(unzipFile);
 
                     // cteni zipu a zapis
-                    while ((count = zis.read(buffer)) != -1)
-                    {
+                    while ((count = zis.read(buffer)) != -1) {
                         fout.write(buffer, 0, count);
                     }
                     fout.close();
@@ -669,9 +768,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             }
 
             zis.close();
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -681,9 +778,8 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     private String extractReleaseNote(String extractPath, String zipPath) {
         InputStream is;
         ZipInputStream zis;
-        String unzipFile="";
-        try
-        {
+        String unzipFile = "";
+        try {
             String filename;
             is = new FileInputStream(zipPath);
             zis = new ZipInputStream(new BufferedInputStream(is));
@@ -691,17 +787,15 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             byte[] buffer = new byte[1024];
             int count;
 
-            while ((ze = zis.getNextEntry()) != null)
-            {
+            while ((ze = zis.getNextEntry()) != null) {
                 filename = ze.getName();
-                if(filename.endsWith(".txt") || filename.endsWith(".TXT")){
+                if (filename.endsWith(".txt") || filename.endsWith(".TXT")) {
                     unzipFile = extractPath + filename;
 
                     FileOutputStream fout = new FileOutputStream(unzipFile);
 
                     // cteni zipu a zapis
-                    while ((count = zis.read(buffer)) != -1)
-                    {
+                    while ((count = zis.read(buffer)) != -1) {
                         fout.write(buffer, 0, count);
                     }
                     fout.close();
@@ -710,9 +804,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             }
 
             zis.close();
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -739,12 +831,12 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                         }
                         break;
                     case XmlPullParser.TEXT:
-                         text = parser.getText().trim();
+                        text = parser.getText().trim();
                         break;
 
                     case XmlPullParser.END_TAG:
                         if (name.equals("component")) {
-                            if(text!=null) {
+                            if (text != null) {
                                 plugInFWVersion.add(text.trim());
                             }
                         }
@@ -781,8 +873,8 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                         break;
 
                     case XmlPullParser.END_TAG:
-                        if (name.equals("release-date") && text!=null) {
-                            plugInRev =text.trim();
+                        if (name.equals("release-date") && text != null) {
+                            plugInRev = text.trim();
                         }
                         break;
                 }
@@ -815,8 +907,8 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                         break;
 
                     case XmlPullParser.END_TAG:
-                        if (name.equals("revision") && text!=null) {
-                            plugInRev =text.trim();
+                        if (name.equals("revision") && text != null) {
+                            plugInRev = text.trim();
                         }
                         break;
                 }
@@ -849,7 +941,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                         break;
 
                     case XmlPullParser.END_TAG:
-                        if(text!=null) {
+                        if (text != null) {
                             if (name.equals("family")) {
                                 plugInName = new StringBuilder(text.trim());
                                 plugInName.append("-");
@@ -869,7 +961,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     }
 
     private void ShowPlugInScannerMismatchDialog() {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             final Dialog dialog = new Dialog(UpdateFirmware.this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_plugin_scanner_mismatch);
@@ -883,6 +975,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                 public void onClick(View v) {
                     // Close dialog
                     dialog.dismiss();
+
                 }
             });
         }
@@ -911,7 +1004,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
                     case XmlPullParser.END_TAG:
                         if (name.equals("model")) {
-                            if(text!=null) {
+                            if (text != null) {
                                 modelList.add(text.trim());
                             }
                         }
@@ -926,13 +1019,11 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     }
 
 
-    private String extractMetaData(String extractPath, String zipPath)
-    {
+    private String extractMetaData(String extractPath, String zipPath) {
         InputStream is;
         ZipInputStream zis;
-        String unzipFile="";
-        try
-        {
+        String unzipFile = "";
+        try {
             String filename;
             is = new FileInputStream(zipPath);
             zis = new ZipInputStream(new BufferedInputStream(is));
@@ -940,17 +1031,15 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             byte[] buffer = new byte[1024];
             int count;
 
-            while ((ze = zis.getNextEntry()) != null)
-            {
+            while ((ze = zis.getNextEntry()) != null) {
                 filename = ze.getName();
-                if(filename.equalsIgnoreCase("Metadata.xml")){
+                if (filename.equalsIgnoreCase("Metadata.xml")) {
                     unzipFile = extractPath + filename;
 
                     FileOutputStream fout = new FileOutputStream(unzipFile);
 
                     // cteni zipu a zapis
-                    while ((count = zis.read(buffer)) != -1)
-                    {
+                    while ((count = zis.read(buffer)) != -1) {
                         fout.write(buffer, 0, count);
                     }
                     fout.close();
@@ -959,9 +1048,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             }
 
             zis.close();
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -971,7 +1058,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     private String getScannerFirmwareVersion(int scannerID) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>20012</attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
-        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET,in_xml,outXML,scannerID);
+        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, in_xml, outXML, scannerID);
         return getSingleStringValue(outXML);
     }
 
@@ -993,7 +1080,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                         break;
 
                     case XmlPullParser.END_TAG:
-                        if (name.equals("value")&& text!=null) {
+                        if (name.equals("value") && text != null) {
                             attr_val = text.trim();
                         }
                         break;
@@ -1009,12 +1096,12 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     private String getScannerModelNumber(int scannerID) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>533</attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
-        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET,in_xml,outXML,scannerID);
+        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, in_xml, outXML, scannerID);
         return getSingleStringValue(outXML);
     }
 
     private void ShowNoPlugInFoundDialog() {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             final Dialog dialog = new Dialog(UpdateFirmware.this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_no_plugin);
@@ -1049,8 +1136,8 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             intent = new Intent(this, ScannersActivity.class);
 
             startActivity(intent);
-        }else if (id == R.id.nav_find_cabled_scanner) {
-            AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
+        } else if (id == R.id.nav_find_cabled_scanner) {
+            AlertDialog.Builder dlg = new AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
             dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
@@ -1071,7 +1158,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                 }
             });
             dlg.show();
-        }else if (id == R.id.nav_connection_help) {
+        } else if (id == R.id.nav_connection_help) {
             intent = new Intent(this, ConnectionHelpActivity2.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
@@ -1090,7 +1177,9 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
     @Override
     public boolean scannerHasAppeared(int scannerID) {
-        if(fwUpdatingScanner.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_USB_SNAPI){
+        if (fwUpdatingScanner.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_USB_SNAPI) {
+            Application.sdkHandler.dcssdkEstablishCommunicationSession(fwUpdatingScanner.getScannerID());
+        } else if (fwUpdatingScanner.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_USB_CDC) {
             Application.sdkHandler.dcssdkEstablishCommunicationSession(fwUpdatingScanner.getScannerID());
         }
         return true;
@@ -1104,11 +1193,11 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     @Override
     public boolean scannerHasConnected(int scannerID) {
         pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
-        if(isWaitingForFWUpdateToComplete && dialogFwRebooting!=null){
+        if (isWaitingForFWUpdateToComplete && dialogFwRebooting != null) {
             dialogFwRebooting.dismiss();
             dialogFwRebooting = null;
         }
-        if(isWaitingForFWUpdateToComplete && dialogFwReconnectScanner!=null){
+        if (isWaitingForFWUpdateToComplete && dialogFwReconnectScanner != null) {
             dialogFwReconnectScanner.dismiss();
             dialogFwReconnectScanner = null;
         }
@@ -1116,14 +1205,14 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     }
 
 
-    private Handler pnpHandler = new Handler(){
+    private Handler pnpHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    if(dialogFwRebooting!=null){
+                    if (dialogFwRebooting != null) {
                         dialogFwRebooting.dismiss();
-                        dialogFwRebooting =null;
+                        dialogFwRebooting = null;
                         ShowReconnectScanner();
                     }
                     break;
@@ -1132,7 +1221,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     };
 
     private void ShowReconnectScanner() {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             dialogFwReconnectScanner = new Dialog(UpdateFirmware.this);
             dialogFwReconnectScanner.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialogFwReconnectScanner.setContentView(R.layout.dialog_fw_reconnect_scanner);
@@ -1152,13 +1241,13 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
             if (fwUpdatingScanner.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_USB_SNAPI) {
                 barCodeView = Application.sdkHandler.dcssdkGetUSBSNAPIWithImagingBarcode();
-            }else{
+            } else {
                 barCodeView = Application.sdkHandler.dcssdkGetPairingBarcode(BaseActivity.selectedProtocol, BaseActivity.selectedConfig);
-                if(barCodeView==null){
-                    barCodeView = Application.sdkHandler.dcssdkGetPairingBarcode(BaseActivity.selectedProtocol, BaseActivity.selectedConfig,HomeActivity.btAddress);
+                if (barCodeView == null) {
+                    barCodeView = Application.sdkHandler.dcssdkGetPairingBarcode(BaseActivity.selectedProtocol, BaseActivity.selectedConfig, HomeActivity.btAddress);
                 }
             }
-                //dialogFwReconnectScanner.getWindow().setLayout(getXReconnection(), getYReconnection());
+            //dialogFwReconnectScanner.getWindow().setLayout(getXReconnection(), getYReconnection());
             if (barCodeView != null && llBarcode != null) {
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-1, -1);
                 Display display = getWindowManager().getDefaultDisplay();
@@ -1175,21 +1264,19 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             dialogFwReconnectScanner.setCanceledOnTouchOutside(false);
             dialogFwReconnectScanner.show();
             Window window = dialogFwReconnectScanner.getWindow();
-            if(window!=null) {
+            if (window != null) {
                 window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, getY());
             }
-        }else{
+        } else {
             finish();
         }
     }
 
-    public static int dpToPx(int dp)
-    {
+    public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public static int pxToDp(int px)
-    {
+    public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
@@ -1227,15 +1314,15 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     @Override
     public boolean scannerHasDisconnected(int scannerID) {
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
-        if(isWaitingForFWUpdateToComplete){
+        if (isWaitingForFWUpdateToComplete) {
             setWaitingForFWReboot(true);
-            pnpHandler.sendMessageDelayed(pnpHandler.obtainMessage(1),180000);
-        }else {
+            pnpHandler.sendMessageDelayed(pnpHandler.obtainMessage(1), 180000);
+        } else {
             Application.barcodeData.clear();
             finish();
         }
 
-        if(dialogFwProgress !=null) {
+        if (dialogFwProgress != null) {
             dialogFwProgress.dismiss();
             dialogFwProgress = null;
         }
@@ -1246,8 +1333,8 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.i("ScannerControl","Show Rebooting dialog");
-                if(!isFinishing()) {
+                Log.i("ScannerControl", "Show Rebooting dialog");
+                if (!isFinishing()) {
                     dialogFwRebooting = new Dialog(UpdateFirmware.this);
                     dialogFwRebooting.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialogFwRebooting.setContentView(R.layout.dialog_fw_rebooting);
@@ -1267,14 +1354,14 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                     dotProgressBar.setDotsCount(6);
 
                     Window window = dialogFwRebooting.getWindow();
-                    if(window!=null) {
+                    if (window != null) {
                         dialogFwRebooting.getWindow().setLayout(getX(), getY());
                     }
                     dialogFwRebooting.setCancelable(false);
                     dialogFwRebooting.setCanceledOnTouchOutside(false);
-                    Log.i("ScannerControl","Showing dot progress dialog");
+                    Log.i("ScannerControl", "Showing dot progress dialog");
                     dialogFwRebooting.show();
-                }else{
+                } else {
                     finish();
                 }
             }
@@ -1286,7 +1373,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         Application.isFirmwareUpdateInProgress = true;
         TurnOnLEDPattern();
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-string>" + selectedPlugIn.getAbsolutePath() + "</arg-string></cmdArgs></inArgs>";
-        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_UPDATE_FIRMWARE,null);
+        cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_UPDATE_FIRMWARE, null);
         cmdExecTask.execute(new String[]{in_xml});
     }
 
@@ -1301,7 +1388,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
         String inXML = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-int>" +
                 90 + "</arg-int></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
-        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_SET_ACTION,inXML,outXML,scannerID);
+        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_SET_ACTION, inXML, outXML, scannerID);
     }
 
     @Override
@@ -1310,17 +1397,18 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     }
 
     @Override
-    public void  scannerImageEvent(byte[] imageData) {
+    public void scannerImageEvent(byte[] imageData) {
 
     }
 
     @Override
-    public void  scannerVideoEvent(byte[] videoData) {
+    public void scannerVideoEvent(byte[] videoData) {
     }
+
     @Override
     public void scannerFirmwareUpdateEvent(FirmwareUpdateEvent firmwareUpdateEvent) {
-        Log.i("ScannerControl","scannerFirmwareUpdateEvent type = "+firmwareUpdateEvent.getEventType());
-        if(firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_SESS_START){
+        Log.i("ScannerControl", "scannerFirmwareUpdateEvent type = " + firmwareUpdateEvent.getEventType());
+        if (firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_SESS_START) {
             dialogFwProgress = new Dialog(UpdateFirmware.this);
             dialogFwProgress.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialogFwProgress.setContentView(R.layout.dialog_fw_progress);
@@ -1330,48 +1418,71 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             cancelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String in_xml = "<inArgs><scannerID>" + scannerIDFWSessionStarted+ "</scannerID></inArgs>";
-                    cmdExecTask = new MyAsyncTask(scannerIDFWSessionStarted,DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_ABORT_UPDATE_FIRMWARE,null);
-                    cmdExecTask.execute(new String[]{in_xml});
+
+                    //Setting message manually and performing action on button click
+                    alertDialogForValidateFirmwareUpdate.setMessage(R.string.msg_firmware_update_validation)
+                            .setCancelable(false)
+                            .setPositiveButton(R.string.alert_action_title_yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //  Action for 'Yes' Button
+                                    String in_xml = "<inArgs><scannerID>" + scannerIDFWSessionStarted + "</scannerID></inArgs>";
+                                    cmdExecTask = new MyAsyncTask(scannerIDFWSessionStarted, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_ABORT_UPDATE_FIRMWARE, null);
+                                    cmdExecTask.execute(new String[]{in_xml});
+
+                                }
+                            })
+                            .setNegativeButton(R.string.alert_action_title_no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //  Action for 'No' Button
+                                    dialog.cancel();
+
+                                }
+                            });
+                    //Creating dialog box
+                    AlertDialog alert = alertDialogForValidateFirmwareUpdate.create();
+                    //Setting the title manually
+                    alert.setTitle(R.string.title_firmware_update_validation);
+                    alert.show();
+
                 }
             });
 
-            progressBar = (ProgressBar)dialogFwProgress.findViewById(R.id.progressBar);
+            progressBar = (ProgressBar) dialogFwProgress.findViewById(R.id.progressBar);
             progressBar.setMax(firmwareUpdateEvent.getMaxRecords());
             fwMax = firmwareUpdateEvent.getMaxRecords();
 
             Window window = dialogFwProgress.getWindow();
-            if(window!=null) {
+            if (window != null) {
                 dialogFwProgress.getWindow().setLayout(getX(), getY());
             }
             dialogFwProgress.setCancelable(false);
             dialogFwProgress.setCanceledOnTouchOutside(false);
-            if(!isFinishing()) {
-                Log.i("ScannerControl","Show Progress dialog");
+            if (!isFinishing()) {
+                Log.i("ScannerControl", "Show Progress dialog");
                 dialogFwProgress.show();
                 txtPercentage = (TextView) dialogFwProgress.findViewById(R.id.txt_percentage);
                 txtPercentage.setText("0%");
             }
 
         }
-        if(firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_DL_PROGRESS){
-            if(progressBar !=null){
+        if (firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_DL_PROGRESS) {
+            if (progressBar != null) {
                 progressBar.setProgress(firmwareUpdateEvent.getCurrentRecord());
-                double percentage = (firmwareUpdateEvent.getCurrentRecord()*100.0/fwMax);
+                double percentage = (firmwareUpdateEvent.getCurrentRecord() * 100.0 / fwMax);
                 int iPercentage = (int) percentage;
-                if(txtPercentage !=null) {
+                if (txtPercentage != null) {
                     txtPercentage.setText(String.format("%s%%", Integer.toString(iPercentage)));
                 }
             }
-            if(dialogFwProgress !=null && !dialogFwProgress.isShowing() && !isFinishing()){
-                Log.i("ScannerControl","Show Progress dialog");
+            if (dialogFwProgress != null && !dialogFwProgress.isShowing() && !isFinishing()) {
+                Log.i("ScannerControl", "Show Progress dialog");
                 dialogFwProgress.show();
             }
         }
 
-        if(firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_SESS_END){
-            if(dialogFwProgress !=null) {
-                if(txtPercentage !=null) {
+        if (firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_SESS_END) {
+            if (dialogFwProgress != null) {
+                if (txtPercentage != null) {
                     txtPercentage.setText("100%");
                 }
                 dialogFwProgress.dismiss();
@@ -1384,19 +1495,20 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                     e.printStackTrace();
                 }
                 executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_START_NEW_FIRMWARE, in_xml, outXML, firmwareUpdateEvent.getScannerInfo().getScannerID());
-                isWaitingForFWUpdateToComplete= true;
+                isWaitingForFWUpdateToComplete = true;
+                getIntent().putExtra(Constants.FW_REBOOT, true);
                 showRebooting();
             }
         }
 
-        if(firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_STATUS){
+        if (firmwareUpdateEvent.getEventType() == DCSSDKDefs.DCSSDK_FU_EVENT_TYPE.SCANNER_UF_STATUS) {
             TurnOffLEDPattern();
-            isWaitingForFWUpdateToComplete= false;
-            if(!isFinishing() && dialogFwProgress !=null) {
+            isWaitingForFWUpdateToComplete = false;
+            if (!isFinishing() && dialogFwProgress != null) {
                 dialogFwProgress.dismiss();
                 dialogFwProgress = null;
             }
-            if(firmwareUpdateEvent.getStatus()!= DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_FIRMWARE_UPDATE_ABORTED) {
+            if (firmwareUpdateEvent.getStatus() != DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_FIRMWARE_UPDATE_ABORTED) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -1411,20 +1523,20 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if(dialogFwProgress!=null) {
+        if (dialogFwProgress != null) {
             Window window = dialogFwProgress.getWindow();
-            if(window!=null) {
+            if (window != null) {
                 window.setLayout(getX(), getY());
             }
         }
-        if(dialogFwRebooting!=null) {
+        if (dialogFwRebooting != null) {
             Window window = dialogFwRebooting.getWindow();
-            if(window!=null) {
+            if (window != null) {
                 window.setLayout(getX(), getY());
             }
         }
-        if(dialogFwReconnectScanner!=null) {
-            if(barCodeView !=null && llBarcode !=null) {
+        if (dialogFwReconnectScanner != null) {
+            if (barCodeView != null && llBarcode != null) {
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-1, -1);
                 Display display = getWindowManager().getDefaultDisplay();
                 Point size = new Point();
@@ -1438,24 +1550,25 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                 llBarcode.addView(barCodeView, layoutParams);
             }
             Window window = dialogFwReconnectScanner.getWindow();
-            if(window!=null) {
+            if (window != null) {
                 window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, getY());
             }
         }
 
     }
 
-    private class MyAsyncTask extends AsyncTask<String,Integer,Boolean> {
+    private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
         int scannerId;
         StringBuilder outXML;
         DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
         private CustomProgressDialog progressDialog;
 
-        public MyAsyncTask(int scannerId,  DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode,StringBuilder outXML){
+        public MyAsyncTask(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, StringBuilder outXML) {
             this.scannerId = scannerId;
             this.opcode = opcode;
             this.outXML = outXML;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1467,7 +1580,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            return  executeCommand(opcode,strings[0],outXML,scannerId);
+            return executeCommand(opcode, strings[0], outXML, scannerId);
         }
 
         @Override
@@ -1475,19 +1588,20 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             super.onPostExecute(b);
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
-            if(!b){
+            if (!b) {
                 Toast.makeText(UpdateFirmware.this, "Cannot perform the action", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private class UIUpdater extends AsyncTask<String,Integer,Boolean> {
+    private class UIUpdater extends AsyncTask<String, Integer, Boolean> {
         private CustomProgressDialog progressDialog;
         private boolean bFwReboot;
 
-        public UIUpdater(boolean fwReboot){
+        public UIUpdater(boolean fwReboot) {
             bFwReboot = fwReboot;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1499,7 +1613,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            return  ShowFirmwareInfo(bFwReboot);
+            return ShowFirmwareInfo(bFwReboot);
         }
 
         @Override
@@ -1507,7 +1621,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             super.onPostExecute(b);
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
-            if(!b){
+            if (!b) {
                 Toast.makeText(UpdateFirmware.this, "Cannot perform the action", Toast.LENGTH_SHORT).show();
             }
         }

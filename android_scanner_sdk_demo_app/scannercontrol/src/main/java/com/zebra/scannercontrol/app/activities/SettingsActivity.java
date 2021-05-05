@@ -76,6 +76,11 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             autoDetection.setOnCheckedChangeListener(this);
         }
 
+        SwitchCompat scannerDiscovery = (SwitchCompat) findViewById(R.id.bluetoothScannerDetection);
+        if (scannerDiscovery != null) {
+            scannerDiscovery.setOnCheckedChangeListener(this);
+        }
+
         SwitchCompat setDefaults = (SwitchCompat) findViewById(R.id.set_factory_defaults);
         if (setDefaults != null) {
             setDefaults.setOnCheckedChangeListener(this);
@@ -223,6 +228,22 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 settingsEditor.putBoolean(Constants.PREF_SCANNER_DETECTION, ((SwitchCompat) findViewById(R.id.autoDetection)).isChecked()).apply();
                 break;
             }
+            case R.id.bluetoothScannerDetection: {
+                TextView textView = (TextView) findViewById(R.id.txt_discover_bluetooth_scanners);
+                boolean enable = false;
+                if (textView != null) {
+                    if (isChecked) {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                        enable = true;
+                    } else {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                        enable = false;
+                    }
+                }
+                enableBluetoothScannerDiscovery(enable);
+                settingsEditor.putBoolean(Constants.PREF_SCANNER_DISCOVERY, ((SwitchCompat) findViewById(R.id.bluetoothScannerDetection)).isChecked()).apply();
+                break;
+            }
             case R.id.availableScanner:
             {
                 TextView textView = (TextView) findViewById(R.id.txt_available_scanner);
@@ -318,6 +339,11 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             autoDetection.setChecked(true);
         }
 
+        SwitchCompat scannerDiscovery = (SwitchCompat) findViewById(R.id.bluetoothScannerDetection);
+        if (scannerDiscovery != null) {
+            scannerDiscovery.setChecked(true);
+        }
+
         SwitchCompat availableScanner = (SwitchCompat) findViewById(R.id.availableScanner);
         if (availableScanner != null) {
             availableScanner.setChecked(false);
@@ -396,6 +422,19 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             TextView textViewAutoDetection = (TextView) findViewById(R.id.txt_auto_detection);
             if(textViewAutoDetection !=null) {
                 if (autoDetection.isChecked()) {
+                    textViewAutoDetection.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                } else {
+                    textViewAutoDetection.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                }
+            }
+        }
+
+        SwitchCompat scannerDiscovery = (SwitchCompat) findViewById(R.id.bluetoothScannerDetection);
+        if (scannerDiscovery != null) {
+            scannerDiscovery.setChecked(settings.getBoolean(Constants.PREF_SCANNER_DISCOVERY, true));
+            TextView textViewAutoDetection = (TextView) findViewById(R.id.txt_discover_bluetooth_scanners);
+            if(textViewAutoDetection !=null) {
+                if (scannerDiscovery.isChecked()) {
                     textViewAutoDetection.setTextColor(ContextCompat.getColor(this, R.color.font_color));
                 } else {
                     textViewAutoDetection.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
@@ -506,6 +545,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     private void SaveSettings() {
 
         SwitchCompat autoDetection = (SwitchCompat) findViewById(R.id.autoDetection);
+        SwitchCompat scannerDiscovery = (SwitchCompat) findViewById(R.id.bluetoothScannerDetection);
         SwitchCompat availableScanner = (SwitchCompat) findViewById(R.id.availableScanner);
         SwitchCompat activeScanner = (SwitchCompat) findViewById(R.id.activeScanner);
         SwitchCompat barcodeEvent = (SwitchCompat) findViewById(R.id.barcodeEvent);
@@ -517,6 +557,11 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         if (autoDetection != null) {
             settingsEditor.putBoolean(Constants.PREF_SCANNER_DETECTION, autoDetection.isChecked()).apply();
         }
+
+        if (scannerDiscovery != null) {
+            settingsEditor.putBoolean(Constants.PREF_SCANNER_DISCOVERY, scannerDiscovery.isChecked()).apply();
+        }
+
         if (availableScanner != null) {
             settingsEditor.putBoolean(Constants.PREF_NOTIFY_AVAILABLE, availableScanner.isChecked() ).commit();
         }
@@ -561,8 +606,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     public  void setDisplayListProtocolType(int val){
         if(val == 0){
             protocolList.clear();
-            protocolList.add("SSI over Bluetooth classic");
             protocolList.add("SSI over Bluetooth LE");
+            protocolList.add("SSI over Bluetooth classic");
             protocolAdapter.notifyDataSetChanged();
         }
     }

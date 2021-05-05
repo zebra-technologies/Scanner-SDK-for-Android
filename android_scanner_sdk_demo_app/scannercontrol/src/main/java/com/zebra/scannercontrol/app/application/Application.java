@@ -57,6 +57,8 @@ public class Application extends android.app.Application {
     public static boolean isAnyScannerConnected = false; //True, if currently connected to any scanner
     public static int currentConnectedScannerID = -1; //Track scannerId of currently connected Scanner
     public static boolean isFirmwareUpdateInProgress = false;
+    public static boolean intentionallyDisconnected = false;
+    public static boolean virtualTetherHostActivated = false;
     //Scanners (both available and active)
     public static ArrayList<DCSScannerInfo> mScannerInfoList=new ArrayList<DCSScannerInfo>();
     public static ArrayList<ScannerAppEngine.IScannerAppEngineDevListDelegate> mDevListDelegates=new ArrayList<ScannerAppEngine.IScannerAppEngineDevListDelegate>();

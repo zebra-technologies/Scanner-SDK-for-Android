@@ -42,7 +42,7 @@ public class AboutActivity extends AppCompatActivity {
             version = pInfo.versionName;
             ((TextView) findViewById(R.id.about)).setText(getResources().getString(R.string.app_name)+" Application v"+version+"\n\n"+
                     "SDK version "+ Application.sdkHandler.dcssdkGetVersion()+"\n\n"
-                    +"\u00a9 2019 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.");
+                    +"\u00a9 2021 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.");
         }
     }
 

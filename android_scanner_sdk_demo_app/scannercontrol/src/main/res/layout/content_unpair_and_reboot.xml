@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.zebra.scannercontrol.app.activities.UnPairAndRebootActivity"
+    tools:showIn="@layout/app_bar_unpair_and_reboot">
+    <TextView
+        android:id="@+id/txt_no_unpair_and_reboot"
+        style="@style/roboto_regular_16dp"
+        android:layout_width="wrap_content"
+        android:background="@android:color/transparent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/app_margin_left"
+        android:layout_marginTop="@dimen/app_margin_left"
+        android:text="@string/no_unpair_and_reboot_stats" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_unpair_and_reboot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/light_gray"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:orientation="vertical">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/app_margin_left"
+                        android:layout_marginRight="@dimen/app_margin_right"
+                        android:layout_weight="85"
+                        android:background="@android:color/transparent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/text1"
+                            style="@style/roboto_regular_14dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/text2"
+                            style="@style/roboto_regular_14dp"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tbl_row_fw_update"
+                    style="@style/white_background_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="91dp"
+                    android:gravity="center_vertical|center_horizontal">
+
+                    <Button
+                        android:id="@+id/btn_unpair_and_reboot"
+                        style="@style/style_blue_gray_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginLeft="45dp"
+                        android:layout_marginRight="45dp"
+                        android:layout_marginTop="5dp"
+                        android:onClick="UnPairAndReboot"
+                        android:textAlignment="center"
+                        android:text="@string/unpair_and_reboot"
+                        android:textSize="22sp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginLeft="@dimen/app_margin_left"
+                        android:layout_marginRight="@dimen/app_margin_right"
+                        android:layout_weight="85"
+                        android:background="@android:color/transparent"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/roboto_regular_14dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unpair_and_reboot_description"/>
+
+                    </LinearLayout>
+                </TableRow>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/app_margin_left"
+                android:background="@android:color/white"
+                android:orientation="horizontal"></LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

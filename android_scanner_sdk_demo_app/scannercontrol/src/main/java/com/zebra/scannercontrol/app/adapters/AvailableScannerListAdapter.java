@@ -24,6 +24,7 @@ import java.util.ArrayList;
 public class AvailableScannerListAdapter extends ArrayAdapter<Barcode> {
     private final Activity context;
     private final ArrayList<AvailableScanner> availableScanners;
+    public static final float defaultTextSize = 12f;
 
     public AvailableScannerListAdapter(Activity context,ArrayList<AvailableScanner> availableScanners) {
         super(context, R.layout.list_available_device_layout);
@@ -61,8 +62,13 @@ public class AvailableScannerListAdapter extends ArrayAdapter<Barcode> {
             }else {
                 holder.typeIcon.setImageResource(R.drawable.ic_action_bluetooth);
             }
+            holder.txtScannerHWSerial.setTextSize(15);
         }else if(scanner.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_USB_SNAPI){
             holder.typeIcon.setImageResource(R.drawable.ic_action_usb);
+            holder.txtScannerHWSerial.setTextSize(12);
+        }else if(scanner.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_USB_CDC){
+            holder.typeIcon.setImageResource(R.drawable.ic_action_usb_cdc);
+            holder.txtScannerHWSerial.setTextSize(defaultTextSize);
         }
 
         if(!scanner.isConnectable()){

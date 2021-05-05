@@ -99,7 +99,38 @@
 
             <include layout="@layout/normal_divider" />
 
+            <TableRow
+                android:id="@+id/tbl_row_virtual_tether"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:onClick="loadVirtualTetherConfiguration">
 
+                <TextView
+                    android:id="@+id/txt_virtual_tether_setting"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="0"
+                    android:text="@string/virtual_tether"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <ImageView
+                    android:id="@+id/right_nav_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center|right"
+                    android:layout_marginRight="18dp"
+                    android:layout_weight="0"
+                    android:src="@drawable/right" />
+            </TableRow>
+            <include layout="@layout/normal_divider" />
             <TableRow
                 android:id="@+id/tableRowsSSA"
                 android:layout_width="match_parent"
@@ -160,17 +191,51 @@
             <include layout="@layout/normal_divider" />
 
             <TableRow
+                android:id="@+id/tbl_row_image_video"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:onClick="ImageVideo">
 
                 <TextView
+                    android:id="@+id/txt_image_video"
                     style="@style/roboto_medium_16dp"
                     android:layout_height="60dp"
                     android:layout_marginLeft="18dp"
                     android:layout_weight="0"
                     android:text="@string/Image_Video" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/white"
+                    android:orientation="vertical"></LinearLayout>
+
+                <ImageView
+                    android:id="@+id/image_video_right_nav_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center|right"
+                    android:layout_marginRight="18dp"
+                    android:layout_weight="0"
+                    android:src="@drawable/right" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:onClick="UnPairAndReboot">
+
+                <TextView
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="0"
+                    android:text="@string/unpair_and_reboot" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -188,7 +253,10 @@
                     android:src="@drawable/right" />
             </TableRow>
 
+
+
             <include layout="@layout/normal_divider" />
+
 
 <!--            <TableRow-->
 <!--                android:layout_width="match_parent"-->

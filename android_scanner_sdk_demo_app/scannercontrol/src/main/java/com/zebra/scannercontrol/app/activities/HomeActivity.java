@@ -60,7 +60,7 @@ public class HomeActivity extends BaseActivity
     private NavigationView navigationView;
     Menu menu;
     MenuItem pairNewScannerMenu;
-    private static final int PERMISSIONS_ACCESS_COARSE_LOCATION = 10;
+    private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 10;
     private static final int MAX_ALPHANUMERIC_CHARACTERS = 12;
     private static final int MAX_BLUETOOTH_ADDRESS_CHARACTERS = 17;
     private static final String DEFAULT_EMPTY_STRING = "";
@@ -104,12 +104,12 @@ public class HomeActivity extends BaseActivity
 
 
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // No explanation needed, we can request the permission.
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    PERMISSIONS_ACCESS_COARSE_LOCATION);
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    ACCESS_FINE_LOCATION_REQUEST_CODE);
         }else{
             initialize();
         }
@@ -179,7 +179,7 @@ public class HomeActivity extends BaseActivity
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSIONS_ACCESS_COARSE_LOCATION: {
+            case ACCESS_FINE_LOCATION_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -201,6 +201,7 @@ public class HomeActivity extends BaseActivity
         Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
         Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_SNAPI);
         Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_LE);
+        Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_USB_CDC);
     }
 
     @Override
@@ -325,7 +326,7 @@ public class HomeActivity extends BaseActivity
         int barcode = settings.getInt(Constants.PREF_PAIRING_BARCODE_TYPE, 0);
         boolean setDefaults = settings.getBoolean(Constants.PREF_PAIRING_BARCODE_CONFIG, true);
         int protocolInt = settings.getInt(Constants.PREF_COMMUNICATION_PROTOCOL_TYPE, 0);
-        String strProtocol = "SSI over Classic Bluetooth";
+        String strProtocol = "SSI over Bluetooth LE";
         llBarcode = (FrameLayout) findViewById(R.id.scan_to_connect_barcode);
         DCSSDKDefs.DCSSDK_BT_PROTOCOL protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.LEGACY_B;
         DCSSDKDefs.DCSSDK_BT_SCANNER_CONFIG config = DCSSDKDefs.DCSSDK_BT_SCANNER_CONFIG.KEEP_CURRENT;
@@ -336,15 +337,15 @@ public class HomeActivity extends BaseActivity
             txtBarcodeType.setText(Html.fromHtml(sourceString));
             switch (protocolInt){
                 case 0:
-                    protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_CRADLE_HOST;//SSI over Classic Bluetooth
-                    strProtocol = "SSI over Classic Bluetooth";
-                    break;
-                case 1:
                     protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_LE;//SSI over Bluetooth LE
                     strProtocol = "Bluetooth LE";
                     break;
-                default:
+                case 1:
                     protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_CRADLE_HOST;//SSI over Classic Bluetooth
+                    strProtocol = "SSI over Classic Bluetooth";
+                    break;
+                default:
+                    protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_LE;//SSI over Bluetooth LE
                     break;
             }
             if(setDefaults){
@@ -400,8 +401,7 @@ public class HomeActivity extends BaseActivity
         if ((barcode == 0 )
                 && (setDefaults == true)
                 && (protocolInt == 0)) {
-            txtScannerConfiguration.setText("");
-            txtBarcodeType.setText("");
+            txtScannerConfiguration.setText(Html.fromHtml("<i> Factory Defaults Are Set, Com Protocol = "+strProtocol+"</i>"));
         } else {
             if(barcode ==0){
                 txtBarcodeType.setText(Html.fromHtml(sourceString));

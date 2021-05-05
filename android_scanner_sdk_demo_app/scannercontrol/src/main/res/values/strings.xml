@@ -70,20 +70,23 @@
     <string name="menu_item_device_pair">Pair Bluetooth Scanner</string>
     <string name="title_activity_about">App Overview</string>
     <string name="version">Version</string>
-    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2019 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
+    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2020 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
     <string name="title_activity_scanners">Available Device List</string>
     <string name="bt_scanners_not_found">BT scanners not found</string>
     <string name="bt_no_scanners">No scanner found.</string>
 
-    <string name="menu_firmware_help">Firmware Update Process</string>
+    <string name="menu_firmware_help">Firmware update help</string>
+    <string name="menu_virtual_tether_help">Virtual Tether help</string>
 
-    <string name="menu_add_scanner">Add Scanner</string>
+    <string name="menu_add_scanner">Refresh device list</string>
     <string name="menu_get_pairing_barcode">Get Pairing Barcode</string>
     <string name="menu_refresh_scanners">Refresh</string>
     <string name="title_activity_scanner_configurations">Connection Help</string>
     <string name="title_activity_settings">App Settings</string>
     <string name="scanner_detection_title">Scanner Detection</string>
+    <string name="scanner_discovery_title">Bluetooth Scanner Discovery</string>
     <string name="auto_detection">Auto Detection</string>
+    <string name="discover_bluetooth_scanners">Discover Bluetooth Scanners</string>
     <string name="pairing_barcode_title">Pair New Scanner (STC) Barcode</string>
     <string name="pairing_barcode_type">Barcode Type</string>
     <string name="pairing_barcode_configuration">Set Factory Defaults</string>
@@ -191,6 +194,7 @@
     <string name="aimon">AIM On</string>
     <string name="aimoff">AIM Off</string>
     <string name="vibration_feedback">Vibration Feedback</string>
+    <string name="virtual_tether">Virtual Tether</string>
     <string name="title_activity_barcode_configuration">Connection Help</string>
     <string name="slowest_decode_image">Slowest Decode Image:</string>
     <string name="weight_measured">Weight Measured :</string>
@@ -222,12 +226,19 @@
     <string name="instruction_snapi">Attach your cabled scanner to your device and scan the barcode to connect with this app.</string>
     <string name="instruction">Scan barcode to pair your cordless scanner to this app.</string>
     <string name="pick_list_mode">Picklist Mode</string>
+    <string name="stop_bluetooth_scanner_discovery">Stop Bluetooth Scanner Discovery</string>
     <string name="scanning">Scanning Control</string>
     <string name="title_activity_connection_help_cs4070">ConnectionHelpCS4070</string>
     <string name="title_activity_connection_help_li4278">ConnectionHelpLI4278</string>
     <string name="title_activity_connection_help_rfd8500">ConnectionHelpRFD8500</string>
     <string name="updateFirmware">Update Firmware</string>
     <string name="Image_Video">Image and Video</string>
+    <string name="unpair_and_reboot">Unpair and Reboot</string>
+    <string name="please_wait_string">Please wait...</string>
+    <string name="attribute_string">attribute</string>
+    <string name="scanner_disconnect_string">This will disconnect your current scanner</string>
+    <string name="continue_string">Continue</string>
+    <string name="cancel_string">Cancel</string>
     <string name="IDC">IDC</string>
     <string name="start_new_firmware">Start New Firmware</string>
     <string name="abort_update_firmware">Abort Firmware Update</string>
@@ -299,14 +310,28 @@
     <string name="fics">UPU FICS</string>
     <string name="title_activity_vibration_feedback">Vibration Feedback</string>
     <string name="vibration">Vibration</string>
+    <string name="scanner">Scanner</string>
+    <string name="tethering_on_off">Tethering ON/OFF</string>
+    <string name="audio">Audio</string>
+    <string name="audio_alarm">Audio Alarm</string>
+    <string name="silent_alarm">Silent Alarm</string>
+    <string name="silent_in_night_mode">Silent in Night Mode</string>
+    <string name="virtual_tether_alarm_indication">Alarm Indication</string>
+    <string name="leds">LEDs</string>
+    <string name="illumination">Illumination</string>
+    <string name="haptics">Haptics</string>
     <string name="on_off">ON/OFF</string>
     <string name="vibration_duration">Vibration Duration (ms)</string>
     <string name="test_vibration">TEST VIBRATION</string>
+    <string name="title_activity_virtual_tether">Virtual Tether</string>
     <string name="battery_statistics">Battery Statistics</string>
     <string name="scanner_name">Scanner Name:</string>
     <string name="title_activity_battery_statistics">Battery Statistics</string>
     <string name="battery_asset_info">Battery Asset Information</string>
     <string name="no_battery_stats">This scanner does not have a PowerPrecision+ smart battery</string>
+    <string name="no_unpair_and_reboot_stats">This scanner does not support Unpair and Reboot feature</string>
+    <string name="unpair_and_reboot_description">Scanner will reboot and will not pair with the device again</string>
+    <string name="cs6080_scanner">cs6080</string>
     <string name="no_scale">This scanner does not have a Scale</string>
     <string name="bat_manufacture_date">Manufacture Date:</string>
     <string name="bat_serial">Serial Number:</string>
@@ -338,11 +363,11 @@
     <string name="com_protocol_not_support_ssa">Scan Speed Analytics is not supported in this communication protocol</string>
     <string name="firmware_not_support_ssa_msg_1"><![CDATA[Update Scanner to a firmware which supports Scan Speed Analytics.]]></string>
     <string name="fw_update_process">Firmware Update Process Help</string>
-    <string name="fw_update_process_msg_1">Copy the correct 123Scan plug-in for your scanner to your phone:</string>
+    <string name="fw_update_process_msg_1">Copy the correct 123Scan plug-in for your scanner to your device:</string>
     <string name="fw_update_process_msg_1_1">1. Load 123Scan onto a Windows computer from:</string>
     <string name="fw_update_process_url">www.Zebra.com/123Scan</string>
     <string name="fw_update_process_msg_1_2">2. From your Windows PC with 123Scan, access your scanner’s plug-in (.scnplg file) from C:\\ProgramData\\123Scan2\\Plug-ins</string>
-    <string name="fw_update_process_msg_1_3"><![CDATA[3. Put a copy of the plug-in into your phone\'s download folder (Device Storage > Download)]]></string>
+    <string name="fw_update_process_msg_1_3"><![CDATA[3. Put a copy of the plug-in into your device\'s download folder (Device Storage > Download)]]></string>
     <string name="fw_update_process_msg_2">Start the firmware update by clicking the \"Update Firmware\" button:</string>
     <string name="close">CLOSE</string>
     <string name="updating_firmware">Updating Firmware</string>
@@ -411,6 +436,7 @@
     <string name="multiple_dat_files">Multiple DAT files</string>
     <string name="multiple_plugin_files">Multiple Plug-in files</string>
     <string name="multiple_dat_files_msg_1">Multiple DAT files found in Download folder. Please keep only one DAT file and try again.</string>
+    <string name="ble_communication_mode_detected">Scanner is connected in Bluetooth Low Energy (BLE) mode. Firmware update will be faster when Scanner is connected in Bluetooth Classic mode</string>
     <string name="no_pager_motor">This scanner does not have a pager motor.</string>
     <string name="title_activity_find_cabled_scanner">Find Cabled Scanner</string>
     <string name="multiple_snapi_devices">You are already in the SNAPI protocol. To pick a device click Continue.</string>
@@ -450,5 +476,51 @@
     <string name="ssa_image_transfer_not_supported">Image transfer not currently supported in Bluetooth Low Energy.</string>
     <string name="title_activity_image_video">Image And Video</string>
     <string name="title_activity_idc">IDC</string>
+
+    <string name="title_firmware_update_validation">Message</string>
+    <string name="msg_firmware_update_validation">Do you want to stop this firmware update ?</string>
+    <string name="alert_action_title_yes">Yes</string>
+    <string name="alert_action_title_no">No</string>
+
+    <string name="scanner_virtual_tether_alarm">Scanner Virtual Tether Alarm</string>
+    <string name="scanner_alarm_on_off">Alarm Enable/Disable</string>
+    <string name="simulate_alarm">Simulate Alarm</string>
+    <string name="virtual_tether_alarm">Enable Virtual Tether</string>
+    <string name="virtual_tether_scanner_settings">Scanner Settings</string>
+    <string name="virtual_tether_host_settings">Host Settings (Tablet/Phone)</string>
+    <string name="btn_virtual_tether_snooze_alarm_on_scanner">Snooze Alarm on scanner</string>
+    <string name="btn_virtual_tether_stop_alarm_on_host">Stop Alarm on host</string>
+    <string name="virtual_tether_host_feedback">Enable Host Feedback</string>
+    <string name="virtual_tether_host_vibrate">Vibrate</string>
+    <string name="virtual_tether_host_audio_alarm">Audio alarm</string>
+    <string name="virtual_tether_host_flashing_screen">Flashing Screen</string>
+    <string name="virtual_tether_host_pop_up_message">Pop-up message</string>
+    <string name="btn_virtual_tether_snooze_alarm">Snooze Alarm</string>
+    <string name="btn_virtual_tether_stop_alarm">Stop Alarm</string>
+    <string name="alarm_activation_delay_picker">Delay Before Alarm Activates </string>
+    <string name="alarm_duration_picker">Alarm Duration </string>
+    <string name="alarm_duration">Alarm Duration (m)</string>
+    <string name="alarm_activation_delay">Alarm Activation Delay (s)</string>
+    <string name="set_alarm_activation_delay">SET ACTIVATION DELAY</string>
+    <string name="set_alarm_duration">SET ALARM DURATION</string>
+    <string name="audio_virtual_tether_alarm">Audio Alarm</string>
+    <string name="enable_audio_alarm_silent_in_night_mode">Enable (Silent in Night Mode)</string>
+    <string name="disable_audio_alarm">Disable</string>
+    <string name="enable_audio_alarm_active_in_night_mode">Enable (Active in Night Mode)</string>
+    <string name="defeat_virtual_tether_alarm">Defeat Virtual Tether Alarm</string>
+    <string name="virtual_tether_notification_channel_id">virtual_tether</string>
+    <string name="virtual_tether_notification_channel_name">Virtual Tether Notification Channel</string>
+    <string name="virtual_tether_notification_channel_description">Virtual Tether Notification Channel is used to alarm the user when the virtual tether event occurs.</string>
+    <string name="virtual_tether_host_pop_up_message_description">Zebra Virtual Tether alarm activated </string>
+    <string name="virtual_tether_host_pop_up_message_cancel">Stop Alarm on Host </string>
+
+    <string name="set_pause_alarm_duration">SET PAUSE DURATION</string>
+    <string name="do_not_defeat_alarm">Do Not Defeat Alarm</string>
+    <string name="pause_alarm_on_scan_page_button">Pause Alarm on Scan Button</string>
+    <string name="pause_alarm">Pause Alarm</string>
+    <string name="stop_alarm_on_scan_page_button">Stop Alarm on Scan Button</string>
+    <string name="pause_alarm_duration">Pause Alarm Duration (s)</string>
+
+
 
 </resources>

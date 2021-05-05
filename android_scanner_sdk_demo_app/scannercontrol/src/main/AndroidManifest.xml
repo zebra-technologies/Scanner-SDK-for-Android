@@ -6,21 +6,50 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
     <application
         android:name=".application.Application"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor"
-        android:requestLegacyExternalStorage="true">  <!--Allows Android v10 to use legacy storage  -->
+        android:theme="@style/AppTheme">
+        <service
+            android:name=".helpers.BackgroundSoundService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity
+            android:name=".activities.VirtualTetherSettings"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_active_scanner"
+            android:parentActivityName=".activities.ActiveScannerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
+        </activity> <!-- Allows Android v10 to use legacy storage -->
         <activity
             android:name=".activities.HomeActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/AppThemeLight.NoActionBar" />
+            android:theme="@style/AppThemeLight.NoActionBar">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+        </activity>
         <activity
             android:name=".activities.SplashScreenActivity"
             android:label="@string/title_activity_home"
@@ -41,7 +70,15 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_scanners"
             android:launchMode="singleTask"
-            android:parentActivityName=".activities.HomeActivity" />
+            android:parentActivityName=".activities.HomeActivity">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+        </activity>
         <activity
             android:name=".activities.ConnectionHelpActivity2"
             android:configChanges="orientation|screenSize"
@@ -60,7 +97,15 @@
         <activity
             android:name=".activities.BaseActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_base" />
+            android:label="@string/title_activity_base">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+        </activity>
 
         <receiver
             android:name=".receivers.NotificationsReceiver"
@@ -85,11 +130,12 @@
             android:label="@string/title_activity_active_scanner"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
-        <intent-filter>
-            <action android:name="activities.ActiveScannerActivity" />
-            <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
-    </activity>
+            <intent-filter>
+                <action android:name="activities.ActiveScannerActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.BeeperActionsActivity"
             android:configChanges="orientation|screenSize"
@@ -179,6 +225,16 @@
                 android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
         </activity>
         <activity
+            android:name=".activities.UnPairAndRebootActivity"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:label="@string/title_activity_active_scanner"
+            android:parentActivityName=".activities.ActiveScannerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
+        </activity>
+        <activity
             android:name=".activities.SupportedScanners"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_supported_scanners"
@@ -224,12 +280,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
         </activity>
-        <activity android:name=".activities.SsaSetSymbologyActivity"
-            android:noHistory="true"
+        <activity
+            android:name=".activities.SsaSetSymbologyActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_active_scanner"
+            android:noHistory="true"
             android:parentActivityName=".activities.ActiveScannerActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
@@ -244,7 +301,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zebra.scannercontrol.app.activities.ActiveScannerActivity" />
         </activity>
-	<activity
+        <activity
             android:name=".activities.ImageActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_active_scanner"
@@ -277,9 +334,7 @@
         <activity
             android:name=".activities.DecodeImageActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

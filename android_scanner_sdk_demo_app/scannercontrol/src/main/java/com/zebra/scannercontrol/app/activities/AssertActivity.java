@@ -90,6 +90,7 @@ public class AssertActivity extends BaseActivity implements NavigationView.OnNav
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
         pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
 
+        fetchAssertInfo();
     }
 
     @Override
