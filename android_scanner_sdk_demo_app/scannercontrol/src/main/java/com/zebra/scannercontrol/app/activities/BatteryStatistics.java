@@ -1,19 +1,30 @@
 package com.zebra.scannercontrol.app.activities;
 
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_CHARGE_CYCLES_CONSUMED;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_CHARGE_STATUS;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_CURRENT;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_DESIGN_CAPACITY;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_FIRMWARE_VERSION;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_FULL_CHARGE_CAP;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_MANUFACTURE_DATE;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_MODEL_NUMBER;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_REMAINING_CAP;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_REMAINING_TIME_TO_COMPLETE_CHARGING;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_SERIAL_NUMBER;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_STATE_OF_CHARGE;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_STATE_OF_HEALTH_METER;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_TEMP_HIGHEST;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_TEMP_LOWEST;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_TEMP_PRESENT;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_BAT_VOLTAGE;
+
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
@@ -23,20 +34,26 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 import com.zebra.scannercontrol.DCSSDKDefs;
-import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
+import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-
-import static com.zebra.scannercontrol.RMDAttributes.*;
 
 public class BatteryStatistics extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate {
     private NavigationView navigationView;
@@ -47,6 +64,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
 
     static MyAsyncTask cmdExecTask=null;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,6 +197,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
             }
 
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -221,8 +240,6 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
                         while (event != XmlPullParser.END_DOCUMENT) {
                             String name = parser.getName();
                             switch (event) {
-                                case XmlPullParser.START_TAG:
-                                    break;
                                 case XmlPullParser.TEXT:
                                     text = parser.getText();
                                     break;
@@ -240,117 +257,58 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
                                             Log.i(TAG, "Value tag found: Value: " + attrVal);
                                             if (RMD_ATTR_BAT_MANUFACTURE_DATE == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_manufacture_date)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_manufacture_date)).setText(attrVal));
 
                                             } else if (RMD_ATTR_BAT_SERIAL_NUMBER == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_serial)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_serial)).setText(attrVal));
 
                                             } else if (RMD_ATTR_BAT_MODEL_NUMBER == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_model)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_model)).setText(attrVal));
 
                                             } else if (RMD_ATTR_BAT_DESIGN_CAPACITY == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_design_cap)).setText(attrVal + " mAh");
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_design_cap)).setText(attrVal + " mAh"));
 
                                             } else if (RMD_ATTR_BAT_STATE_OF_HEALTH_METER == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_state_of_health)).setText(attrVal + "%");
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_state_of_health)).setText(attrVal + "%"));
 
                                             } else if (RMD_ATTR_BAT_CHARGE_CYCLES_CONSUMED == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_charge_cycles_consumed)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_charge_cycles_consumed)).setText(attrVal));
 
                                             } else if (RMD_ATTR_BAT_FULL_CHARGE_CAP == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_full_charge_cap)).setText(attrVal + " mAh");
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_full_charge_cap)).setText(attrVal + " mAh"));
 
                                             } else if (RMD_ATTR_BAT_STATE_OF_CHARGE == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_state_of_charge)).setText(attrVal + "%");
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_state_of_charge)).setText(attrVal + "%"));
 
                                             } else if (RMD_ATTR_BAT_REMAINING_CAP == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_remaining_cap)).setText(attrVal + " mAh");
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_remaining_cap)).setText(attrVal + " mAh"));
 
                                             } else if (RMD_ATTR_BAT_TEMP_PRESENT == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_present)).setText(getTempString(attrVal));
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_present)).setText(getTempString(attrVal)));
 
                                             } else if (RMD_ATTR_BAT_TEMP_HIGHEST == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_highest)).setText(getTempString(attrVal));
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_highest)).setText(getTempString(attrVal)));
 
                                             } else if (RMD_ATTR_BAT_TEMP_LOWEST == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txt_bat_lowest)).setText(getTempString(attrVal));
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txt_bat_lowest)).setText(getTempString(attrVal)));
 
                                             }
                                         }
 
                                     }
                                     break;
+                                default: break; //XmlPullParser.START_TAG
                             }
                             event = parser.next();
                         }
@@ -371,8 +329,6 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
                         while (event != XmlPullParser.END_DOCUMENT) {
                             String name = parser.getName();
                             switch (event) {
-                                case XmlPullParser.START_TAG:
-                                    break;
                                 case XmlPullParser.TEXT:
                                     text = parser.getText();
                                     break;
@@ -382,6 +338,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
                                         attrs.add(text != null ? text.trim() : null);
                                     }
                                     break;
+                                default: break; //XmlPullParser.START_TAG
                             }
                             event = parser.next();
                         }
@@ -434,22 +391,18 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-            dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setPositiveButton("Continue", (dialog, arg) -> {
 
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(BatteryStatistics.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                finish();
+                Intent intent_battery = new Intent(BatteryStatistics.this, FindCabledScanner.class);
+                startActivity(intent_battery);
             });
 
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                }
             });
             dlg.show();
         }else if (id == R.id.nav_connection_help) {

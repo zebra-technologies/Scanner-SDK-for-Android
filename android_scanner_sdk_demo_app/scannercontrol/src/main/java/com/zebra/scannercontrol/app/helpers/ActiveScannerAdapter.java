@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+
+import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
@@ -20,6 +22,7 @@ public class ActiveScannerAdapter extends FragmentStatePagerAdapter {
     SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
     String[] tabs = {"Settings","Data View","Advanced"};
+    public static boolean handlingIntent = false;
     /**
      * Constructor. Handles the initialization.
      * @param fm - Fragment Manager to be used for handling fragments.
@@ -50,7 +53,11 @@ public class ActiveScannerAdapter extends FragmentStatePagerAdapter {
                 return BarcodeFargment.newInstance();
             case 2:
                 Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "3rd Tab Selected");
-                return AdvancedFragment.newInstance();
+                AdvancedFragment advancedFragment = new AdvancedFragment();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(Constants.IS_HANDLING_INTENT,handlingIntent);
+                advancedFragment.setArguments(bundle);
+                return advancedFragment;
 
             default:
                 return null;

@@ -276,6 +276,8 @@ public class BeeperSettingsActivity extends BaseActivity implements View.OnClick
                                         }
                                     }
                                     break;
+                                default:
+                                    break;
                             }
                             event = parser.next();
                         }

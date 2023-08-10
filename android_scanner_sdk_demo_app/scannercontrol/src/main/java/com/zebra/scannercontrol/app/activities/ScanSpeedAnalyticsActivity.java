@@ -54,6 +54,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.zebra.barcode.sdk.sms.ConfigurationUpdateEvent;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
 import com.zebra.scannercontrol.app.R;
@@ -102,13 +103,11 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
     int slowestImageGostImagePadding = 60;
     protected CustomProgressDialog getSlowetDecodeImageProgressDialog;
 
-    //public static Bitmap bmp2;
     List<Integer> histogramValues =  Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0);
 
     private NavigationView navigationView;
     Menu menu;
     MenuItem pairNewScannerMenu;
-    //private TextView symbologyNameTextView;
     private TextView slowestDecodeImageLabelTextView;
     private TextView slowestDecodeTimeLabelTextView;
     private TextView slowestDecodeTimeValueTextView;
@@ -168,7 +167,6 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
         setSupportActionBar(subActionBar);
 
         // link with UI
-        //symbologyNameTextView = (TextView) findViewById(R.id.txt_ssa_symbology_name);
         slowestDecodeImageLabelTextView = (TextView) findViewById(R.id.txtSlowestDecodeImageLabel);
         slowestDecodeTimeLabelTextView = (TextView) findViewById(R.id.txtSlowestDecodeTimeLabel);
         slowestDecodeTimeValueTextView = (TextView) findViewById(R.id.txtSlowestDecodeTime);
@@ -339,33 +337,20 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
 
                                             if (selectedSSASymbology.getAttrIDMaxDecodeTime() == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        slowestDecodeTimeValue = attrVal;
-                                                    }
-                                                });
+                                                runOnUiThread(() -> slowestDecodeTimeValue = attrVal);
 
                                             } else if (selectedSSASymbology.getAttrIDSlowestDecodeData() == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        slowestDecodeDataValue = hexStringToString(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> slowestDecodeDataValue = hexStringToString(attrVal));
 
                                             } else if (selectedSSASymbology.getAttrIDDecodeCount() == attrId) {
 
                                                 try {
                                                     if (Integer.parseInt(attrVal) > 0) {
-                                                        runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                FLAG_NO_SSA_DATA = false;
-                                                                totalScansValue = attrVal;
+                                                        runOnUiThread(() -> {
+                                                            FLAG_NO_SSA_DATA = false;
+                                                            totalScansValue = attrVal;
 
-                                                            }
                                                         });
                                                     } else {
                                                         FLAG_NO_SSA_DATA = true;
@@ -438,19 +423,16 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
             super.onPostExecute(b);
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+            runOnUiThread(() -> {
 
-                    // set SSA data flag ON
-                    SSA_DATA_RETRIEVED_FLAG = true;
+                // set SSA data flag ON
+                SSA_DATA_RETRIEVED_FLAG = true;
 
-                    if (!FLAG_NO_SSA_DATA) {
-                        addSelfToDevEventsDelegate();
-                        getSlowestDecodeImage();
-                    }
-                    updateUI();
+                if (!FLAG_NO_SSA_DATA) {
+                    addSelfToDevEventsDelegate();
+                    getSlowestDecodeImage();
                 }
+                updateUI();
             });
         }
     }
@@ -580,33 +562,20 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
 
                                             if (selectedSSASymbology.getAttrIDMaxDecodeTime() == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        slowestDecodeTimeValue = attrVal;
-                                                    }
-                                                });
+                                                runOnUiThread(() -> slowestDecodeTimeValue = attrVal);
 
                                             } else if (selectedSSASymbology.getAttrIDSlowestDecodeData() == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        slowestDecodeDataValue = hexStringToString(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> slowestDecodeDataValue = hexStringToString(attrVal));
 
                                             } else if (selectedSSASymbology.getAttrIDDecodeCount() == attrId) {
 
                                                 try {
                                                     if (Integer.parseInt(attrVal) > 0) {
-                                                        runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                FLAG_NO_SSA_DATA = false;
-                                                                totalScansValue = attrVal;
+                                                        runOnUiThread(() -> {
+                                                            FLAG_NO_SSA_DATA = false;
+                                                            totalScansValue = attrVal;
 
-                                                            }
                                                         });
                                                     } else {
                                                         FLAG_NO_SSA_DATA = true;
@@ -680,12 +649,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
             super.onPostExecute(b);
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    updateUI();
-                }
-            });
+            runOnUiThread(() -> updateUI());
         }
     }
 
@@ -992,7 +956,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
                 e.printStackTrace();
             }
         }
-        else
+        else if (finalBitmap != null)
         {
             try {
                 FileOutputStream outStream = null;
@@ -1050,29 +1014,18 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
          resetAlertBuilder.setMessage("Remove all Scan Speed Analytics from scanner.");
          resetAlertBuilder.setCancelable(true);
 
-         resetAlertBuilder.setPositiveButton(
-                "RESET",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
+         resetAlertBuilder.setPositiveButton("RESET", (dialog, id) -> {
+                     dialog.cancel();
 
-                        // TODO : the current symbology is re-setted. if needed do it for all supported symbology types
-                        String inXML = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>" +
-                                RMD_ATTR_VALUE_RESET_SSA_FOR_SYMBOLOGY_TYPE + "</id><datatype>W</datatype><value>" + selectedSSASymbology.getAttrIDDecodeCount() + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
-                        StringBuilder outXML = new StringBuilder();
+                     // TODO : the current symbology is re-setted. if needed do it for all supported symbology types
+                     String inXML = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>" +
+                             RMD_ATTR_VALUE_RESET_SSA_FOR_SYMBOLOGY_TYPE + "</id><datatype>W</datatype><value>" + selectedSSASymbology.getAttrIDDecodeCount() + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
+                     StringBuilder outXML = new StringBuilder();
 
-                        new ResetSSAStatisticsAsyncTask(getIntent().getIntExtra(Constants.SCANNER_ID, 0), DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_SET,outXML).execute(new String[]{inXML});
-                    }
-                });
+                     new ResetSSAStatisticsAsyncTask(getIntent().getIntExtra(Constants.SCANNER_ID, 0), DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_SET,outXML).execute(new String[]{inXML});
+                 });
 
-         resetAlertBuilder.setNegativeButton(
-                "CANCEL",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-
-                    }
-                });
+         resetAlertBuilder.setNegativeButton("CANCEL", (dialog, id) -> dialog.cancel());
 
         AlertDialog resetAlert = resetAlertBuilder.create();
          resetAlert.show();
@@ -1106,6 +1059,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
             return  executeCommand(opcode,strings[0],outXML,scannerId);
@@ -1122,15 +1076,12 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
                 Toast.makeText(ScanSpeedAnalyticsActivity.this, "Resetting Analytics action failed", Toast.LENGTH_SHORT).show();
             } else {
                 //success
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        FLAG_NO_SSA_DATA = true;
-                        removeSelfFromDevEventsDelegate();
-                        //updateUI();
-                        finish();
-                        startActivity(getIntent());
-                    }
+                runOnUiThread(() -> {
+                    FLAG_NO_SSA_DATA = true;
+                    removeSelfFromDevEventsDelegate();
+                    //updateUI();
+                    finish();
+                    startActivity(getIntent());
                 });
 
             }
@@ -1208,7 +1159,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
 
             //------------------------------
 
-            if (ContextCompat.checkSelfPermission(this,
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && ContextCompat.checkSelfPermission(this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 // No explanation needed, we can request the permission.
@@ -1237,6 +1188,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSIONS_REQUEST_WRITE_EX_STORAGE: {
                 // If request is cancelled, the result arrays are empty.
@@ -1246,10 +1198,10 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
                     // permission was granted, yay! Do the
                     // storage-related task you need to do.
                     if (saveToInternalStorage(retrievedSlowestDecodeImage)) {
-                        Toast.makeText(this, "Image saved to \'Download\' folder successfully!" ,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Image saved to \'Download\' folder successfully!", Toast.LENGTH_SHORT).show();
                         saveImageButton.setVisibility(View.GONE);
                     } else {
-                        Toast.makeText(this, "Image Saved Failed!" ,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Image Saved Failed!", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -1290,22 +1242,18 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-            dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setPositiveButton("Continue", (dialog, arg) -> {
 
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(ScanSpeedAnalyticsActivity.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                finish();
+                Intent intent_scan_speed = new Intent(ScanSpeedAnalyticsActivity.this, FindCabledScanner.class);
+                startActivity(intent_scan_speed);
             });
 
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                }
             });
             dlg.show();
         }else if (id == R.id.nav_connection_help) {
@@ -1348,8 +1296,6 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
         this.finish();
         Application.currentScannerId =Application.SCANNER_ID_NONE;
-        Intent intent = new Intent(ScanSpeedAnalyticsActivity.this,HomeActivity.class);
-        startActivity(intent);
         return true;
     }
 
@@ -1401,5 +1347,10 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
     }
     @Override
     public void  scannerVideoEvent(byte[] videoData) {
+    }
+
+    @Override
+    public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
+
     }
 }

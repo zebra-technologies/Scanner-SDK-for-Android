@@ -1,13 +1,14 @@
 package com.zebra.scannercontrol.app.fragments;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.activities.ActiveScannerActivity;
@@ -20,7 +21,7 @@ import java.util.Objects;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BarcodeFargment extends Fragment{
+public class BarcodeFargment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -30,14 +31,14 @@ public class BarcodeFargment extends Fragment{
     BarcodeListAdapter barcodeAdapter;
     ListView barcodesList;
     ArrayList<Barcode> barcodes;
-    public static BarcodeFargment newInstance() {
-        return new BarcodeFargment();
-    }
 
     public BarcodeFargment() {
         // Required empty public constructor
     }
 
+    public static BarcodeFargment newInstance() {
+        return new BarcodeFargment();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -49,21 +50,17 @@ public class BarcodeFargment extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Button btnClear = getActivity().findViewById(R.id.btnClearList);
+        barcodes = ((ActiveScannerActivity) requireActivity()).getBarcodeData(((ActiveScannerActivity) requireActivity()).getScannerID());
+        barcodesList = getActivity().findViewById(R.id.barcodesList);
+        if (barcodes != null) {
+            barcodeAdapter = new BarcodeListAdapter(getActivity(), barcodes);
+            barcodesList.setAdapter(barcodeAdapter);
 
-        barcodes= ((ActiveScannerActivity) Objects.requireNonNull(getActivity())).getBarcodeData( ((ActiveScannerActivity) Objects.requireNonNull(getActivity())).getScannerID());
-        barcodeAdapter = new BarcodeListAdapter(getActivity(),barcodes);
-
-        barcodesList = (ListView) getActivity().findViewById(R.id.barcodesList);
-        barcodesList.setAdapter(barcodeAdapter);
-        Button btnClear = (Button) getActivity().findViewById(R.id.btnClearList);
-
-        if(barcodes==null || barcodes.size()<=0) {
+            btnClear.setEnabled(!barcodes.isEmpty());
+        } else {
             btnClear.setEnabled(false);
         }
-        if(barcodes.size()>0){
-            btnClear.setEnabled(true);
-        }
-
         barcodesList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         ((ActiveScannerActivity) getActivity()).updateBarcodeCount();
     }
@@ -76,20 +73,17 @@ public class BarcodeFargment extends Fragment{
         scrollListViewToBottom();
     }
 
-    public void clearList(){
+    public void clearList() {
         barcodes.clear();
         barcodeAdapter.clear();
         barcodesList.setAdapter(barcodeAdapter);
-        ((ActiveScannerActivity) Objects.requireNonNull(getActivity())).clearBarcodeData();
+        ((ActiveScannerActivity) requireActivity()).clearBarcodeData();
     }
 
     private void scrollListViewToBottom() {
-        barcodesList.post(new Runnable() {
-            @Override
-            public void run() {
-                // Select the last row so it will scroll into view...
-                barcodesList.setSelection(barcodeAdapter.getCount() - 1);
-            }
+        barcodesList.post(() -> {
+            // Select the last row so it will scroll into view...
+            barcodesList.setSelection(barcodeAdapter.getCount() - 1);
         });
     }
 

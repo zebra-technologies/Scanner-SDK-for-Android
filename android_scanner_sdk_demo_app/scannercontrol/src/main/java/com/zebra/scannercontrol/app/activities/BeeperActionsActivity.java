@@ -359,9 +359,9 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         int mProgress = seekBar.getProgress();
-        if(mProgress >= 0 & mProgress < 26) {
+        if(mProgress >= 0 && mProgress < 26) {
             seekBar.setProgress(SEEK_BAR_PROGRESS_MIN);
-        } else if(mProgress > 25 & mProgress < 76) {
+        } else if(mProgress > 25 && mProgress < 76) {
             seekBar.setProgress(SEEK_BAR_PROGRESS_MEDIUM);
         } else seekBar.setProgress(SEEK_BAR_PROGRESS_MAX);
 

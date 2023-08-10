@@ -582,21 +582,21 @@ class Barcode128 {
         int len = 1;
         int barcode;
         int ctrl_code = BARCODE128STARTBNO();
-        int w;
+        int barcodeWidth;
 
         int outputPointer = 0;
         int inputPointer = 0;
 
         output[outputPointer] = BARCODE128STARTB();
         outputPointer++;
-        w = BARCODE128STOPWIDTH();
+        barcodeWidth = BARCODE128STOPWIDTH();
 
         while (inputPointer < input.length) {
             if (input[inputPointer] > 127) {
                 return 0;
             }
             barcode = s_bc128Bcodes[input[inputPointer]];
-            w += s_bc128Bcode_widths[input[inputPointer]];
+            barcodeWidth += s_bc128Bcode_widths[input[inputPointer]];
             if (barcode == 0) {
                 return 0;
             }
@@ -625,16 +625,14 @@ class Barcode128 {
         ctrl_code %= 103;
 
         output[outputPointer] = s_bc128Bnum_codes[ctrl_code];
-        w += s_bc128Bnum_code_widths[ctrl_code];
+        barcodeWidth += s_bc128Bnum_code_widths[ctrl_code];
         outputPointer++;
         len++;
         output[outputPointer] = BARCODE128STOP();
-        w += BARCODE128STOPWIDTH();
+        barcodeWidth += BARCODE128STOPWIDTH();
         len++;
 
-        width = w;
-
-        Barcode128.width = width;
+        Barcode128.width = barcodeWidth;
         Barcode128.input = input;
         Barcode128.output = output;
 

@@ -40,6 +40,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.zebra.barcode.sdk.sms.ConfigurationUpdateEvent;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
 import com.zebra.scannercontrol.IDCConfig;
@@ -307,8 +308,6 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
         //pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
         this.finish();
         Application.currentScannerId = Application.SCANNER_ID_NONE;
-        Intent intent = new Intent(ImageActivity.this, HomeActivity.class);
-        startActivity(intent);
         return true;
     }
 
@@ -346,6 +345,11 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
 
         final byte[] tempVideoData = videoData;
 
+
+    }
+
+    @Override
+    public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
 
     }
 
@@ -521,6 +525,7 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
                 // If request is cancelled, the result arrays are empty.

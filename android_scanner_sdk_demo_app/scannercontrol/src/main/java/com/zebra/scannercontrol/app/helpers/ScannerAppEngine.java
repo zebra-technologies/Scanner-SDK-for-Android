@@ -2,6 +2,7 @@ package com.zebra.scannercontrol.app.helpers;
 
 import android.content.Context;
 
+import com.zebra.barcode.sdk.sms.ConfigurationUpdateEvent;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.DCSScannerInfo;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
@@ -63,6 +64,7 @@ public interface ScannerAppEngine{
         void scannerFirmwareUpdateEvent(FirmwareUpdateEvent firmwareUpdateEvent);
         void scannerImageEvent(byte[] imageData);
         void scannerVideoEvent(byte[] videoData);
+        void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent);
     }
 
 

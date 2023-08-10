@@ -149,6 +149,10 @@ public class SymbologiesActivity extends BaseActivity implements  NavigationView
         symbologies.add(new Symbology("Japan Post", RMD_ATTR_SYM_JAPAN_POST));                      //40
         symbologies.add(new Symbology("UPU FICS", RMD_ATTR_SYM_FICS));                              //41
         symbologies.add(new Symbology("MicroQR", RMD_ATTR_SYM_MICRO_QR_CODE));                      //42
+        symbologies.add(new Symbology("Composite C", RMD_ATTR_SYM_COMPOSITE_C));                    //43
+        symbologies.add(new Symbology("Composite AB", RMD_ATTR_SYM_COMPOSITE_AB));                  //44
+        symbologies.add(new Symbology("TLC39", RMD_ATTR_SYM_COMPOSITE_TLC39));                      //45
+        symbologies.add(new Symbology("Dot Code", RMD_ATTR_SYM_DOTCODE));                           //46
     }
 
 
@@ -286,23 +290,18 @@ public class SymbologiesActivity extends BaseActivity implements  NavigationView
         }else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
-            //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-            dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setPositiveButton("Continue", (dialog, arg) -> {
 
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(SymbologiesActivity.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                finish();
+                Intent intent_symbol = new Intent(SymbologiesActivity.this, FindCabledScanner.class);
+                startActivity(intent_symbol);
             });
 
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                }
             });
             dlg.show();
         }else if (id == R.id.nav_connection_help) {

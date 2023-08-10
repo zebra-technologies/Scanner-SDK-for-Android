@@ -50,7 +50,7 @@ public class BarcodeListAdapter extends ArrayAdapter<Barcode> {
         holder.tv_barCode.setText(new String(barcode.getBarcodeData()));
         holder.tv_barCodeType.setText(BarcodeTypes.getBarcodeTypeName(barcode.getBarcodeType()));
         holder.txtBarcodeCounter.setText(Integer.toString(position + 1) );
-        holder.txtBarcodeLength.setText(" Characters = "+ Integer.toString(barcode.getBarcodeData().length));
+        holder.txtBarcodeLength.setText(" Characters = "+ barcode.getBarcodeData().length);
         return rowView;
     }
 

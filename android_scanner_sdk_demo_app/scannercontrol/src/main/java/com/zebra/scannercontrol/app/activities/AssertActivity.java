@@ -145,28 +145,22 @@ public class AssertActivity extends BaseActivity implements NavigationView.OnNav
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
             startActivity(intent);
         }else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
-            //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-            dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setPositiveButton("Continue", (dialog, arg) -> {
 
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(AssertActivity.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                finish();
+                Intent intent_assert = new Intent(AssertActivity.this, FindCabledScanner.class);
+                startActivity(intent_assert);
             });
 
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                }
             });
             dlg.show();
         }else if (id == R.id.nav_connection_help) {
@@ -261,48 +255,23 @@ public class AssertActivity extends BaseActivity implements NavigationView.OnNav
                                             Log.i(TAG, "Value tag found: Value: " + attrVal);
                                             if (RMD_ATTR_MODEL_NUMBER == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txtModel)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txtModel)).setText(attrVal));
 
                                             } else if (RMD_ATTR_SERIAL_NUMBER == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txtSerial)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txtSerial)).setText(attrVal));
 
                                             } else if (RMD_ATTR_FW_VERSION == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txtFW)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txtFW)).setText(attrVal));
 
                                             } else if (RMD_ATTR_DOM == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txtDOM)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txtDOM)).setText(attrVal));
 
                                             } else if (RMD_ATTR_CONFIG_NAME == attrId) {
 
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        ((TextView) findViewById(R.id.txtConfigName)).setText(attrVal);
-                                                    }
-                                                });
+                                                runOnUiThread(() -> ((TextView) findViewById(R.id.txtConfigName)).setText(attrVal));
 
                                             }
                                         }

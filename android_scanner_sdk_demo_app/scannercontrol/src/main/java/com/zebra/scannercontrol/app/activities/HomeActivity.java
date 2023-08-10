@@ -4,24 +4,23 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -41,48 +40,161 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.material.navigation.NavigationView;
 import com.zebra.scannercontrol.BarCodeView;
 import com.zebra.scannercontrol.DCSSDKDefs;
+import com.zebra.scannercontrol.IDcsScannerEventsOnReLaunch;
 import com.zebra.scannercontrol.DCSScannerInfo;
-import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.SDKHandler;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
+import com.zebra.scannercontrol.app.helpers.AvailableScanner;
 import com.zebra.scannercontrol.app.helpers.Constants;
+import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class HomeActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener,ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate{
-    private FrameLayout llBarcode;
-    private NavigationView navigationView;
-    Menu menu;
-    MenuItem pairNewScannerMenu;
+        implements IDcsScannerEventsOnReLaunch, NavigationView.OnNavigationItemSelectedListener, ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate {
+    public static final String BLUETOOTH_ADDRESS_VALIDATOR = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
     private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 10;
     private static final int MAX_ALPHANUMERIC_CHARACTERS = 12;
     private static final int MAX_BLUETOOTH_ADDRESS_CHARACTERS = 17;
     private static final String DEFAULT_EMPTY_STRING = "";
     private static final String COLON_CHARACTER = ":";
-    public static final String BLUETOOTH_ADDRESS_VALIDATOR = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
     static boolean firstRun = true;
-    Dialog dialog;
-    Dialog dialogBTAddress;
     static String btAddress;
     static String userEnteredBluetoothAddress;
+    static AvailableScanner curAvailableScanner = null;
+
+    Menu menu;
+    MenuItem pairNewScannerMenu;
+    Dialog dialog;
+    Dialog dialogBTAddress;
+    private FrameLayout llBarcode;
+    private NavigationView navigationView;
+    private GoogleApiClient googleApiClient;
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+
+    AlertDialog alertDialog;
+    ArrayList<String> permissionsList;
+    int permissionsCount = 0;
+    private static final String[] BLE_PERMISSIONS = new String[]{
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+    };
+
+    private static final String[] ANDROID_13_BLE_PERMISSIONS = new String[]{
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_ADVERTISE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.POST_NOTIFICATIONS
+    };
+
+    private static final String[] ANDROID_12_BLE_PERMISSIONS = new String[]{
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_ADVERTISE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+    };
+    private final static int REQUEST_ENABLE_BT=1;
+    BluetoothAdapter mBluetoothAdapter;
+
+    ActivityResultLauncher<String[]> permissionsLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                    new ActivityResultCallback<Map<String, Boolean>>() {
+                        @RequiresApi(api = Build.VERSION_CODES.M)
+                        @Override
+                        public void onActivityResult(Map<String,Boolean> result) {
+                            ArrayList<Boolean> list = new ArrayList<>(result.values());
+                            permissionsList = new ArrayList<>();
+                            permissionsCount = 0;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                for (int i = 0; i < list.size(); i++) {
+                                    if (shouldShowRequestPermissionRationale(ANDROID_13_BLE_PERMISSIONS[i])) {
+                                        permissionsList.add(ANDROID_13_BLE_PERMISSIONS[i]);
+                                    } else if (!hasPermission(HomeActivity.this, ANDROID_13_BLE_PERMISSIONS[i])) {
+                                        permissionsCount++;
+                                    }
+                                }
+                            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                                for (int i = 0; i < list.size(); i++) {
+                                    if (shouldShowRequestPermissionRationale(ANDROID_12_BLE_PERMISSIONS[i])) {
+                                        permissionsList.add(ANDROID_12_BLE_PERMISSIONS[i]);
+                                    }else if (!hasPermission(HomeActivity.this, ANDROID_12_BLE_PERMISSIONS[i])){
+                                        permissionsCount++;
+                                    }
+                                }
+                            } else {
+                                for (int i = 0; i < list.size(); i++) {
+                                    if (shouldShowRequestPermissionRationale(BLE_PERMISSIONS[i])) {
+                                        permissionsList.add(BLE_PERMISSIONS[i]);
+                                    }else if (!hasPermission(HomeActivity.this, BLE_PERMISSIONS[i])){
+                                        permissionsCount++;
+                                    }
+                                }
+                            }
+                            if (permissionsList.size() > 0) {
+                                //Some permissions are denied and can be asked again.
+                                askForPermissions(permissionsList);
+                            } else if (permissionsCount > 0) {
+                                //Show alert dialog
+                                showPermissionDialog();
+                            } else {
+                                //All permissions granted
+                                initialize();
+                            }
+                        }
+                    });
+    ProgressDialog progressDialog;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        googleApiClient = getAPIClientInstance();
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
+
         Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
+        } else {
+            if (configuration.screenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         }
@@ -92,30 +204,139 @@ public class HomeActivity extends BaseActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer,toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
 
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        permissionsList = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionsList.addAll(Arrays.asList(ANDROID_13_BLE_PERMISSIONS));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            permissionsList.addAll(Arrays.asList(ANDROID_12_BLE_PERMISSIONS));
+        } else {
+            permissionsList.addAll(Arrays.asList(BLE_PERMISSIONS));
+        }
+        askForPermissions(permissionsList);
+    }
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    ACCESS_FINE_LOCATION_REQUEST_CODE);
-        }else{
-            initialize();
+    /**
+     * Method to request required permissions with the permission launcher
+     * @param permissionsList list of permissions
+     */
+    private void askForPermissions(ArrayList<String> permissionsList) {
+        String[] newPermissionStr = new String[permissionsList.size()];
+        for (int i = 0; i < newPermissionStr.length; i++) {
+            newPermissionStr[i] = permissionsList.get(i);
+        }
+        if (newPermissionStr.length > 0) {
+            permissionsLauncher.launch(newPermissionStr);
+        } else {
+            showPermissionDialog();
+        }
+
+
+    }
+
+
+    /**
+     * Method to redirect to application settings if user denies the permissions
+     */
+    private void showPermissionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Permission required")
+                .setCancelable(false)
+                .setMessage("Some permissions are need to be allowed to use this app without any problems.")
+                .setPositiveButton("Settings", (dialog, which) -> {
+                    //askForPermissions(permissionsList);
+                    openAppSettings();
+                    dialog.dismiss();
+                });
+        if (alertDialog == null) {
+            alertDialog = builder.create();
+            if (!alertDialog.isShowing()) {
+                alertDialog.show();
+            }
         }
     }
 
+    /**
+     * Method to open application settings
+     */
+    public void openAppSettings() {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package",HomeActivity.this.getPackageName(), null);
+        intent.setData(uri);
+        HomeActivity.this.startActivity(intent);
+    }
+
+    /**
+     * Method to check permissions granted status
+     * @param context
+     * @param permissionStr
+     * @return true if permission granted otherwise false
+     */
+    private boolean hasPermission(Context context, String permissionStr) {
+        return ContextCompat.checkSelfPermission(context, permissionStr) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * GoogleApiClient instance
+     *
+     * @return GoogleApiClient
+     */
+    private GoogleApiClient getAPIClientInstance() {
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API).build();
+        return mGoogleApiClient;
+    }
+
+    /**
+     * check the location settings status and ask for Location settings on
+     */
+    private void requestDeviceLocationSettings() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(2000);
+        locationRequest.setFastestInterval(500);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        try {
+                            status.startResolutionForResult(HomeActivity.this, REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            Log.e(TAG, e.toString());
+
+                        }
+                        break;
+                }
+            }
+        });
+    }
+
+    @SuppressLint("MissingPermission")
     private void initialize() {
+        if(!mBluetoothAdapter.isEnabled())
+        {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
         initializeDcsSdk();
         llBarcode = (FrameLayout) findViewById(R.id.scan_to_connect_barcode);
         addDevConnectionsDelegate(this);
@@ -136,17 +357,17 @@ public class HomeActivity extends BaseActivity
         int width = size.x;
         int height = size.y;
 
-        int orientation =this.getResources().getConfiguration().orientation;
+        int orientation = this.getResources().getConfiguration().orientation;
         int x = width * 9 / 10;
         int y = x / 3;
-        if(getDeviceScreenSize()>6){ // TODO: Check 6 is ok or not
+
+        if (getDeviceScreenSize() > 6) { // TODO: Check 6 is ok or not
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                x =  width /2;
-                y = x/3;
-            }else {
-                x =  width *2/3;
-                y = x/3;
+                x = width / 2;
+            } else {
+                x = width * 2 / 3;
             }
+            y = x / 3;
         }
         barCodeView.setSize(x, y);
         llBarcode.addView(barCodeView, layoutParams);
@@ -167,36 +388,18 @@ public class HomeActivity extends BaseActivity
             mHeightPixels = realSize.y;
             DisplayMetrics dm = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(dm);
-            double x = Math.pow(mWidthPixels/dm.xdpi,2);
-            double y = Math.pow(mHeightPixels/dm.ydpi,2);
-            screenInches = Math.sqrt(x+y);
-        } catch (Exception ignored) {
+            double x = Math.pow(mWidthPixels / dm.xdpi, 2);
+            double y = Math.pow(mHeightPixels / dm.ydpi, 2);
+            screenInches = Math.sqrt(x + y);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return screenInches;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case ACCESS_FINE_LOCATION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay!
-                    initialize();
 
-                } else {
-                    finish();
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-        }
-    }
 
-    private void initializeDcsSdk(){
+    private void initializeDcsSdk() {
         Application.sdkHandler.dcssdkEnableAvailableScannersDetection(true);
         Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
         Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_SNAPI);
@@ -242,37 +445,34 @@ public class HomeActivity extends BaseActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         Intent intent;
-        if(id==R.id.nav_pair_device){
-            if(Application.isAnyScannerConnected) {
-                AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
+        if (id == R.id.nav_pair_device) {
+            if (Application.getAnyScannerConnectedStatus()) {
+                AlertDialog.Builder dlg = new AlertDialog.Builder(this);
                 dlg.setTitle("This will disconnect your current scanner");
                 //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-                dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int arg) {
+                dlg.setPositiveButton("Continue", (dialog, arg) -> {
 
-                        disconnect(Application.currentConnectedScannerID);
-                        Application.barcodeData.clear();
-                        Application.currentScannerId =Application.SCANNER_ID_NONE;
-                        finish();
-                        Intent intent = new Intent(HomeActivity.this,HomeActivity.class);
-                        startActivity(intent);
-                    }
+                    disconnect(Application.currentConnectedScannerID);
+                    Application.barcodeData.clear();
+                    Application.currentScannerId = Application.SCANNER_ID_NONE;
+                    finish();
+                    Intent intent_home = new Intent(HomeActivity.this, HomeActivity.class);
+                    startActivity(intent_home);
                 });
 
-                dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int arg) {
+                dlg.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                    } });
+                });
                 dlg.show();
 
             }
-        }else if (id == R.id.nav_devices) {
+        } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
             startActivity(intent);
-        }else if (id == R.id.nav_find_cabled_scanner) {
+        } else if (id == R.id.nav_find_cabled_scanner) {
             intent = new Intent(this, FindCabledScanner.class);
             startActivity(intent);
-        }else if (id == R.id.nav_connection_help) {
+        } else if (id == R.id.nav_connection_help) {
             intent = new Intent(this, ConnectionHelpActivity2.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
@@ -289,14 +489,12 @@ public class HomeActivity extends BaseActivity
         return true;
     }
 
-
     @Override
-    protected void onDestroy(){
-    // TODO: https://jiraemv.zebra.com/browse/SSDK-5961
-    // Application.sdkHandler.dcssdkClose();
+    protected void onDestroy() {
+        // TODO: https://jiraemv.zebra.com/browse/SSDK-5961
+        // Application.sdkHandler.dcssdkClose();
         super.onDestroy();
     }
-
 
     @Override
     protected void onPause() {
@@ -305,8 +503,15 @@ public class HomeActivity extends BaseActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        requestDeviceLocationSettings();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume: HOME--------------------------------------------");
         addDevConnectionsDelegate(this);
         navigationView.getMenu().findItem(R.id.nav_about).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_pair_device).setChecked(false);
@@ -317,8 +522,8 @@ public class HomeActivity extends BaseActivity
         navigationView.getMenu().findItem(R.id.nav_find_cabled_scanner).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_find_cabled_scanner).setCheckable(false);
         SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
-        TextView txtBarcodeType = (TextView)findViewById(R.id.scan_to_connect_barcode_type);
-        TextView txtScannerConfiguration = (TextView)findViewById(R.id.scan_to_connect_scanner_config);
+        TextView txtBarcodeType = (TextView) findViewById(R.id.scan_to_connect_barcode_type);
+        TextView txtScannerConfiguration = (TextView) findViewById(R.id.scan_to_connect_scanner_config);
         String sourceString = "";
         txtBarcodeType.setText(Html.fromHtml(sourceString));
         txtScannerConfiguration.setText("");
@@ -330,12 +535,12 @@ public class HomeActivity extends BaseActivity
         llBarcode = (FrameLayout) findViewById(R.id.scan_to_connect_barcode);
         DCSSDKDefs.DCSSDK_BT_PROTOCOL protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.LEGACY_B;
         DCSSDKDefs.DCSSDK_BT_SCANNER_CONFIG config = DCSSDKDefs.DCSSDK_BT_SCANNER_CONFIG.KEEP_CURRENT;
-        if(barcode ==0){
+        if (barcode == 0) {
             txtBarcodeType.setText("");
             txtScannerConfiguration.setText("");
             sourceString = "STC Barcode ";
             txtBarcodeType.setText(Html.fromHtml(sourceString));
-            switch (protocolInt){
+            switch (protocolInt) {
                 case 0:
                     protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_LE;//SSI over Bluetooth LE
                     strProtocol = "Bluetooth LE";
@@ -348,31 +553,32 @@ public class HomeActivity extends BaseActivity
                     protocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_LE;//SSI over Bluetooth LE
                     break;
             }
-            if(setDefaults){
+            if (setDefaults) {
                 config = DCSSDKDefs.DCSSDK_BT_SCANNER_CONFIG.SET_FACTORY_DEFAULTS;
-                txtScannerConfiguration.setText(Html.fromHtml("<i> Set Factory Defaults, Com Protocol = "+strProtocol+"</i>"));
-            }else{
-                txtScannerConfiguration.setText(Html.fromHtml("<i> Keep Current Settings, Com Protocol = "+strProtocol+"</i>"));
+                txtScannerConfiguration.setText(Html.fromHtml("<i> Set Factory Defaults, Com Protocol = " + strProtocol + "</i>"));
+            } else {
+                txtScannerConfiguration.setText(Html.fromHtml("<i> Keep Current Settings, Com Protocol = " + strProtocol + "</i>"));
             }
-        }else{
+        } else {
             sourceString = "Legacy Pairing ";
             txtBarcodeType.setText(Html.fromHtml(sourceString));
             txtScannerConfiguration.setText("");
         }
         selectedProtocol = protocol;
+        setCommunicationProtocol(selectedProtocol);
         selectedConfig = config;
         generatePairingBarcode();
-        if(dialogBTAddress == null && firstRun && !dntShowMessage){
+        if (dialogBTAddress == null && firstRun && !dntShowMessage) {
             dialog = new Dialog(HomeActivity.this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_launch_instructions);
 
-            CheckBox chkDontShow = (CheckBox)dialog.findViewById(R.id.chk_dont_show);
+            CheckBox chkDontShow = (CheckBox) dialog.findViewById(R.id.chk_dont_show);
             chkDontShow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @SuppressLint("ApplySharedPref")
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked){
+                    if (isChecked) {
                         SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
                         settingsEditor.putBoolean(Constants.PREF_DONT_SHOW_INSTRUCTIONS, true).commit(); // Commit is required here. So suppressing warning.
                     }
@@ -393,22 +599,27 @@ public class HomeActivity extends BaseActivity
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
             Window window = dialog.getWindow();
-            if(window!=null) window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            if (window != null)
+                window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             firstRun = false;
         }
 
 
-        if ((barcode == 0 )
+        if ((barcode == 0)
                 && (setDefaults == true)
                 && (protocolInt == 0)) {
-            txtScannerConfiguration.setText(Html.fromHtml("<i> Factory Defaults Are Set, Com Protocol = "+strProtocol+"</i>"));
+            txtScannerConfiguration.setText(Html.fromHtml("<i> Factory Defaults Are Set, Com Protocol = " + strProtocol + "</i>"));
         } else {
-            if(barcode ==0){
+            if (barcode == 0) {
                 txtBarcodeType.setText(Html.fromHtml(sourceString));
-            }else{
+            } else {
                 txtBarcodeType.setText(Html.fromHtml(sourceString));
             }
 
+        }
+
+        if(Application.isScannerConnectedAfterSMS && Application.currentConnectedScannerID != -1) {
+            scannerHasConnected(Application.currentConnectedScannerID);
         }
 
     }
@@ -417,15 +628,15 @@ public class HomeActivity extends BaseActivity
         SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-1, -1);
         BarCodeView barCodeView = Application.sdkHandler.dcssdkGetPairingBarcode(selectedProtocol, selectedConfig);
-        if(barCodeView!=null) {
+        if (barCodeView != null) {
             updateBarcodeView(layoutParams, barCodeView);
-        }else{
+        } else {
             // SDK was not able to determine Bluetooth MAC. So call the dcssdkGetPairingBarcode with BT Address.
 
-            btAddress= getDeviceBTAddress(settings);
-            if(btAddress.equals("")){
+            btAddress = getDeviceBTAddress(settings);
+            if (btAddress.equals("")) {
                 llBarcode.removeAllViews();
-            }else {
+            } else {
                 Application.sdkHandler.dcssdkSetBTAddress(btAddress);
                 barCodeView = Application.sdkHandler.dcssdkGetPairingBarcode(selectedProtocol, selectedConfig, btAddress);
                 if (barCodeView != null) {
@@ -459,7 +670,12 @@ public class HomeActivity extends BaseActivity
                     @Override
                     public void onClick(View view) {
                         if (cancelContinueButton.getText().equals(getResources().getString(R.string.cancel))) {
-                            finish();
+                            if (dialogBTAddress != null) {
+                                dialogBTAddress.dismiss();
+                                Intent intent = new Intent(HomeActivity.this, SettingsActivity.class);
+                                startActivity(intent);
+                            }
+
                         } else {
                             Application.sdkHandler.dcssdkSetSTCEnabledState(true);
                             SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
@@ -473,18 +689,16 @@ public class HomeActivity extends BaseActivity
                     }
                 });
 
-                skipButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Application.sdkHandler.dcssdkSetSTCEnabledState(false);
-                        Intent intent = new Intent(HomeActivity.this, ScannersActivity.class);
-                        startActivity(intent);
-                    }
+                skipButton.setOnClickListener(view -> {
+                    Application.sdkHandler.dcssdkSetSTCEnabledState(false);
+                    Intent intent = new Intent(HomeActivity.this, ScannersActivity.class);
+                    startActivity(intent);
                 });
 
                 final EditText editTextBluetoothAddress = (EditText) dialogBTAddress.findViewById(R.id.text_bt_address);
                 editTextBluetoothAddress.addTextChangedListener(new TextWatcher() {
                     String previousMac = null;
+
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -507,7 +721,7 @@ public class HomeActivity extends BaseActivity
                     @Override
                     public void afterTextChanged(Editable s) {
                         userEnteredBluetoothAddress = s.toString();
-                        if(userEnteredBluetoothAddress.length() > MAX_BLUETOOTH_ADDRESS_CHARACTERS)
+                        if (userEnteredBluetoothAddress.length() > MAX_BLUETOOTH_ADDRESS_CHARACTERS)
                             return;
 
                         if (isValidBTAddress(userEnteredBluetoothAddress)) {
@@ -532,7 +746,7 @@ public class HomeActivity extends BaseActivity
                      * @return String containing bluetooth MAC-allowed characters.
                      */
                     private String clearNonMacCharacters(String inputMacString) {
-                        return inputMacString.toString().replaceAll("[^A-Fa-f0-9]", DEFAULT_EMPTY_STRING);
+                        return inputMacString.replaceAll("[^A-Fa-f0-9]", DEFAULT_EMPTY_STRING);
                     }
 
                     /**
@@ -577,11 +791,11 @@ public class HomeActivity extends BaseActivity
                             int currentColonCount = colonCount(enteredMacAddress);
 
                             if (currentColonCount < previousColonCount) {
-                               try {
-                                   formattedMacAddress = formattedMacAddress.substring(0, selectionStartPosition - 1) + formattedMacAddress.substring(selectionStartPosition);
-                               }catch (Exception e){
-                                   e.printStackTrace();
-                               }
+                                try {
+                                    formattedMacAddress = formattedMacAddress.substring(0, selectionStartPosition - 1) + formattedMacAddress.substring(selectionStartPosition);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                                 String cleanMacAddress = clearNonMacCharacters(formattedMacAddress);
                                 formattedMacAddress = formatMacAddress(cleanMacAddress);
                             }
@@ -628,7 +842,8 @@ public class HomeActivity extends BaseActivity
                 dialogBTAddress.setCanceledOnTouchOutside(false);
                 dialogBTAddress.show();
                 Window window = dialogBTAddress.getWindow();
-                if(window!=null) window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                if (window != null)
+                    window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 bluetoothMAC = settings.getString(Constants.PREF_BT_ADDRESS, "");
             } else {
                 dialogBTAddress.show();
@@ -648,19 +863,19 @@ public class HomeActivity extends BaseActivity
         return text != null && text.length() > 0 && text.matches(BLUETOOTH_ADDRESS_VALIDATOR);
     }
 
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         reloadBarcode();
-        if(dialog !=null){
+        if (dialog != null) {
             Window window = dialog.getWindow();
-            if(window!=null) window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            if (window != null)
+                window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         }
     }
 
     private void reloadBarcode() {
-       generatePairingBarcode();
+        generatePairingBarcode();
     }
 
     @Override
@@ -692,21 +907,23 @@ public class HomeActivity extends BaseActivity
                 intent.putExtra(Constants.SCANNER_ID, scannerInfo.getScannerID());
                 intent.putExtra(Constants.AUTO_RECONNECTION, scannerInfo.isAutoCommunicationSessionReestablishment());
                 intent.putExtra(Constants.CONNECTED, true);
-                intent.putExtra(Constants.PICKLIST_MODE,getPickListMode(scannerID));
+                intent.putExtra(Constants.PICKLIST_MODE, getPickListMode(scannerID));
+                intent.putExtra(Constants.BEEPER_VOLUME, getBeeperVolume(scannerID));
 
-                if(scannerInfo.getScannerModel() !=null && scannerInfo.getScannerModel().startsWith("PL3300")){ // remove this condition when CS4070 get the capability
+                if (scannerInfo.getScannerModel() != null && scannerInfo.getScannerModel().startsWith("PL3300")) { // remove this condition when CS4070 get the capability
                     intent.putExtra(Constants.PAGER_MOTOR_STATUS, true);
-                }else {
+                } else {
                     intent.putExtra(Constants.PAGER_MOTOR_STATUS, isPagerMotorAvailable(scannerID));
                 }
 
-                intent.putExtra(Constants.BEEPER_VOLUME,getBeeperVolume(scannerID));
-
-                Application.isAnyScannerConnected = true;
+                Application.setAnyScannerConnectedStatus(true);
                 Application.currentConnectedScannerID = scannerID;
                 Application.currentConnectedScanner = scannerInfo;
+                Application.currentScannerType = scannerInfo.getConnectionType().value;
                 Application.lastConnectedScanner = Application.currentConnectedScanner;
-                startActivity(intent);
+                if (!Application.isSMSExecutionInProgress) {
+                    startActivity(intent);
+                }
                 break;
             }
         }
@@ -718,7 +935,7 @@ public class HomeActivity extends BaseActivity
 
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>140</attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
-        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET,in_xml,outXML,scannerID);
+        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, in_xml, outXML, scannerID);
 
         try {
             XmlPullParser parser = Xml.newPullParser();
@@ -729,8 +946,6 @@ public class HomeActivity extends BaseActivity
             while (event != XmlPullParser.END_DOCUMENT) {
                 String name = parser.getName();
                 switch (event) {
-                    case XmlPullParser.START_TAG:
-                        break;
                     case XmlPullParser.TEXT:
                         text = parser.getText();
                         break;
@@ -740,17 +955,18 @@ public class HomeActivity extends BaseActivity
                             beeperVolume = Integer.parseInt(text != null ? text.trim() : null);
                         }
                         break;
+                    default: break; //XmlPullParser.START_TAG
                 }
                 event = parser.next();
             }
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-        if(beeperVolume == 0){
+        if (beeperVolume == 0) {
             return 100;
-        }else if(beeperVolume == 1){
+        } else if (beeperVolume == 1) {
             return 50;
-        }else{
+        } else {
             return 0;
         }
     }
@@ -759,19 +975,18 @@ public class HomeActivity extends BaseActivity
         boolean isFound = false;
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>613</attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
-        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET,in_xml,outXML,scannerID);
-        if(outXML.toString().contains("<id>613</id>")){
+        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, in_xml, outXML, scannerID);
+        if (outXML.toString().contains("<id>613</id>")) {
             isFound = true;
         }
         return isFound;
     }
 
-
     private int getPickListMode(int scannerID) {
         int attrVal = 0;
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>402</attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
-        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET,in_xml,outXML,scannerID);
+        executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, in_xml, outXML, scannerID);
 
         try {
             XmlPullParser parser = Xml.newPullParser();
@@ -782,8 +997,6 @@ public class HomeActivity extends BaseActivity
             while (event != XmlPullParser.END_DOCUMENT) {
                 String name = parser.getName();
                 switch (event) {
-                    case XmlPullParser.START_TAG:
-                        break;
                     case XmlPullParser.TEXT:
                         text = parser.getText();
                         break;
@@ -793,6 +1006,7 @@ public class HomeActivity extends BaseActivity
                             attrVal = Integer.parseInt(text != null ? text.trim() : null);
                         }
                         break;
+                    default: break; //XmlPullParser.START_TAG
                 }
                 event = parser.next();
             }
@@ -805,10 +1019,73 @@ public class HomeActivity extends BaseActivity
     @Override
     public boolean scannerHasDisconnected(int scannerID) {
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
-        Application.isAnyScannerConnected = false;
+        Application.setAnyScannerConnectedStatus(false);
         Application.currentConnectedScannerID = -1;
         Application.lastConnectedScanner = Application.currentConnectedScanner;
         Application.currentConnectedScanner = null;
         return false;
     }
+
+
+    /**
+     * callback from BluetoothLEManager to show detected last connected device and get
+     * setting "Auto connect to last scanner"
+     * @param device
+     * @return boolean - (application settings scanner connect to last scanner)?true:false
+     */
+    @Override
+    public boolean onLastConnectedScannerDetect(BluetoothDevice device) {
+        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        return settings.getBoolean(Constants.PREF_SCANNER_CONNECTION, false);
+    }
+
+    /**
+     * callback from BluetoothLeManager to show connecting last connected device
+     * @param device
+     */
+    @Override
+    public void onConnectingToLastConnectedScanner(BluetoothDevice device) {
+
+        int progressUntil = 31 * 1000;
+        progressDialog = new ProgressDialog(HomeActivity.this);
+        progressDialog.setMessage(getString(R.string.progress_connecting_on_launch)+device.getName());
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // progress will dismiss after 'progressUntil'
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if(progressDialog!=null){
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();
+                    }
+                }
+            }
+        }, progressUntil);
+    }
+
+
+    /**
+     * callback from BluetoothLeManager to show disconnected device
+     */
+    @Override
+    public void onScannerDisconnect() {
+        if(progressDialog!=null){
+            if(progressDialog.isShowing()){
+                progressDialog.dismiss();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(progressDialog!=null){
+            if(progressDialog.isShowing()){
+                progressDialog.dismiss();
+            }
+        }
+    }
+
 }

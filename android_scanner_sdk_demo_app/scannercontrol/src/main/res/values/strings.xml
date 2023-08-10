@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">Settings</string>
@@ -70,7 +70,7 @@
     <string name="menu_item_device_pair">Pair Bluetooth Scanner</string>
     <string name="title_activity_about">App Overview</string>
     <string name="version">Version</string>
-    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2020 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
+    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2023 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
     <string name="title_activity_scanners">Available Device List</string>
     <string name="bt_scanners_not_found">BT scanners not found</string>
     <string name="bt_no_scanners">No scanner found.</string>
@@ -85,8 +85,13 @@
     <string name="title_activity_settings">App Settings</string>
     <string name="scanner_detection_title">Scanner Detection</string>
     <string name="scanner_discovery_title">Bluetooth Scanner Discovery</string>
+    <string name="scanner_filteration_title">Classic mode Scanner Filtration</string>
     <string name="auto_detection">Auto Detection</string>
+    <string name="auto_connection">Auto Connect To Last BLE Scanner</string>
     <string name="discover_bluetooth_scanners">Discover Bluetooth Scanners</string>
+    <string name="set_sms_dir_path">SMS folder location</string>
+    <string name="filter_zebra_devices">Filter Zebra Devices</string>
+    <string name="add_customized_friendly_name">Add customized friendly name</string>
     <string name="pairing_barcode_title">Pair New Scanner (STC) Barcode</string>
     <string name="pairing_barcode_type">Barcode Type</string>
     <string name="pairing_barcode_configuration">Set Factory Defaults</string>
@@ -232,13 +237,8 @@
     <string name="title_activity_connection_help_li4278">ConnectionHelpLI4278</string>
     <string name="title_activity_connection_help_rfd8500">ConnectionHelpRFD8500</string>
     <string name="updateFirmware">Update Firmware</string>
+    <string name="selectFirmware">Select Firmware</string>
     <string name="Image_Video">Image and Video</string>
-    <string name="unpair_and_reboot">Unpair and Reboot</string>
-    <string name="please_wait_string">Please wait...</string>
-    <string name="attribute_string">attribute</string>
-    <string name="scanner_disconnect_string">This will disconnect your current scanner</string>
-    <string name="continue_string">Continue</string>
-    <string name="cancel_string">Cancel</string>
     <string name="IDC">IDC</string>
     <string name="start_new_firmware">Start New Firmware</string>
     <string name="abort_update_firmware">Abort Firmware Update</string>
@@ -359,6 +359,9 @@
     <string name="mismatch">Plug-in / Scanner Mismatch</string>
     <string name="mismatch_plugin_msg_1"><![CDATA[1. Delete the incorrect plug-in from the Device Storage > Download folder.]]></string>
     <string name="mismatch_plugin_msg_2">2. Load the correct plug-in for your scanner model into the folder.</string>
+    <string name="change_path">Incorrect Plug-in File Path</string>
+    <string name="change_path_plugin_msg_1"><![CDATA[Do not select the firmware file from default shortcut directory folders such as Downloads, Documents, Musics, etc.. Select the relevant folder from Device Internal Storage.]]></string>
+    <string name="change_path_plugin_msg_2">ex:If the file located in Downloads Folder. \n<b>Correct:</b> (<i>Device Internal Storage > Download > File</i>) \n<b>Wrong:</b> (<i>Downloads(Shortcut) > File</i>)</string>
     <string name="firmware_not_support_ssa">This scanner does not have Scan Speed Analytics capabilities</string>
     <string name="com_protocol_not_support_ssa">Scan Speed Analytics is not supported in this communication protocol</string>
     <string name="firmware_not_support_ssa_msg_1"><![CDATA[Update Scanner to a firmware which supports Scan Speed Analytics.]]></string>
@@ -369,10 +372,19 @@
     <string name="fw_update_process_msg_1_2">2. From your Windows PC with 123Scan, access your scanner’s plug-in (.scnplg file) from C:\\ProgramData\\123Scan2\\Plug-ins</string>
     <string name="fw_update_process_msg_1_3"><![CDATA[3. Put a copy of the plug-in into your device\'s download folder (Device Storage > Download)]]></string>
     <string name="fw_update_process_msg_2">Start the firmware update by clicking the \"Update Firmware\" button:</string>
+    <string name="fw_update_process_msg_2_1">Note: Do not select the firmware file from default shortcut directory folders such as Downloads, Documents, Musics, etc.. Select the relevant folder from Device Internal Storage.</string>
+    <string name="fw_update_process_msg_3">Select the copied firmware by clicking the \"Select Firmware\" button:</string>
     <string name="close">CLOSE</string>
     <string name="updating_firmware">Updating Firmware</string>
+    <string name="updating_configurations">Updating configurations</string>
     <string name="rebooting_scanner">Rebooting Scanner</string>
     <string name="update_failed">Update Failed</string>
+    <string name="update_failed_low_battery_level">(Battery percentage is below 20%)</string>
+    <string name="update_failed_commands_are_out_of_sync">(Commands are out of sync)</string>
+    <string name="update_failed_has_overlapping_address">(Firmware has overlapping address)</string>
+    <string name="update_failed_load_count_error">(Load count error)</string>
+    <string name="config_failed_invalid_config_file">Invalid Configuration file</string>
+    <string name="config_failed_incompatible_config_file">Configuration file incompatible with the selected scanner</string>
     <string name="firmware_updated">✓ Firmware Updated</string>
     <string name="last_connected_scanner">Last Connected Scanner</string>
     <string name="other_scanners">Other Scanners</string>
@@ -459,6 +471,7 @@
     <string name="bluetooth_address">Bluetooth Address</string>
     <string name="clear">Clear</string>
     <string name="skip">Skip\n(If USB Corded)</string>
+    <string name="progress_connecting_on_launch">Connecting to ... \n</string>
 
 
     <!-- Scan speed analytics-->
@@ -521,6 +534,28 @@
     <string name="stop_alarm_on_scan_page_button">Stop Alarm on Scan Button</string>
     <string name="pause_alarm_duration">Pause Alarm Duration (s)</string>
 
+    <string name="executeSmsPackage">Execute SMS Package</string>
+    <string name="title_activity_execute_sms">Execute SMS Package</string>
+    <string name="executeSms">Execute SMS</string>
+    <string name="configuration_updated">✓ Configuration updated</string>
+    <string name="firmware_updating">Firmware updating...</string>
+    <string name="configuration_updating">Configuration updating...</string>
 
 
+    <!-- Manifest Permissions -->
+    <string name="perm_desc_service_launch_permission">Permission to launch Scanner Control Application Virtual Tether service from other application/components</string>
+    <string name="perm_label_service_launch_permission">Service launch permission</string>
+    <string name="perm_desc_activity_launch_permission">Permission to launch Scanner Control Application from other application/components</string>
+    <string name="perm_label_activity_launch_permission">Activity launch permission</string>
+
+    <!--  Add Friendly name dialog  -->
+    <string name="customized_friendly_name">Customized friendly name</string>
+    <string name="add_btn_text">Add</string>
+    <string name="friendly_name_description_text">Please enter customized friendly name</string>
+    <string name="enter_friendly_name">Please enter a friendly name</string>
+    <string name="overlay_instruction">This app requires Display over other apps Permission to handle the intent mechanism in order to provide automatic sms package execution.</string>
+    <string name="overlay_instruction2">How to Enable Display over other apps?</string>
+    <string name="overlay_instruction_item1">* Click Continue and it will redirect to Settings</string>
+    <string name="overlay_instruction_item2">* Now select Scanner Control App and Enable Allow display over other apps</string>
+    <string name="overlay_instruction_item3">* Now Press Back twice to continue with Scanner Control App.</string>
 </resources>

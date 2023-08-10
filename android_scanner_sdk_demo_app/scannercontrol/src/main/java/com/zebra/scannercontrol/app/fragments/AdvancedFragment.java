@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.util.Xml;
 import android.view.LayoutInflater;
@@ -38,7 +39,8 @@ import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VIRTUAL_TETHER_ALA
 public class AdvancedFragment extends Fragment {
     private View advancedFragmentView;
     boolean virtualTetherSupport;
-    final int communicationModeClassic = 1;
+    final int communicationModeLowEnergy = 4;
+    TableRow tbl_row_execute_sms;
     public static AdvancedFragment newInstance() {
         return new AdvancedFragment();
     }
@@ -49,7 +51,6 @@ public class AdvancedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -57,6 +58,8 @@ public class AdvancedFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         advancedFragmentView  = inflater.inflate(R.layout.fragment_advanced, container, false);
+
+        tbl_row_execute_sms = advancedFragmentView.findViewById(R.id.tbl_row_execute_sms);
 
         final TextView virtualTetherAlarm = (TextView)advancedFragmentView.findViewById(R.id.txt_virtual_tether_setting);
         final TableRow virtualTetherSetting = (TableRow)advancedFragmentView.findViewById(R.id.tbl_row_virtual_tether);
@@ -66,28 +69,31 @@ public class AdvancedFragment extends Fragment {
         final TableRow imageVideoRow = (TableRow)advancedFragmentView.findViewById(R.id.tbl_row_image_video);
         final ImageView imageVideoRightNavIcon = (ImageView)advancedFragmentView.findViewById(R.id.image_video_right_nav_icon);
 
-        virtualTetherSupport = ((ActiveScannerActivity) Objects.requireNonNull(getActivity())).virtualTetheringSupported();
+        virtualTetherSupport = ((ActiveScannerActivity) requireActivity()).virtualTetheringSupported();
         if(virtualTetherSupport == true){
-            virtualTetherAlarm.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.font_color));
+            virtualTetherAlarm.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) requireActivity()), R.color.font_color));
             virtualTetherSetting.setClickable(true);
-            rightNavIcon.setColorFilter(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.font_color));
+            rightNavIcon.setColorFilter(ContextCompat.getColor(((ActiveScannerActivity) requireActivity()), R.color.font_color));
         }else{
-            virtualTetherAlarm.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.light_gray));
+            virtualTetherAlarm.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) requireActivity()), R.color.light_gray));
             virtualTetherSetting.setClickable(false);
-            rightNavIcon.setColorFilter(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.light_gray));
+            rightNavIcon.setColorFilter(ContextCompat.getColor(((ActiveScannerActivity) requireActivity()), R.color.light_gray));
         }
-        if(((ActiveScannerActivity) Objects.requireNonNull(getActivity())).getScannerCommunicationMode() == communicationModeClassic)
-        {
-            imageVideoText.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.font_color));
-            imageVideoRow.setClickable(true);
-            imageVideoRightNavIcon.setColorFilter(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.font_color));
-        }
-        else
-        {
-            imageVideoText.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.light_gray));
+        if(((ActiveScannerActivity) requireActivity()).getScannerCommunicationMode() == communicationModeLowEnergy) {
+            imageVideoText.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) requireActivity()), R.color.light_gray));
             imageVideoRow.setClickable(false);
-            imageVideoRightNavIcon.setColorFilter(ContextCompat.getColor(((ActiveScannerActivity) getActivity()), R.color.light_gray));
+            imageVideoRightNavIcon.setColorFilter(ContextCompat.getColor(((ActiveScannerActivity) requireActivity()), R.color.light_gray));
+        } else {
+            imageVideoText.setTextColor(ContextCompat.getColor(((ActiveScannerActivity) requireActivity()), R.color.font_color));
+            imageVideoRow.setClickable(true);
+            imageVideoRightNavIcon.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.font_color));
         }
+
+
+        if(getArguments().getBoolean(Constants.IS_HANDLING_INTENT)){
+            tbl_row_execute_sms.performClick();
+        }
+
         return advancedFragmentView;
     }
 

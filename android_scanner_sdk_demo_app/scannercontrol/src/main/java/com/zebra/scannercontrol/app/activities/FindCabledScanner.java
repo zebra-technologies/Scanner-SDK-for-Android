@@ -62,7 +62,7 @@ public class FindCabledScanner extends BaseActivity implements ScannerAppEngine.
         }
 
         llBarcode = (FrameLayout) findViewById(R.id.snapi_barcode);
-        if(mSNAPIList.size() == 0){
+        if(mSNAPIList.isEmpty()){
             // No SNAPI Scanners
             getSnapiBarcode();
         }else if(mSNAPIList.size() >1){
@@ -208,6 +208,7 @@ public class FindCabledScanner extends BaseActivity implements ScannerAppEngine.
             if (!b) {
                 setResult(RESULT_CANCELED, returnIntent);
                 Toast.makeText(getApplicationContext(), "Unable to communicate with scanner", Toast.LENGTH_SHORT).show();
+                getSnapiBarcode();
             }
 
         }
@@ -236,11 +237,12 @@ public class FindCabledScanner extends BaseActivity implements ScannerAppEngine.
 
     @Override
     public void onBackPressed() {
-        if(Application.isAnyScannerConnected){
+        if(Application.getAnyScannerConnectedStatus()){
             Intent intent = new Intent(FindCabledScanner.this, ActiveScannerActivity.class);
             intent.putExtra(Constants.SCANNER_NAME, Application.currentConnectedScanner.getScannerName());
             intent.putExtra(Constants.SCANNER_ADDRESS, Application.currentConnectedScanner.getScannerHWSerialNumber());
             intent.putExtra(Constants.SCANNER_ID, Application.currentConnectedScanner.getScannerID());
+            intent.putExtra(Constants.SCANNER_TYPE, Application.currentScannerType);
             intent.putExtra(Constants.AUTO_RECONNECTION, Application.currentConnectedScanner.isAutoCommunicationSessionReestablishment());
             intent.putExtra(Constants.CONNECTED, true);
             startActivity(intent);

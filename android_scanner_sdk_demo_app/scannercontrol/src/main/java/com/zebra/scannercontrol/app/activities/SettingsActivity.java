@@ -1,28 +1,57 @@
 package com.zebra.scannercontrol.app.activities;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.UriPermission;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.documentfile.provider.DocumentFile;
+
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.zebra.scannercontrol.DCSSDKDefs;
+import com.zebra.scannercontrol.app.BuildConfig;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,30 +59,50 @@ import java.util.Objects;
 public class SettingsActivity extends BaseActivity implements View.OnClickListener, OnCheckedChangeListener {
 
     Button btnResetDefaults = null;
-    //Spinner barcodeType;
     Spinner comProtocol;
+    Spinner logFormat;
     List<String> spinnerArrayHost;
-    private  List<String> protocolList;
+    private List<String> protocolList;
+    private List<String> logFormatList;
     ArrayAdapter<String> adapterHost;
-    private  ArrayAdapter<String>protocolAdapter;
+    private ArrayAdapter<String> protocolAdapter;
+    private ArrayAdapter<String> logFormatAdapter;
     private static int BARCODE_TYPE_SCANTOCONNECT = 0; // 0 : ScanToConnect Suite
-    @SuppressLint("ApplySharedPref")
+    Dialog dialogAddFriendlyName;
+    TableRow tableRowAddFriendlyName = null;
+    private String customizedFriendlyName;
+    public static Boolean isNavigateToChooseSMSDir = false;
+    private static int SMS_DIR_CHOOSER_RESPONSE = 119;
+    private static int MANAGE_ALL_FILE_ACCESS = 129;
+    Uri persistedUri;
+    TextView btnSMSDir;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
+        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
         Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
+        } else {
+            if (configuration.screenWidthDp < Application.minScreenWidth) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         }
         btnResetDefaults = (Button) findViewById(R.id.btnResetAppDefaults);
+        tableRowAddFriendlyName = findViewById(R.id.tableRowAddFriendlyName);
+        tableRowAddFriendlyName.setOnClickListener(this);
+        btnSMSDir = (TextView) findViewById(R.id.sms_dir_path_button);
+
+        //when the customized SMS folder already defined on shared preference
+        if(!settings.getString(Constants.CUSTOM_SMS_DIR, "0").equals("0")){
+            pathSetInTextView(settings.getString(Constants.CUSTOM_SMS_DIR, "0"));
+        }
+        btnSMSDir.setOnClickListener(this);
 
         SwitchCompat optAvailableScanner = (SwitchCompat) findViewById(R.id.availableScanner);
         if (optAvailableScanner != null) {
@@ -76,6 +125,11 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             autoDetection.setOnCheckedChangeListener(this);
         }
 
+        SwitchCompat autoConnection = (SwitchCompat) findViewById(R.id.autoConnection);
+        if (autoConnection != null) {
+            autoConnection.setOnCheckedChangeListener(this);
+        }
+
         SwitchCompat scannerDiscovery = (SwitchCompat) findViewById(R.id.bluetoothScannerDetection);
         if (scannerDiscovery != null) {
             scannerDiscovery.setOnCheckedChangeListener(this);
@@ -86,13 +140,22 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             setDefaults.setOnCheckedChangeListener(this);
         }
 
+        SwitchCompat classicDeviceFiltration = (SwitchCompat) findViewById(R.id.classicDeviceFiltration);
+        if (classicDeviceFiltration != null) {
+            classicDeviceFiltration.setOnCheckedChangeListener(this);
+        }
+
 
         comProtocol = (Spinner) findViewById(R.id.spinner_com_protocol);
+        logFormat = (Spinner) findViewById(R.id.spinner_log_format);
         protocolList = new ArrayList<String>();
+        logFormatList = new ArrayList<>();
+        selectLogFileFormat();
 
         // Edit(2018/01/02) : SSDK_6172_Remove legacy barcode type
         // save barcode type value to 0(ScanToConnect Suite)
-        SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
+        SharedPreferences.Editor settingsEditor = settings.edit();
+
         settingsEditor.putInt(Constants.PREF_PAIRING_BARCODE_TYPE, BARCODE_TYPE_SCANTOCONNECT).commit();// Commit is required here. So suppressing warning.
 
         protocolAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, protocolList);
@@ -173,9 +236,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         */
 
 
-
         comProtocol.setAdapter(protocolAdapter);
-        AdapterView.OnItemSelectedListener listner= new AdapterView.OnItemSelectedListener() {
+        AdapterView.OnItemSelectedListener listner = new AdapterView.OnItemSelectedListener() {
             @SuppressLint("ApplySharedPref")
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -185,8 +247,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                     selectedProtocolIndex = spinnerComProtocol.getSelectedItemPosition();
                 }
                 SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
-                settingsEditor.putInt(Constants.PREF_COMMUNICATION_PROTOCOL_TYPE,selectedProtocolIndex).commit();// Commit is required here. So suppressing warning.
-
+                settingsEditor.putInt(Constants.PREF_COMMUNICATION_PROTOCOL_TYPE, selectedProtocolIndex).commit();// Commit is required here. So suppressing warning.
+                selectProtocolByItemIndex(selectedProtocolIndex);
                 setDisplayListProtocolType(selectedProtocolIndex);
                 if (SettingsChangedFromDefaults()) {
                     btnResetDefaults.setEnabled(true);
@@ -208,6 +270,60 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         } else {
             btnResetDefaults.setEnabled(false);
         }
+
+    }
+
+
+    /*
+     * Method to select the log file format from spinner dropdown
+     * */
+    private void selectLogFileFormat(){
+        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        logFormatList = new ArrayList<>();
+        logFormatList.add(Constants.XML);
+        logFormatList.add(Constants.TXT);
+        logFormatAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, logFormatList);
+        logFormatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        logFormat.setAdapter(logFormatAdapter);
+        logFormat.setSelection(settings.getInt(Constants.LOG_FORMAT,0));
+
+        logFormat.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
+                settingsEditor.putInt(Constants.LOG_FORMAT,position).commit();
+
+                if (SettingsChangedFromDefaults()) {
+                    btnResetDefaults.setEnabled(true);
+                } else {
+                    btnResetDefaults.setEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+    }
+
+    /**
+     * Method to set the selected protocol enum by protocol list index
+     *
+     * @param itemIndex - index of the protocol list
+     */
+    private void selectProtocolByItemIndex(int itemIndex) {
+        DCSSDKDefs.DCSSDK_BT_PROTOCOL selectedProtocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_LE;
+        if (itemIndex == 0) {
+            //BT LE
+            selectedProtocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_LE;
+        } else {
+            //BT CLASSIC
+            selectedProtocol = DCSSDKDefs.DCSSDK_BT_PROTOCOL.SSI_BT_CRADLE_HOST;
+        }
+        setCommunicationProtocol(selectedProtocol);
     }
 
     @Override
@@ -228,6 +344,20 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 settingsEditor.putBoolean(Constants.PREF_SCANNER_DETECTION, ((SwitchCompat) findViewById(R.id.autoDetection)).isChecked()).apply();
                 break;
             }
+
+            case R.id.autoConnection: {
+                TextView textView = (TextView) findViewById(R.id.txt_auto_connection);
+                if (textView != null) {
+                    if (isChecked) {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                    } else {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                    }
+                }
+                settingsEditor.putBoolean(Constants.PREF_SCANNER_CONNECTION, ((SwitchCompat) findViewById(R.id.autoConnection)).isChecked()).apply();
+                break;
+            }
+
             case R.id.bluetoothScannerDetection: {
                 TextView textView = (TextView) findViewById(R.id.txt_discover_bluetooth_scanners);
                 boolean enable = false;
@@ -244,8 +374,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 settingsEditor.putBoolean(Constants.PREF_SCANNER_DISCOVERY, ((SwitchCompat) findViewById(R.id.bluetoothScannerDetection)).isChecked()).apply();
                 break;
             }
-            case R.id.availableScanner:
-            {
+            case R.id.availableScanner: {
                 TextView textView = (TextView) findViewById(R.id.txt_available_scanner);
                 if (textView != null) {
                     if (isChecked) {
@@ -254,11 +383,10 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                         textView.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
                     }
                 }
-                settingsEditor.putBoolean(Constants.PREF_NOTIFY_AVAILABLE, ((SwitchCompat) findViewById(R.id.availableScanner)).isChecked() ).commit();
+                settingsEditor.putBoolean(Constants.PREF_NOTIFY_AVAILABLE, ((SwitchCompat) findViewById(R.id.availableScanner)).isChecked()).commit();
                 break;
             }
-            case R.id.activeScanner:
-            {
+            case R.id.activeScanner: {
                 TextView textView = (TextView) findViewById(R.id.txt_active_scanner);
                 if (textView != null) {
                     if (isChecked) {
@@ -270,8 +398,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 settingsEditor.putBoolean(Constants.PREF_NOTIFY_ACTIVE, ((SwitchCompat) findViewById(R.id.activeScanner)).isChecked()).commit();
                 break;
             }
-            case R.id.barcodeEvent:
-            {
+            case R.id.barcodeEvent: {
                 TextView textView = (TextView) findViewById(R.id.txt_barcode_event);
                 if (textView != null) {
                     if (isChecked) {
@@ -280,11 +407,10 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                         textView.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
                     }
                 }
-                settingsEditor.putBoolean(Constants.PREF_NOTIFY_BARCODE,((SwitchCompat) findViewById(R.id.barcodeEvent)).isChecked() ).commit();
+                settingsEditor.putBoolean(Constants.PREF_NOTIFY_BARCODE, ((SwitchCompat) findViewById(R.id.barcodeEvent)).isChecked()).commit();
                 break;
             }
-            case R.id.set_factory_defaults:
-            {
+            case R.id.set_factory_defaults: {
                 TextView textView = (TextView) findViewById(R.id.set_factory_defaults_txt);
                 if (textView != null) {
                     if (isChecked) {
@@ -294,6 +420,21 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                     }
                 }
                 settingsEditor.putBoolean(Constants.PREF_PAIRING_BARCODE_CONFIG, ((SwitchCompat) findViewById(R.id.set_factory_defaults)).isChecked()).commit();
+                break;
+            }
+            case R.id.classicDeviceFiltration: {
+                TextView textView = (TextView) findViewById(R.id.txt_filter_device);
+                if (textView != null) {
+                    if (isChecked) {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                        enableAddFriendlyName(true);
+                    } else {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                        enableAddFriendlyName(false);
+                    }
+                }
+                Application.sdkHandler.dcssdkEnableBluetoothClassicFiltration(isChecked);
+                settingsEditor.putBoolean(Constants.PREF_SCANNER_CLASSIC_FILTER,isChecked).apply();
                 break;
             }
 
@@ -316,8 +457,150 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 ResetDefaultSettings();
                 break;
             }
+            case R.id.tableRowAddFriendlyName: {
+                openAddFriendlyNameDialog();
+                break;
+            }
+            case R.id.sms_dir_path_button:{
+                isNavigateToChooseSMSDir = true; // start browse with flag on and flag off on onActivityResult
+                //choose SMS Directory
+                startActivityForResult((new Intent("android.intent.action.OPEN_DOCUMENT_TREE")).putExtra("android.provider.extra.INITIAL_URI", DocumentsContract.buildRootsUri("com.android.externalstorage.documents")), SMS_DIR_CHOOSER_RESPONSE);
+                break;
+            }
         }
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SMS_DIR_CHOOSER_RESPONSE && resultCode == -1) {
+
+            this.persistedUri = data.getData();
+            this.getContentResolver().takePersistableUriPermission(data.getData(), Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            manageSMSDirPath();
+
+
+        }
+    }
+
+    /**
+     * decode display and save path
+     */
+    private void manageSMSDirPath(){
+        //decode the file path from uri
+        String fileLocation = persistedUri.toString().split("tree/")[1];
+        try {
+            String fileLocationDecoded = new URI(fileLocation).getPath();
+            //displaySmsPackageFolder(fileLocationDecoded.replace("primary:","/"));
+            String smsFolderPathString = fileLocationDecoded.replace("primary:", "/");
+            if (smsFolderPathString.contains("/storage/emulated/0")) {
+                smsFolderPathString = smsFolderPathString.replace("/storage/emulated/0", "");
+            }
+            //check the selected folder is valid or not
+            if(smsFolderPathString.contains("Documents")||smsFolderPathString.contains("Download")){
+                saveSMSFolderPath(smsFolderPathString);
+                pathSetInTextView(smsFolderPathString);
+                isNavigateToChooseSMSDir = false;//flag off
+            }else{
+                //show popup Incompatible folder Selected
+                showAlertDialogTONavigatePermission(smsFolderPathString);
+            }
+
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Alert to grant Manage All File Access Permission
+     */
+    private void showAlertDialogTONavigatePermission(String smsFolderPathString){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Incompatible folder Selected...!!")
+                .setMessage("The selected folder is :"+ smsFolderPathString +". Please select folder inside Documents or Download")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        try {
+                            startActivityForResult((new Intent("android.intent.action.OPEN_DOCUMENT_TREE")).putExtra("android.provider.extra.INITIAL_URI", DocumentsContract.buildRootsUri("com.android.externalstorage.documents")), SMS_DIR_CHOOSER_RESPONSE);
+                        } catch (Exception ex) {
+                        }
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * display SMS folder path on test view with text changes
+     * @param path
+     */
+    private void pathSetInTextView(String path){
+        btnSMSDir.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        btnSMSDir.setSelected(true);
+        btnSMSDir.setSingleLine(true);
+        btnSMSDir.setText(path);
+        if (SDK_INT >= Build.VERSION_CODES.M) {
+            btnSMSDir.setTextColor(getColor(R.color.font_color));
+        }
+    }
+
+    /**
+     * save selected path in shared preference
+     * @param smsFolderPathToSharedPref
+     */
+    private void saveSMSFolderPath(String smsFolderPathToSharedPref){
+        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(Constants.CUSTOM_SMS_DIR,smsFolderPathToSharedPref);
+        editor.apply();
+    }
+
+    /**
+     * Method to open the dialog to input customized friendly name
+     *
+     */
+    private void openAddFriendlyNameDialog() {
+        if (dialogAddFriendlyName == null) {
+            dialogAddFriendlyName = new Dialog(SettingsActivity.this);
+            dialogAddFriendlyName.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogAddFriendlyName.setContentView(R.layout.dialog_add_friendly_name);
+
+            final EditText editTextFriendlyName = (EditText) dialogAddFriendlyName.findViewById(R.id.editTextFriendlyName);
+
+            TextView cancelButton = (TextView) dialogAddFriendlyName.findViewById(R.id.textViewCancel);
+            cancelButton.setOnClickListener(v -> {
+                // Close dialog
+                dialogAddFriendlyName.dismiss();
+                dialogAddFriendlyName = null;
+            });
+
+            TextView addButton = (TextView) dialogAddFriendlyName.findViewById(R.id.textViewAdd);
+            addButton.setOnClickListener(v -> {
+                // Add name to the list
+                customizedFriendlyName = editTextFriendlyName.getText().toString().trim();
+                if(!customizedFriendlyName.isEmpty()) {
+                    Application.sdkHandler.dcssdkAddCustomFriendlyName(customizedFriendlyName);
+                    // Close dialog
+                    dialogAddFriendlyName.dismiss();
+                    dialogAddFriendlyName = null;
+                } else {
+                    Toast.makeText(SettingsActivity.this, getString(R.string.enter_friendly_name)+ customizedFriendlyName ,Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            dialogAddFriendlyName.setCancelable(false);
+            dialogAddFriendlyName.setCanceledOnTouchOutside(false);
+            dialogAddFriendlyName.show();
+            Window window = dialogAddFriendlyName.getWindow();
+            if (window != null)
+                window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -370,12 +653,15 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 
         if (spinnerComProtocol != null) {
             spinnerComProtocol.setSelection(0);
+            selectProtocolByItemIndex(0);
         }
 
         SwitchCompat setFactoryDefaults = (SwitchCompat) findViewById(R.id.set_factory_defaults);
         if (setFactoryDefaults != null) {
             setFactoryDefaults.setChecked(true);
         }
+
+        logFormat.setSelection(0);
 
         btnResetDefaults.setEnabled(false);
 
@@ -391,6 +677,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         Spinner barcodeType = (Spinner)findViewById(R.id.spinner_type);
         */
         Spinner comPrrotocol = (Spinner) findViewById(R.id.spinner_com_protocol);
+        Spinner logFormat = (Spinner) findViewById(R.id.spinner_log_format);
 
         if (autoDetection != null && availableScanner!=null && activeScanner!=null && barcodeEvent!=null && setDefaults!=null /* SSDK_6172: && barcodeType!=null*/) {
             if ((autoDetection.isChecked())
@@ -398,6 +685,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                     && (!activeScanner.isChecked())
                     && (!barcodeEvent.isChecked())
                     && (setDefaults.isChecked())
+                    && (logFormat.getSelectedItemPosition() == 0)
                     /* Edit(2018/01/02) : SSDK_6172_Remove legacy barcode type
                     && (barcodeType.getSelectedItemPosition() ==0)
                     */
@@ -425,6 +713,20 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                     textViewAutoDetection.setTextColor(ContextCompat.getColor(this, R.color.font_color));
                 } else {
                     textViewAutoDetection.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                }
+            }
+        }
+
+
+        SwitchCompat autoConnection = (SwitchCompat) findViewById(R.id.autoConnection);
+        if (autoConnection != null) {
+            autoConnection.setChecked(settings.getBoolean(Constants.PREF_SCANNER_CONNECTION, false));
+            TextView textViewAutoConnection = (TextView) findViewById(R.id.txt_auto_connection);
+            if(textViewAutoConnection !=null) {
+                if (autoConnection.isChecked()) {
+                    textViewAutoConnection.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                } else {
+                    textViewAutoConnection.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
                 }
             }
         }
@@ -469,7 +771,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         }
 
 
-
         SwitchCompat barcodeEvent = (SwitchCompat) findViewById(R.id.barcodeEvent);
         if (barcodeEvent != null) {
             barcodeEvent.setChecked(settings.getBoolean(Constants.PREF_NOTIFY_BARCODE, false));
@@ -482,7 +783,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 }
             }
         }
-
 
 
         SwitchCompat setDefaults = (SwitchCompat) findViewById(R.id.set_factory_defaults);
@@ -499,6 +799,21 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             }
         }
 
+        SwitchCompat classicFiltration = (SwitchCompat) findViewById(R.id.classicDeviceFiltration);
+        if (classicFiltration != null) {
+            classicFiltration.setChecked(settings.getBoolean(Constants.PREF_SCANNER_CLASSIC_FILTER, false));
+            TextView textViewClassicFiltration = (TextView) findViewById(R.id.txt_filter_device);
+            if(textViewClassicFiltration !=null) {
+                if (classicFiltration.isChecked()) {
+                    textViewClassicFiltration.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                    enableAddFriendlyName(true);
+                } else {
+                    textViewClassicFiltration.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                    enableAddFriendlyName(false);
+                }
+            }
+        }
+
         /* Edit(2018/01/02) : SSDK_6172_Remove legacy barcode type
         int barcode = settings.getInt(Constants.PREF_PAIRING_BARCODE_TYPE, 0);
         barcodeType = (Spinner)findViewById(R.id.spinner_type);
@@ -509,6 +824,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         int barcode = BARCODE_TYPE_SCANTOCONNECT;
         setDisplayListProtocolType(barcode);
         int protocol = settings.getInt(Constants.PREF_COMMUNICATION_PROTOCOL_TYPE, 0);
+        selectProtocolByItemIndex(protocol);
         comProtocol = (Spinner)findViewById(R.id.spinner_com_protocol);
         if (comProtocol != null) {
             comProtocol.setSelection(protocol);
@@ -532,19 +848,38 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
+    /**
+     * Method to enable/disable the add friendly name functionality
+     *
+     * @param enable - boolean indicating whether to enable filter or diable
+     */
+    private void enableAddFriendlyName(boolean enable) {
+        TextView textViewAddFriendlyName = (TextView) findViewById(R.id.txt_add_friendly_name);
+        if (enable) {
+            textViewAddFriendlyName.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+            tableRowAddFriendlyName.setEnabled(true);
+        } else {
+            textViewAddFriendlyName.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+            tableRowAddFriendlyName.setEnabled(false);
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         // Save preferences
         SaveSettings();
         if (isInBackgroundMode(getApplicationContext())) {
-            finish();
+            if(!isNavigateToChooseSMSDir) { //if user navigate to select SMS folder Settings activity should keep on background
+                finish();
+            }
         }
     }
 
     private void SaveSettings() {
 
         SwitchCompat autoDetection = (SwitchCompat) findViewById(R.id.autoDetection);
+        SwitchCompat autoConnection = (SwitchCompat) findViewById(R.id.autoConnection);
         SwitchCompat scannerDiscovery = (SwitchCompat) findViewById(R.id.bluetoothScannerDetection);
         SwitchCompat availableScanner = (SwitchCompat) findViewById(R.id.availableScanner);
         SwitchCompat activeScanner = (SwitchCompat) findViewById(R.id.activeScanner);
@@ -552,10 +887,15 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         SwitchCompat setDefaults = (SwitchCompat) findViewById(R.id.set_factory_defaults);
         //Spinner barcodeType = (Spinner)findViewById(R.id.spinner_type);
         Spinner comProtocol = (Spinner)findViewById(R.id.spinner_com_protocol);
+        Spinner logFormat = (Spinner) findViewById(R.id.spinner_log_format);
 
         SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
         if (autoDetection != null) {
             settingsEditor.putBoolean(Constants.PREF_SCANNER_DETECTION, autoDetection.isChecked()).apply();
+        }
+
+        if (autoConnection != null) {
+            settingsEditor.putBoolean(Constants.PREF_SCANNER_CONNECTION, autoConnection.isChecked()).apply();
         }
 
         if (scannerDiscovery != null) {
@@ -584,6 +924,11 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 
         if (comProtocol != null) {
             settingsEditor.putInt(Constants.PREF_COMMUNICATION_PROTOCOL_TYPE, comProtocol.getSelectedItemPosition()).commit();
+            selectProtocolByItemIndex(comProtocol.getSelectedItemPosition());
+        }
+
+        if (logFormat != null){
+            settingsEditor.putInt(Constants.LOG_FORMAT,logFormat.getSelectedItemPosition()).commit();
         }
         initializeDcsSdkWithAppSettings();
 

@@ -209,8 +209,10 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
                             Application.currentScannerAddress = lastConnectedScannerList.get(0).getScannerAddress();
                             Application.currentScannerId = lastConnectedScannerList.get(0).getScannerId();
                             Application.currentAutoReconnectionState = lastConnectedScannerList.get(0).isAutoReconnection();
+                            Application.currentScannerType = lastConnectedScannerList.get(0).getConnectionType().value;
                             Intent intent = new Intent(ScannersActivity.this, ActiveScannerActivity.class);
                             intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
+                            intent.putExtra(Constants.SCANNER_TYPE, lastConnectedScannerList.get(0).getConnectionType().value);
                             intent.putExtra(Constants.SCANNER_ADDRESS, Application.currentScannerAddress);
                             intent.putExtra(Constants.SCANNER_ID, Application.currentScannerId);
                             intent.putExtra(Constants.AUTO_RECONNECTION, Application.currentAutoReconnectionState);
@@ -327,7 +329,7 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
 
     @Override
     public void onBackPressed() {
-        if(Application.isAnyScannerConnected){
+        if(Application.getAnyScannerConnectedStatus()){
             Intent intent = new Intent(ScannersActivity.this, ActiveScannerActivity.class);
             intent.putExtra(Constants.SCANNER_NAME, curAvailableScanner.getScannerName());
             intent.putExtra(Constants.SCANNER_ADDRESS, curAvailableScanner.getScannerAddress());

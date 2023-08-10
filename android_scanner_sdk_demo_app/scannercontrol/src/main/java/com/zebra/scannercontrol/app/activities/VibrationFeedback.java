@@ -138,6 +138,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -228,6 +229,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -270,6 +272,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -397,6 +400,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
