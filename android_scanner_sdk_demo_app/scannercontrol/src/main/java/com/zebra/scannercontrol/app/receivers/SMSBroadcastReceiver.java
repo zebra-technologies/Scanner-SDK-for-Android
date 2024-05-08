@@ -47,8 +47,18 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                             LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Completed Successfully "+ "\n",logFilePath);
                         }
                         logFilePath = null;
+
+                        // start Active scanner activity with extra display overlay
+                        Intent in = new Intent(context, ActiveScannerActivity.class);
+                        in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        in.putExtra(Constants.IS_HANDLING_INTENT,true);
+                        in.putExtra(Constants.IS_DISPLAY_OVERLAY_DIALOG,true);
+                        context.startActivity(in);
+
                     }catch (IOException e){
                         e.printStackTrace();
+                    }catch (NullPointerException npe){
+                        npe.printStackTrace();
                     }
                 }else{
                     LogFile.initiateReceiverLogFile(iLogFormat);

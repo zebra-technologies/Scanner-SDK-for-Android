@@ -2,6 +2,10 @@ package com.zebra.scannercontrol.app.helpers;
 
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by mfv347 on 6/20/2014.
  * <p/>
@@ -92,6 +96,7 @@ public class Constants {
     //Handling automatic Intent
     public static final String IS_HANDLING_INTENT = "intent_handling";
     public static final String LOG_FILE_PATH  = "intent_log_file_path";
+    public static final String IS_DISPLAY_OVERLAY_DIALOG = "intent_display_overlay_dialog";
 
 
     //Intent Data
@@ -176,6 +181,54 @@ public class Constants {
     //Scan speed analytics
     public static final String SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_TITLE = "Image not supported";
     public static final String SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_CONTENT = "Image feature not supported in Bluetooth Low Energy mode";
+
+    //Beacon filters
+    public static final String PREF_BCON_FILTER_MODEL_NUMBER = "PREF_BCON_FILTER_MODEL_NUMBER";
+    public static final String PREF_BCON_FILTER_SERIAL_NUMBER = "PREF_BCON_FILTER_SERIAL_NUMBER";
+    public static final String PREF_BCON_FILTER_RSSI_P_REF = "PREF_BCON_FILTER_RSSI_P_REF";
+    public static final String PREF_BCON_FILTER_BATTERY_PERCENTAGE_CONDITION = "PREF_BCON_FILTER_BATTERY_PERCENTAGE_CONDITION";
+    public static final String PREF_BCON_FILTER_BATTERY_PERCENTAGE = "PREF_BCON_FILTER_BATTERY_PERCENTAGE";
+    public static final String PREF_BCON_FILTER_BATTERY_CHARGE_STATUS = "PREF_BCON_FILTER_BATTERY_CHARGE_STATUS";
+    public static final String PREF_BCON_FILTER_IN_MOTION = "PREF_BCON_FILTER_IN_MOTION";
+    public static final String PREF_BCON_FILTER_IN_CRADLE= "PREF_BCON_FILTER_IN_CRADLE";
+    public static final String PREF_BCON_FILTER_IS_CONNECTED= "PREF_BCON_FILTER_IS_CONNECTED";
+    public static final String PREF_BCON_FILTER_VIRTUAL_TETHER= "PREF_BCON_FILTER_VIRTUAL_TETHER";
+    public static final String PREF_BCON_FILTER_PRODUCT_RELEASE_NAME= "PREF_BCON_FILTER_PRODUCT_RELEASE_NAME";
+    public static final String PREF_BCON_FILTER_DOM_CONDITION= "PREF_BCON_FILTER_DOM_CONDITION";
+    public static final String PREF_BCON_FILTER_DOM= "PREF_BCON_FILTER_DOM";
+    public static final String PREF_BCON_FILTER_CONFIG_FILE_NAME= "PREF_BCON_FILTER_CONFIG_FILE_NAME";
+    public static final String DATE_FORMAT = "dd MMM yyyy";
+
+    public static final String BCON_FILTER_SELECTOR_ALL = "All";
+
+    public static final String BCON_FILTER_SELECTOR_EQUALS = "Equals";
+
+    public static final String BCON_FILTER_SELECTOR_TO_DATE = "To Date";
+
+    public static final String BCON_FILTER_SELECTOR_FROM_DATE = "From Date";
+
+    public static final String  BCON_FILTER_SELECTOR_BETWEEN = "Between";
+
+    public static final String BCON_FILTER_SELECTOR_GRATER_THAN = "Grater than";
+
+    public static final String BCON_FILTER_SELECTOR_LESS_THAN = "Less than";
+
+    public static final String BCON_FILTER_SELECTOR_YES = "Yes";
+
+    public static final String BCON_FILTER_SELECTOR_NO = "No";
+
+    public static final String BCON_FILTER_SELECTOR_ON = "On";
+
+    public static final String BCON_FILTER_SELECTOR_OFF = "Off";
+
+    public static final List<String> SPINNER_DATA_DATE = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL,BCON_FILTER_SELECTOR_EQUALS, BCON_FILTER_SELECTOR_TO_DATE,BCON_FILTER_SELECTOR_FROM_DATE,BCON_FILTER_SELECTOR_BETWEEN));
+
+    public static final List<String> SPINNER_DATA_BATTERY = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL,BCON_FILTER_SELECTOR_EQUALS, BCON_FILTER_SELECTOR_GRATER_THAN,BCON_FILTER_SELECTOR_LESS_THAN,BCON_FILTER_SELECTOR_BETWEEN));
+
+
+    public static final List<String> SPINNER_DATA_YES_NO = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL, BCON_FILTER_SELECTOR_YES, BCON_FILTER_SELECTOR_NO));
+
+    public static final List<String> SPINNER_DATA_ON_OFF = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL, BCON_FILTER_SELECTOR_ON, BCON_FILTER_SELECTOR_OFF));
 
 
     //Scanner models

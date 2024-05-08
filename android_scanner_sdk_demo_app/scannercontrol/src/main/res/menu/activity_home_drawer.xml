@@ -11,6 +11,10 @@
             android:icon="@drawable/nav_available_scanners"
             android:title="Available Device List" />
         <item
+            android:id="@+id/nav_beacons"
+            android:icon="@drawable/nav_beacon"
+            android:title="Beacons" />
+        <item
             android:id="@+id/nav_find_cabled_scanner"
             android:icon="@drawable/nav_find_cabled_scanners"
             android:title="Find Cabled Scanner" />

@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.UriPermission;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,12 +19,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.documentfile.provider.DocumentFile;
 
-import android.os.Environment;
 import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.provider.Settings;
+
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,9 +39,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.zebra.scannercontrol.DCSSDKDefs;
-import com.zebra.scannercontrol.app.BuildConfig;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
@@ -476,11 +470,11 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SMS_DIR_CHOOSER_RESPONSE && resultCode == -1) {
 
-            this.persistedUri = data.getData();
-            this.getContentResolver().takePersistableUriPermission(data.getData(), Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            manageSMSDirPath();
-
+            if (data != null) {
+                this.persistedUri = data.getData();
+                this.getContentResolver().takePersistableUriPermission(data.getData(), Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                manageSMSDirPath();
+            }
 
         }
     }

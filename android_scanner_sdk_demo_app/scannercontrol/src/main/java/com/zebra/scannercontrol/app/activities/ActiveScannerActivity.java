@@ -1,6 +1,7 @@
 package com.zebra.scannercontrol.app.activities;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,12 +12,15 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -122,7 +126,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     MenuItem pairNewScannerMenu;
     static int picklistMode;
     public static final String VIRTUAL_TETHER_FEATURE = "Virtual Tether";
-
+    Dialog dialog_overlay;
 
     public boolean isPagerMotorAvailable() {
         return pagerMotorAvailable;
@@ -250,6 +254,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         navigationView.getMenu().findItem(R.id.nav_devices).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_connection_help).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_settings).setChecked(false);
+        navigationView.getMenu().findItem(R.id.nav_beacons).setChecked(false);
 
         if (waitingForFWReboot) {
             viewPager.setCurrentItem(ADVANCED_TAB);
@@ -271,17 +276,59 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
 
         if(getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT, false)){
-
-            ActiveScannerAdapter.handlingIntent = true;
-            viewPager.setAdapter(new ActiveScannerAdapter(getSupportFragmentManager()));
-            //Moving to AdvancedFragment.class inorder to automate the click event of ExecuteSMS Package
-            viewPager.setCurrentItem(2);
-            getIntent().putExtra(Constants.IS_HANDLING_INTENT,false);
-        }else{
+            if(getIntent().getBooleanExtra(Constants.IS_DISPLAY_OVERLAY_DIALOG, false)) {
+                viewPager.setAdapter(new ActiveScannerAdapter(getSupportFragmentManager()));
+                //moving to active scanner activity default page and display overlay dialog
+                viewPager.setCurrentItem(0);
+                getIntent().putExtra(Constants.IS_HANDLING_INTENT, false);
+                getIntent().getBooleanExtra(Constants.IS_DISPLAY_OVERLAY_DIALOG, false);
+                openDeviceOverlayActionDialog();// display overlay dialog and directing to permission page
+            }else {
+                ActiveScannerAdapter.handlingIntent = true;
+                viewPager.setAdapter(new ActiveScannerAdapter(getSupportFragmentManager()));
+                //Moving to AdvancedFragment.class inorder to automate the click event of ExecuteSMS Package
+                viewPager.setCurrentItem(2);
+                getIntent().putExtra(Constants.IS_HANDLING_INTENT, false);
+            }
+        } else{
             ActiveScannerAdapter.handlingIntent = false;
         }
     }
 
+
+    /**Pop up dialog to display the instructions for Overlay permission*/
+    private void openDeviceOverlayActionDialog(){
+        dialog_overlay = new Dialog(ActiveScannerActivity.this);
+        dialog_overlay.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog_overlay.setContentView(R.layout.dialog_overlay);
+        TextView btn_continue = dialog_overlay.findViewById(R.id.btn_continue);
+        TextView btn_cancel = dialog_overlay.findViewById(R.id.btn_cancel);
+
+        CheckBox chkDontShow = (CheckBox) dialog_overlay.findViewById(R.id.chk_dont_show);
+        chkDontShow.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor settingsEditor = ActiveScannerActivity.this.getSharedPreferences(Constants.PREFS_NAME, 0).edit();
+            if (isChecked) {
+                settingsEditor.putBoolean(Constants.PREF_DONT_SHOW_OVERLAY_INSTRUCTIONS, true).commit(); // Commit is required here. So suppressing warning.
+            }else{
+                settingsEditor.putBoolean(Constants.PREF_DONT_SHOW_OVERLAY_INSTRUCTIONS, false).commit();
+
+            }
+        });
+
+        btn_continue.setOnClickListener(v -> {
+            dialog_overlay.dismiss();
+            dialog_overlay = null;
+            Intent myIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            ActiveScannerActivity.this.startActivity(myIntent);
+        });
+
+        btn_cancel.setOnClickListener(v -> {
+            dialog_overlay.dismiss();
+            dialog_overlay = null;
+        });
+        dialog_overlay.show();
+
+    }
 
     @Override
     protected void onPause() {
@@ -697,7 +744,9 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_find_cabled_scanner) {
 

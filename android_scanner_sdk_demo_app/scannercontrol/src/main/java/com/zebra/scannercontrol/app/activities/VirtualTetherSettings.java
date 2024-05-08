@@ -5,7 +5,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -19,7 +18,6 @@ import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -37,7 +35,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
-import com.zebra.scannercontrol.app.helpers.BackgroundSoundService;
+import com.zebra.scannercontrol.app.services.BackgroundSoundService;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
@@ -158,7 +156,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
                 virtualTetherAlarmStopped = false;
                 showVirtualTetherPopUpMessage();
                 enableFlashScreen();
-                startVirtualTetherAudioAlarm();
+                startVirtualTetherAudioAlarmFunction();
                 startVirtualTetherVibrateAlarm();
 
         }
@@ -170,7 +168,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
                 if (hasVibrator) {
                     vibrator.cancel();
                 }
-                stopVirtualTetherAudioAlarm();
+                stopVirtualTetherAudioAlarmFunction();
                 stopAlarmVirtualTetherButton.setEnabled(false);
                 virtualTetherHostActivated=false;
                 virtualTetherAlarmStopped = true;
@@ -457,7 +455,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
                     if (hasVibrator) {
                         vibrator.cancel();
                     }
-                    stopVirtualTetherAudioAlarm();
+                    stopVirtualTetherAudioAlarmFunction();
                     stopAlarmVirtualTetherButton.setEnabled(false);
                     virtualTetherHostActivated = false;
                     virtualTetherAlarmStopped = true;
@@ -540,7 +538,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
                             if (hasVibrator) {
                                 vibrator.cancel();
                             }
-                            stopVirtualTetherAudioAlarm();
+                            stopVirtualTetherAudioAlarmFunction();
                             stopAlarmVirtualTetherButton.setEnabled(false);
                             virtualTetherHostActivated = false;
                             virtualTetherAlarmStopped = true;
@@ -564,7 +562,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     /**
      * Method to start background sound service
      */
-    private void startVirtualTetherAudioAlarm() {
+    private void startVirtualTetherAudioAlarmFunction() {
 
         SharedPreferences virtualTetherSavedSettings = getSharedPreferences(Constants.PREFS_NAME, 0);
         if (virtualTetherSavedSettings.getBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, false)) {
@@ -634,7 +632,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
             if (hasVibrator) {
                 vibrator.cancel();
             }
-            stopVirtualTetherAudioAlarm();
+            stopVirtualTetherAudioAlarmFunction();
             stopAlarmVirtualTetherButton.setEnabled(false);
             virtualTetherHostActivated= false;
             virtualTetherAlarmStopped = true;
@@ -682,7 +680,9 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new AlertDialog.Builder(this);
@@ -802,6 +802,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         try {
             myAsyncTask.get();
         } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         }
         try {
@@ -876,7 +877,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     /**
      * This method is to shop the audio alarm background service
      */
-    private void stopVirtualTetherAudioAlarm() {
+    private void stopVirtualTetherAudioAlarmFunction() {
         Intent intent = new Intent(getApplicationContext(), BackgroundSoundService.class);
         stopService(intent);
     }

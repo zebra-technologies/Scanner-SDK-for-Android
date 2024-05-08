@@ -42,12 +42,10 @@ public class ActiveScannerAdapter extends FragmentStatePagerAdapter {
      * Return the Fragment associated with a specified position.
      * @param position - tab selected
      */
+    @NonNull
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "1st Tab Selected");
-                return SettingsFragment.newInstance();
+        switch (position){
             case 1:
                 Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "2nd Tab Selected");
                 return BarcodeFargment.newInstance();
@@ -58,9 +56,10 @@ public class ActiveScannerAdapter extends FragmentStatePagerAdapter {
                 bundle.putBoolean(Constants.IS_HANDLING_INTENT,handlingIntent);
                 advancedFragment.setArguments(bundle);
                 return advancedFragment;
+           default:
+               Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "1st Tab Selected");
+               return SettingsFragment.newInstance();
 
-            default:
-                return null;
         }
     }
 

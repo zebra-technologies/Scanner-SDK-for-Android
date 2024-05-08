@@ -181,9 +181,11 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
             startActivity(intent);
-        }else if (id == R.id.nav_find_cabled_scanner) {
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle(disconnect_current_scanner);
             dlg.setPositiveButton(continueTxt, (dialog, which) -> {
@@ -289,7 +291,7 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
 
     @Override
     public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
-
+        //Overridden abstract method not used here
     }
 
 

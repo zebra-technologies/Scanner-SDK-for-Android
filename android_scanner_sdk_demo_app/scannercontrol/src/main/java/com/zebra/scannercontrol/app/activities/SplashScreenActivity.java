@@ -46,15 +46,13 @@ public class SplashScreenActivity extends AppCompatActivity {
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.POST_NOTIFICATIONS
     };
 
     private static final String[] ANDROID_12_BLE_PERMISSIONS = new String[]{
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH_ADVERTISE
     };
     private final static int REQUEST_ENABLE_BT=1;
 
@@ -64,7 +62,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         @RequiresApi(api = Build.VERSION_CODES.M)
                         @Override
                         public void onActivityResult(Map<String,Boolean> result) {
-                            if (result.size() != 0) {
+                            if (!result.isEmpty()) {
                                 ArrayList<Boolean> list = new ArrayList<>(result.values());
                                 permissionsList = new ArrayList<>();
                                 permissionsCount = 0;
@@ -93,7 +91,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                                         }
                                     }
                                 }
-                                if (permissionsList.size() > 0) {
+                                if (!permissionsList.isEmpty()) {
                                     //Some permissions are denied and can be asked again.
                                     askForPermissions(permissionsList);
                                 } else if (permissionsCount > 0) {

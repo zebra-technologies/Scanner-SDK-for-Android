@@ -1,5 +1,6 @@
 package com.zebra.scannercontrol.app.activities;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -138,16 +139,16 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
    // static final int PERMISSIONS_REQUEST_MANAGE_ALL_FILES_ACCESS = 2296;
     private String currentScannerFirmwareVersion;
     private String currentScannerModelNumber;
+   
     private Handler pnpHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1: if (dialogFwRebooting != null) {
-                        dialogFwRebooting.dismiss();
-                        dialogFwRebooting = null;
-                        ShowReconnectScanner();
-                    }
-                    break;
+            if (msg.what == 1) {
+                if (dialogFwRebooting != null) {
+                    dialogFwRebooting.dismiss();
+                    dialogFwRebooting = null;
+                    ShowReconnectScanner();
+                }
             }
         }
     };
@@ -1120,6 +1121,14 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                 if (filename.equalsIgnoreCase("Metadata.xml")) {
                     unzipFile = extractPath + filename;
 
+                    File targetDirectory = new File(extractPath);
+                    File file = new File(unzipFile);
+                    String canonicalDestinationPath = file.getCanonicalPath();
+
+                    if (!canonicalDestinationPath.startsWith(targetDirectory.getCanonicalPath())) {
+                        throw new IOException("Entry is outside of the target directory");
+                    }
+
                     try (FileOutputStream fout = new FileOutputStream(unzipFile) ) {
                         // cteni zipu a zapis
                         while ((count = zis.read(buffer)) != -1) {
@@ -1129,10 +1138,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
                 }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        } catch (SecurityException e){
+        } catch (IOException | SecurityException e) {
             e.printStackTrace();
             return "";
         } finally {
@@ -1158,10 +1164,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
             FileChannel outChannel = outStream.getChannel();
             inChannel.transferTo(0, inChannel.size(), outChannel);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        } catch (SecurityException e) {
+        } catch (IOException | SecurityException e) {
             e.printStackTrace();
             return "";
         } finally {
@@ -1300,7 +1303,9 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new AlertDialog.Builder(this);
@@ -1554,7 +1559,7 @@ public class UpdateFirmware extends BaseActivity implements NavigationView.OnNav
 
     @Override
     public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
-
+        //Overridden abstract method not used here
     }
 
     @Override

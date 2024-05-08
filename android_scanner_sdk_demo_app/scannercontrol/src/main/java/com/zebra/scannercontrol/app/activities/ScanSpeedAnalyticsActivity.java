@@ -940,20 +940,23 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
                 if (uri == null) {
                     throw new IOException("Failed to create new MediaStore record.");
                 }
-
                 stream = resolver.openOutputStream(uri);
 
-                if (stream == null) {
-                    throw new IOException("Failed to get output stream.");
-                }
-
-                if (finalBitmap.compress(Bitmap.CompressFormat.JPEG, 95, stream) == false) {
+                if (!finalBitmap.compress(Bitmap.CompressFormat.JPEG, 95, stream)) {
                     throw new IOException("Failed to save bitmap.");
                 }
 
                 retVal = true;
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
             }
         }
         else if (finalBitmap != null)
@@ -1236,7 +1239,9 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        }else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         }else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);

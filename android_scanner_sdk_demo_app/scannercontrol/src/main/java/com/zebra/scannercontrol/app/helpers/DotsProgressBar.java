@@ -107,7 +107,7 @@ public class DotsProgressBar extends View {
         super.onDraw(canvas);
 
         float dX = (widthSize - mDotCount * mRadius * 2 - (mDotCount - 1) * margin) / 2.0f;
-        float dY = heightSize / 2;
+        float dY = heightSize / 2f;
         for (int i = 0; i < mDotCount; i++) {
             if (i == mIndex) {
                 canvas.drawCircle(dX, dY, mRadius, mPaintFill);

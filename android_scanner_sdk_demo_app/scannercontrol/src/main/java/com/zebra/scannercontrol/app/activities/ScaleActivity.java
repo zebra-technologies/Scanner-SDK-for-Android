@@ -289,7 +289,9 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
 
         } else if (id == R.id.nav_devices) {
             navigateActivity = new Intent(this, ScannersActivity.class);
-
+            startActivity(navigateActivity);
+        } else if(id == R.id.nav_beacons){
+            navigateActivity = new Intent(this, BeaconActivity.class);
             startActivity(navigateActivity);
         } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);

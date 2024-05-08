@@ -196,9 +196,11 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
             startActivity(intent);
-        } else if (id == R.id.nav_find_cabled_scanner) {
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
+            startActivity(intent);
+        }else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new AlertDialog.Builder(this);
             dlg.setTitle(R.string.disconnect_current_scanner);
             dlg.setPositiveButton(R.string.continue_txt, new DialogInterface.OnClickListener() {
@@ -350,7 +352,7 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
 
     @Override
     public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
-
+        //Overridden abstract method not used here
     }
 
 
@@ -578,25 +580,18 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
             if (uri == null) {
                 throw new IOException("Failed to create new MediaStore record.");
             }
-
             stream = resolver.openOutputStream(uri);
-
-            if (stream == null) {
-                throw new IOException("Failed to get output stream.");
-            }
-
-            if (bitmap.compress(format, 95, stream) == false) {
+            if (!bitmap.compress(format, 95, stream)) {
                 throw new IOException("Failed to save bitmap.");
             }
-
             String message = imageSavedSuccessfully;
             alertShow(message, false);
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (uri != null) {
                 resolver.delete(uri, null, null);
             }
 
-            throw e;
+            throw new IOException(e.getMessage());
         } finally {
             if (stream != null) {
                 stream.close();

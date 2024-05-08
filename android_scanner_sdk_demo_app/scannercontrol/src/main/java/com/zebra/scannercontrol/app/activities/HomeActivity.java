@@ -1,5 +1,9 @@
 package com.zebra.scannercontrol.app.activities;
 
+import static com.zebra.scannercontrol.DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_ACTION_HIGH_HIGH_LOW_LOW_BEEP;
+import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_OTHER_ON;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -8,7 +12,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -47,7 +50,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -66,7 +68,6 @@ import com.zebra.scannercontrol.BarCodeView;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.IDcsScannerEventsOnReLaunch;
 import com.zebra.scannercontrol.DCSScannerInfo;
-import com.zebra.scannercontrol.SDKHandler;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.AvailableScanner;
@@ -116,15 +117,13 @@ public class HomeActivity extends BaseActivity
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.POST_NOTIFICATIONS
     };
 
     private static final String[] ANDROID_12_BLE_PERMISSIONS = new String[]{
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH_ADVERTISE
     };
     private final static int REQUEST_ENABLE_BT=1;
     BluetoothAdapter mBluetoothAdapter;
@@ -224,6 +223,8 @@ public class HomeActivity extends BaseActivity
             permissionsList.addAll(Arrays.asList(BLE_PERMISSIONS));
         }
         askForPermissions(permissionsList);
+
+        Application.sdkHandler.setiDcsScannerEventsOnReLaunch(this);
     }
 
     /**
@@ -322,8 +323,9 @@ public class HomeActivity extends BaseActivity
                             status.startResolutionForResult(HomeActivity.this, REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException e) {
                             Log.e(TAG, e.toString());
-
                         }
+                        break;
+                    default:
                         break;
                 }
             }
@@ -469,6 +471,10 @@ public class HomeActivity extends BaseActivity
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
             startActivity(intent);
+        } else if(id == R.id.nav_beacons){
+            disconnect(Application.currentConnectedScannerID);
+            intent = new Intent(this, BeaconActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_find_cabled_scanner) {
             intent = new Intent(this, FindCabledScanner.class);
             startActivity(intent);
@@ -515,12 +521,11 @@ public class HomeActivity extends BaseActivity
         addDevConnectionsDelegate(this);
         navigationView.getMenu().findItem(R.id.nav_about).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_pair_device).setChecked(false);
-        navigationView.getMenu().findItem(R.id.nav_pair_device).setCheckable(false);
         navigationView.getMenu().findItem(R.id.nav_devices).setChecked(false);
+        navigationView.getMenu().findItem(R.id.nav_beacons).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_connection_help).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_settings).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_find_cabled_scanner).setChecked(false);
-        navigationView.getMenu().findItem(R.id.nav_find_cabled_scanner).setCheckable(false);
         SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
         TextView txtBarcodeType = (TextView) findViewById(R.id.scan_to_connect_barcode_type);
         TextView txtScannerConfiguration = (TextView) findViewById(R.id.scan_to_connect_scanner_config);
@@ -610,11 +615,7 @@ public class HomeActivity extends BaseActivity
                 && (protocolInt == 0)) {
             txtScannerConfiguration.setText(Html.fromHtml("<i> Factory Defaults Are Set, Com Protocol = " + strProtocol + "</i>"));
         } else {
-            if (barcode == 0) {
-                txtBarcodeType.setText(Html.fromHtml(sourceString));
-            } else {
-                txtBarcodeType.setText(Html.fromHtml(sourceString));
-            }
+            txtBarcodeType.setText(Html.fromHtml(sourceString));
 
         }
 
@@ -891,40 +892,64 @@ public class HomeActivity extends BaseActivity
     @Override
     public boolean scannerHasConnected(int scannerID) {
 
+        // check is waiting to beep from Beacon Activity
+        if(waitingForBeaconBeep){
+            String inXML = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-int>" +
+                    RMD_ATTR_VALUE_ACTION_HIGH_HIGH_LOW_LOW_BEEP + "</arg-int></cmdArgs></inArgs>";
+            StringBuilder outXML = new StringBuilder();
+            executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_SET_ACTION, inXML, outXML, scannerID);
 
-        SsaSetSymbologyActivity.resetScanSpeedAnalyticSettings();
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
+            Application.setScannerDisconnectedIntention(true);
+            disconnect(scannerID);
+            Application.barcodeData.clear();
+            return false;
+        } else if(waitingForBeaconLED){ // check is waiting to LED from Beacon Activity
+            String inXML = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-int>" +
+                    RMD_ATTR_VALUE_ACTION_LED_OTHER_ON + "</arg-int></cmdArgs></inArgs>";
+            StringBuilder outXML = new StringBuilder();
+            executeCommand(DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_SET_ACTION, inXML, outXML, scannerID);
 
-        ArrayList<DCSScannerInfo> activeScanners = new ArrayList<DCSScannerInfo>();
-        Application.sdkHandler.dcssdkGetActiveScannersList(activeScanners);
-        Intent intent = new Intent(HomeActivity.this, ActiveScannerActivity.class);
-        pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
+            Application.setScannerDisconnectedIntention(true);
+            disconnect(scannerID);
+            Application.barcodeData.clear();
+            return false;
+        } else {
+            SsaSetSymbologyActivity.resetScanSpeedAnalyticSettings();
 
-        for (DCSScannerInfo scannerInfo : Application.mScannerInfoList) {
-            if (scannerInfo.getScannerID() == scannerID) {
-                intent.putExtra(Constants.SCANNER_NAME, scannerInfo.getScannerName());
-                intent.putExtra(Constants.SCANNER_TYPE, scannerInfo.getConnectionType().value);
-                intent.putExtra(Constants.SCANNER_ADDRESS, scannerInfo.getScannerHWSerialNumber());
-                intent.putExtra(Constants.SCANNER_ID, scannerInfo.getScannerID());
-                intent.putExtra(Constants.AUTO_RECONNECTION, scannerInfo.isAutoCommunicationSessionReestablishment());
-                intent.putExtra(Constants.CONNECTED, true);
-                intent.putExtra(Constants.PICKLIST_MODE, getPickListMode(scannerID));
-                intent.putExtra(Constants.BEEPER_VOLUME, getBeeperVolume(scannerID));
+            ArrayList<DCSScannerInfo> activeScanners = new ArrayList<DCSScannerInfo>();
+            Application.sdkHandler.dcssdkGetActiveScannersList(activeScanners);
+            Intent intent = new Intent(HomeActivity.this, ActiveScannerActivity.class);
+            pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
 
-                if (scannerInfo.getScannerModel() != null && scannerInfo.getScannerModel().startsWith("PL3300")) { // remove this condition when CS4070 get the capability
-                    intent.putExtra(Constants.PAGER_MOTOR_STATUS, true);
-                } else {
-                    intent.putExtra(Constants.PAGER_MOTOR_STATUS, isPagerMotorAvailable(scannerID));
+            for (DCSScannerInfo scannerInfo : Application.mScannerInfoList) {
+                if (scannerInfo.getScannerID() == scannerID) {
+                    intent.putExtra(Constants.SCANNER_NAME, scannerInfo.getScannerName());
+                    intent.putExtra(Constants.SCANNER_TYPE, scannerInfo.getConnectionType().value);
+                    intent.putExtra(Constants.SCANNER_ADDRESS, scannerInfo.getScannerHWSerialNumber());
+                    intent.putExtra(Constants.SCANNER_ID, scannerInfo.getScannerID());
+                    intent.putExtra(Constants.AUTO_RECONNECTION, scannerInfo.isAutoCommunicationSessionReestablishment());
+                    intent.putExtra(Constants.CONNECTED, true);
+                    intent.putExtra(Constants.PICKLIST_MODE, getPickListMode(scannerID));
+                    intent.putExtra(Constants.BEEPER_VOLUME, getBeeperVolume(scannerID));
+
+                    if (scannerInfo.getScannerModel() != null && scannerInfo.getScannerModel().startsWith("PL3300")) { // remove this condition when CS4070 get the capability
+                        intent.putExtra(Constants.PAGER_MOTOR_STATUS, true);
+                    } else {
+                        intent.putExtra(Constants.PAGER_MOTOR_STATUS, isPagerMotorAvailable(scannerID));
+                    }
+
+                    Application.setAnyScannerConnectedStatus(true);
+                    Application.currentConnectedScannerID = scannerID;
+                    Application.currentConnectedScanner = scannerInfo;
+                    Application.currentScannerType = scannerInfo.getConnectionType().value;
+                    Application.lastConnectedScanner = Application.currentConnectedScanner;
+                    if (!Application.isSMSExecutionInProgress) {
+                        startActivity(intent);
+                    }
+                    break;
                 }
-
-                Application.setAnyScannerConnectedStatus(true);
-                Application.currentConnectedScannerID = scannerID;
-                Application.currentConnectedScanner = scannerInfo;
-                Application.currentScannerType = scannerInfo.getConnectionType().value;
-                Application.lastConnectedScanner = Application.currentConnectedScanner;
-                if (!Application.isSMSExecutionInProgress) {
-                    startActivity(intent);
-                }
-                break;
             }
         }
         return true;
@@ -1087,5 +1112,4 @@ public class HomeActivity extends BaseActivity
             }
         }
     }
-
 }

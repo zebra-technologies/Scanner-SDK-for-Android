@@ -13,7 +13,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.UriPermission;
@@ -48,7 +47,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -73,25 +71,20 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.DotsProgressBar;
-import com.zebra.scannercontrol.app.helpers.FileObserverService;
+import com.zebra.scannercontrol.app.services.FileObserverService;
 import com.zebra.scannercontrol.app.helpers.LogFile;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -135,7 +128,9 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
     boolean bServiceRunning = false;
     Button btn_execute_sms;
     Dialog dialog_overlay;
-
+    AlertDialog.Builder alertDialogForValidateFirmwareUpdate;
+    String LOG_DATA;
+    NewLogThread newLogThread;
 
     private final Handler pnpHandler = new Handler(Looper.getMainLooper()) {
 
@@ -148,6 +143,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                     reconnectScanner();
                 }
                     break;
+                default: break;
             }
         }
     };
@@ -156,6 +152,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_execute_sms);
+        alertDialogForValidateFirmwareUpdate = new AlertDialog.Builder(this);
         btn_execute_sms = findViewById(R.id.btn_execute_sms);
         preferences = getSharedPreferences(Constants.PREFS_NAME, 0);
         //get selected directory from shared preferences
@@ -272,7 +269,9 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         isWaitingForFWUpdateCompletion = false;
         Application.isFirmwareUpdateInProgress = false;
         Application.isSMSExecutionInProgress = false;
-        logFilePath = null;
+        if(newLogThread!=null){
+            newLogThread.threadStop();
+        }
     }
 
 
@@ -327,49 +326,19 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
             if(persistedUri != null){
                 Uri smsPackageUri = getSmsPackageUri(persistedUri);
                 if(smsPackageUri == null || !smsPackageUri.getPath().endsWith(".smspkg") || !smsPackageUri.getPath().endsWith(".SMSPKG")) {
-                    try{
-                        if(iLogFormat == 0){ //XML
-                            LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                    "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                    "\t\t<message> SMS Package File Not Found </message>"+
-                                    "\t</info>\n" +
-                                    "</firmware_update>\n" +
-                                    "\t<end>SMS Completed Successfully</end>\n"+
-                                    "</firmware>",logFilePath);
-                        }else{ //TXT
-                            LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Package File Not Found "+ "\n",logFilePath);
-                            LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Completed Successfully "+ "\n",logFilePath);
-                        }
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
+                    updateLogEndTags("SMS Package File Not Found!");
                     getIntent().putExtra(Constants.IS_HANDLING_INTENT,false);
                 }
             }else{
-                try{
-                    if(iLogFormat == 0){ //XML
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message> SMS Package File Not Found </message>"+
-                                "\t</info>\n" +
-                                "</firmware_update>\n" +
-                                "\t<end>SMS Completed Successfully</end>\n"+
-                                "</firmware>",logFilePath);
-                    }else{ //TXT
-                        LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Package File Not Found "+ "\n",logFilePath);
-                        LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Completed Successfully "+ "\n",logFilePath);
-                    }
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
+                updateLogEndTags("SMS Package File Not Found!");
                 getIntent().putExtra(Constants.IS_HANDLING_INTENT,false);
             }
         }
     }
 
     /**
-    * To Trigger the Execute SMS Button Programmatically
-    * */
+     * To Trigger the Execute SMS Button Programmatically
+     * */
     private void handleSMSExecution(){
         if(getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT,false)) {
             btn_execute_sms.performClick();
@@ -504,11 +473,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
 
             //sort list by persistent time, to take last selected dir location permission
             List<UriPermission> permissions = getContentResolver().getPersistedUriPermissions();
-            Collections.sort(permissions, new Comparator<UriPermission>() {
-                public int compare(UriPermission o1, UriPermission o2) {
-                    return (String.valueOf(o2.getPersistedTime())).compareTo(String.valueOf(o1.getPersistedTime()));
-                }
-            });
+            Collections.sort(permissions, (o1, o2) -> (String.valueOf(o2.getPersistedTime())).compareTo(String.valueOf(o1.getPersistedTime())));
             UriPermission p = permissions.get(0);
 
             if (p.getUri().toString().contains("ZebraSMS")) {
@@ -521,25 +486,10 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                     String fileLocationDecoded = new URI(fileLocation).getPath();
 
                     if(getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT,false)){
-                        try{
-                            if(iLogFormat == 0){ //XML
-                                LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                        "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                        "\t\t<message> Folder Permission Not Provided </message>"+
-                                        "\t</info>\n" +
-                                        "</firmware_update>\n" +
-                                        "\t<end>SMS Completed Successfully</end>\n"+
-                                        "</firmware>",logFilePath);
-                            }else{ //TXT
-                                LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " Folder permission not provided "+ "\n",logFilePath);
-                                LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Completed Successfully "+ "\n",logFilePath);
-                            }
-                        }catch (IOException e){
-                            e.printStackTrace();
-                        }
+                        updateLogEndTags("Folder Permission Not Provided");
                         getIntent().putExtra(Constants.IS_HANDLING_INTENT,false);
                     }
-                    
+
                     startActivityForResult((new Intent("android.intent.action.OPEN_DOCUMENT_TREE")).putExtra("android.provider.extra.INITIAL_URI", DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", fileLocationDecoded + SMS_DIR)), MY_PERMISSIONS_REQUEST_READ_WRITE_URI);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
@@ -547,22 +497,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
             } else {
 
                 if(getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT,false)){
-                    try{
-                        if(iLogFormat == 0){ //XML
-                            LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                    "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                    "\t\t<message> Folder Permission Not Provided </message>"+
-                                    "\t</info>\n" +
-                                    "</firmware_update>\n" +
-                                    "\t<end>SMS Completed Successfully</end>\n"+
-                                    "</firmware>",logFilePath);
-                        }else{ //TXT
-                            LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " Folder Permission Not Provided "+ "\n",logFilePath);
-                            LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Completed Successfully "+ "\n",logFilePath);
-                        }
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
+                    updateLogEndTags("Folder Permission Not Provided");
                     getIntent().putExtra(Constants.IS_HANDLING_INTENT,false);
                 }
 
@@ -571,22 +506,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         } else {
 
             if(getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT,false)){
-                try{
-                    if(iLogFormat == 0){ //XML
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message> Folder Permission Not Provided </message>"+
-                                "\t</info>\n" +
-                                "</firmware_update>\n" +
-                                "\t<end>SMS Completed Successfully</end>\n"+
-                                "</firmware>",logFilePath);
-                    }else{ //TXT
-                        LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " Folder Permission not provided"+ "\n",logFilePath);
-                        LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Completed Successfully "+ "\n",logFilePath);
-                    }
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
+                updateLogEndTags("Folder Permission Not Provided");
                 getIntent().putExtra(Constants.IS_HANDLING_INTENT,false);
             }
             startActivityForResult((new Intent("android.intent.action.OPEN_DOCUMENT_TREE")).putExtra("android.provider.extra.INITIAL_URI", DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Download/ZebraSMS")), MY_PERMISSIONS_REQUEST_READ_WRITE_URI);
@@ -600,9 +520,9 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
     public void executeSms(View view) {
         if(persistedUri != null){
             Uri smsPackageUri = getSmsPackageUri(persistedUri);
-            if(logFilePath==null){
-                LogFile.initiateLogFile(iLogFormat,""+scannerID,modelNumber,serialNumber,DOM,currentFirmware,configName,comMode);
-            }
+            //Start NewLogThread
+            newLogThread = new NewLogThread();
+            newLogThread.start();
             if (smsPackageUri != null && (smsPackageUri.getPath().endsWith(".smspkg") || smsPackageUri.getPath().endsWith(".SMSPKG"))) {
                 // Asynchronously Call DCSSDK_EXECUTE_SMS_PACKAGE API with InXML
                 String in_xml = "<inArgs><cmdArgs><arg-string>" + smsPackageUri + "</arg-string></cmdArgs></inArgs>";
@@ -619,23 +539,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                             DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_EXECUTE_SMS_PACKAGE, null);
                     cmdExecTask.execute(new String[]{in_xml});
                 }else{
-                    //Closing the log when there is no file is available
-                    try{
-                        if(logFilePath == null){
-                            LogFile.initiateLogFile(iLogFormat,""+scannerID,modelNumber,serialNumber,DOM,currentFirmware,configName,comMode);
-                        }
-                        if(iLogFormat == 0){ //xml
-                            LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                    "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                    "\t\t<message> SMS Package File Not Found </message>"+
-                                    "\t\t"+getXmlAssetDetails()+
-                                    "\t</info>\n</firmware_update>\n</firmware>",logFilePath);
-                        }else{ //Log
-                            LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " SMS Package File Not Found "+getTxtAssetDetails()+ "\n",logFilePath);
-                        }
-                    }catch (IOException e){
-                        throw new RuntimeException(e);
-                    }
+                    updateLogEndTags("SMS Package File Not Found");
                     Toast.makeText(ExecuteSmsActivity.this, "SMS Package file not found", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -676,29 +580,26 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
             startActivity(intent);
-        } else if (id == R.id.nav_find_cabled_scanner) {
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
+            startActivity(intent);
+        }else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
-            dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
-
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    updateScannerID(Application.SCANNER_ID_NONE);
-                    finish();
-                    Intent intent = new Intent(ExecuteSmsActivity.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+            dlg.setPositiveButton("Continue", (dialog, arg) -> {
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                updateScannerID(Application.SCANNER_ID_NONE);
+                finish();
+                Intent intent1 = new Intent(ExecuteSmsActivity.this, FindCabledScanner.class);
+                startActivity(intent1);
             });
 
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
-                    /*
-                     * Cancel will do nothing. Other than close dialog
-                     */
-                }
+            dlg.setNegativeButton("Cancel", (dialog, arg) -> {
+                /*
+                 * Cancel will do nothing. Other than close dialog
+                 */
             });
             dlg.show();
         } else if (id == R.id.nav_connection_help) {
@@ -753,19 +654,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
             if(getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT,false)){
-                try{
-                    if(iLogFormat == 0){ //XML
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message> Folder Permission Not Provided </message>"+
-                                "\t\t"+getXmlAssetDetails()+
-                                "\t</info>\n</firmware_update>\n</firmware>",logFilePath);
-                    }else{ //TXT
-                        LogFile.writeTxtOrXmlContentToFile(""+sdf.format(new Date())+ " Folder Permission Not Provided "+getTxtAssetDetails()+ "\n",logFilePath);
-                    }
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
+                updateLogEndTags("Folder Permission Not Provided");
             }
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -785,7 +674,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
 
     @Override
     public void scannerBarcodeEvent(byte[] barcodeData, int barcodeType, int scannerID) {
-
+        //Overridden abstract method not used here
     }
 
     @Override
@@ -793,18 +682,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         switch(firmwareUpdateEvent.getEventType()){
             case SCANNER_UF_SESS_START:
                 Log.i(TAG, "SCANNER_UF_SESS_START");
-                try{
-                    if(iLogFormat == 0){ //Xml
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message>Firmware Update Initialized</message>\n"+
-                                getXmlAssetDetails(),logFilePath);
-                    }else{ //txt
-                        LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" Firmware Update Initialized "+getTxtAssetDetails()+"\n",logFilePath);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                addLogTags("Firmware update Initialized");
                 txtReleaseNoteInfo.setText("Firmware update started...");
                 onFWInfoCollected(firmwareUpdateEvent.getPluginPath());
                 Application.isFirmwareUpdateInProgress = true;
@@ -833,18 +711,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                 break;
             case SCANNER_UF_SESS_END:
                 Log.i(TAG, "SCANNER_UF_SESS_END");
-                try{
-                    if(iLogFormat == 0){ //Xml
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message>Firmware Update Succeeded</message>\n"+
-                                getXmlAssetDetails(),logFilePath);
-                    }else{ //txt
-                        LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" Firmware Update Succeeded "+getTxtAssetDetails()+"\n",logFilePath);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                addLogTags("Firmware Update Succeeded");
                 txtReleaseNoteInfo.append("\nFirmware updated successfully...");
                 onSessionEnd();
                 isWaitingForFWUpdateCompletion = true;
@@ -854,19 +721,22 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                 break;
             case SCANNER_UF_STATUS:
                 Log.i(TAG, "SCANNER_UF_STATUS");
+                updateLogEndTags("Firmware Update Aborted");
                 onUpdateFirmwareState(firmwareUpdateEvent.getStatus());
+                break;
+            default:
                 break;
         }
     }
 
     @Override
     public void scannerImageEvent(byte[] imageData) {
-
+        //Overridden abstract method not used here
     }
 
     @Override
     public void scannerVideoEvent(byte[] videoData) {
-
+        //Overridden abstract method not used here
     }
 
     /**
@@ -874,31 +744,28 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * @param max
      */
     public void onConfigProgressStart(int max) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dialogSMSProgress = new Dialog(ExecuteSmsActivity.this);
-                dialogSMSProgress.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialogSMSProgress.setContentView(R.layout.dialog_sms_progress);
-                progressBar = (ProgressBar) dialogSMSProgress.findViewById(R.id.progressBar);
-                progressBar.setMax(max);
-                Window window = dialogSMSProgress.getWindow();
-                if (window != null) {
-                    dialogSMSProgress.getWindow().setLayout(getX(), getY());
-                }
-                dialogSMSProgress.setCancelable(false);
-                dialogSMSProgress.setCanceledOnTouchOutside(false);
-                if (!isFinishing()) {
-                    Log.i(TAG, "Show Progress dialog start");
-                    dialogSMSProgress.show();
-                    txtPercentage = (TextView) dialogSMSProgress.findViewById(R.id.txt_percentage);
-                    txtPercentage.setText("0%");
-                }
-                if(!txtReleaseNoteInfo.getText().toString().contains("Configuration Update started...")){
-                    txtReleaseNoteInfo.append("\nConfiguration Update downloading...");
-                }
-                updateButton(getResources().getString(R.string.configuration_updating));
+        runOnUiThread(() -> {
+            dialogSMSProgress = new Dialog(ExecuteSmsActivity.this);
+            dialogSMSProgress.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogSMSProgress.setContentView(R.layout.dialog_sms_progress);
+            progressBar = (ProgressBar) dialogSMSProgress.findViewById(R.id.progressBar);
+            progressBar.setMax(max);
+            Window window = dialogSMSProgress.getWindow();
+            if (window != null) {
+                dialogSMSProgress.getWindow().setLayout(getX(), getY());
             }
+            dialogSMSProgress.setCancelable(false);
+            dialogSMSProgress.setCanceledOnTouchOutside(false);
+            if (!isFinishing()) {
+                Log.i(TAG, "Show Progress dialog start");
+                dialogSMSProgress.show();
+                txtPercentage = (TextView) dialogSMSProgress.findViewById(R.id.txt_percentage);
+                txtPercentage.setText("0%");
+            }
+            if(!txtReleaseNoteInfo.getText().toString().contains("Configuration Update started...")){
+                txtReleaseNoteInfo.append("\nConfiguration Update downloading...");
+            }
+            updateButton(getResources().getString(R.string.configuration_updating));
         });
 
     }
@@ -909,24 +776,21 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * @param max
      */
     public void onConfigProgressUpdate(int current, int max) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (progressBar != null) {
-                    progressBar.setProgress(current);
-                    double percentage = (current * 100.0 / max);
-                    int iPercentage = (int) percentage;
-                    if (txtPercentage != null) {
-                        txtPercentage.setText(String.format("%s%%", Integer.toString(iPercentage)));
-                    }
+        runOnUiThread(() -> {
+            if (progressBar != null) {
+                progressBar.setProgress(current);
+                double percentage = (current * 100.0 / max);
+                int iPercentage = (int) percentage;
+                if (txtPercentage != null) {
+                    txtPercentage.setText(String.format("%s%%", Integer.toString(iPercentage)));
                 }
-                if (dialogSMSProgress != null && !dialogSMSProgress.isShowing() && !isFinishing()) {
-                    Log.i(TAG, "Show Progress dialog progress");
-                    dialogSMSProgress.show();
-                }
-                if(!txtReleaseNoteInfo.getText().toString().contains("Configuration Update In Progress...")){
-                    txtReleaseNoteInfo.append("\nConfiguration Update In Progress...");
-                }
+            }
+            if (dialogSMSProgress != null && !dialogSMSProgress.isShowing() && !isFinishing()) {
+                Log.i(TAG, "Show Progress dialog progress");
+                dialogSMSProgress.show();
+            }
+            if(!txtReleaseNoteInfo.getText().toString().contains("Configuration Update In Progress...")){
+                txtReleaseNoteInfo.append("\nConfiguration Update In Progress...");
             }
         });
     }
@@ -936,22 +800,19 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * dismissed the progress bar and update the UI details
      */
     public void onConfigSessionEnd() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (dialogSMSProgress != null) {
-                    if (txtPercentage != null) {
-                        txtPercentage.setText("100%");
-                    }
-                    Log.i(TAG, "Show Progress dialog end");
-                    displaySupportedModels();
-                    dialogSMSProgress.dismiss();
-                    updateButton(getResources().getString(R.string.configuration_updated));
-                    Application.isSMSExecutionInProgress = false;
+        runOnUiThread(() -> {
+            if (dialogSMSProgress != null) {
+                if (txtPercentage != null) {
+                    txtPercentage.setText("100%");
                 }
-                if(!txtReleaseNoteInfo.getText().toString().contains("Configuration Update Completed...")){
-                    txtReleaseNoteInfo.append("\nConfiguration Update Completed...");
-                }
+                Log.i(TAG, "Show Progress dialog end");
+                displaySupportedModels();
+                dialogSMSProgress.dismiss();
+                updateButton(getResources().getString(R.string.configuration_updated));
+                Application.isSMSExecutionInProgress = false;
+            }
+            if(!txtReleaseNoteInfo.getText().toString().contains("Configuration Update Completed...")){
+                txtReleaseNoteInfo.append("\nConfiguration Update Completed...");
             }
         });
     }
@@ -960,60 +821,23 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
     public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
         switch (configurationUpdateEvent.getEventType()) {
             case SCANNER_UC_SESS_START:
-                try{
-                    if(iLogFormat == 0){ //Xml
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message>Configuration update Initialized</message>\n"+
-                                getXmlAssetDetails()+"\n",logFilePath);
-                    }else{ //txt
-                        LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" Configuration update Initialized "+getTxtAssetDetails()+"\n",logFilePath);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                addLogTags("Configuration update Initialized");
                 Application.isSMSExecutionInProgress = true;
                 onConfigProgressStart(configurationUpdateEvent.getMaxRecords());
                 break;
             case SCANNER_UC_PROGRESS:
                 onConfigProgressUpdate(configurationUpdateEvent.getCurrentRecord(),configurationUpdateEvent.getMaxRecords());
-
                 break;
             case SCANNER_UC_SESS_END:
-                try{
-                    if(iLogFormat == 0){ //Xml
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message>Configuration update succeeded</message>\n"+
-                                getXmlAssetDetails()+"\n</firmware_update>\n",logFilePath);
-                        LogFile.writeTxtOrXmlContentToFile("<end>SMS Completed Successfully</end>\n</firmware>",logFilePath);
-                    }else{ //txt
-                        LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" Configuration update succeeded "+getTxtAssetDetails()+"\n",logFilePath);
-                        LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" SMS Completed Successfully\n",logFilePath);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                updateLogEndTags("Configuration update succeeded");
                 onConfigSessionEnd();
                 break;
             case SCANNER_UC_STATUS:
-                try{
-                    if(iLogFormat == 0){ //Xml
-                        LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                                "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                                "\t\t<message>Configuration Update Failed </message>\n"+
-                                getXmlAssetDetails()+"\n</firmware_update>\n",logFilePath);
-                        LogFile.writeTxtOrXmlContentToFile("<end>SMS Completed Successfully</end>\n</firmware>",logFilePath);
-                    }else{ //txt
-                        LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" Configuration Update Failed "+getFlashResponseErrorDescription(configurationUpdateEvent.getStatus())+getTxtAssetDetails()+"\n",logFilePath);
-                        LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" SMS Completed Successfully\n",logFilePath);
-
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                updateLogEndTags("Configuration Update Failed!");
                 persistedUri = null;
                 Log.i(TAG,"\nConfiguration Update failed - "+ getFlashResponseErrorDescription(configurationUpdateEvent.getStatus()));
+                break;
+            default:
                 break;
         }
 
@@ -1055,13 +879,10 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * @param info (firmware file path)
      */
     public void onFWInfoCollected(String info) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                LinearLayout updateFirmwarelayout = (LinearLayout) findViewById(R.id.layout_execute_sms);
-                updateFirmwarelayout.setVisibility(View.VISIBLE);
-                UpdatePlugInName(info);
-            }
+        runOnUiThread(() -> {
+            LinearLayout updateFirmwarelayout = (LinearLayout) findViewById(R.id.layout_execute_sms);
+            updateFirmwarelayout.setVisibility(View.VISIBLE);
+            UpdatePlugInName(info);
         });
     }
 
@@ -1070,24 +891,21 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * @param max
      */
     public void onProgressStart(int max) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressBar = (ProgressBar) dialogFwProgress.findViewById(R.id.progressBar);
-                progressBar.setMax(max);
+        runOnUiThread(() -> {
+            progressBar = (ProgressBar) dialogFwProgress.findViewById(R.id.progressBar);
+            progressBar.setMax(max);
 
-                Window window = dialogFwProgress.getWindow();
-                if (window != null) {
-                    dialogFwProgress.getWindow().setLayout(getX(), getY());
-                }
-                dialogFwProgress.setCancelable(false);
-                dialogFwProgress.setCanceledOnTouchOutside(false);
-                if (!isFinishing()) {
-                    Log.i(TAG, "Show Progress dialog");
-                    dialogFwProgress.show();
-                    txtPercentage = (TextView) dialogFwProgress.findViewById(R.id.txt_percentage);
-                    txtPercentage.setText("0%");
-                }
+            Window window = dialogFwProgress.getWindow();
+            if (window != null) {
+                dialogFwProgress.getWindow().setLayout(getX(), getY());
+            }
+            dialogFwProgress.setCancelable(false);
+            dialogFwProgress.setCanceledOnTouchOutside(false);
+            if (!isFinishing()) {
+                Log.i(TAG, "Show Progress dialog");
+                dialogFwProgress.show();
+                txtPercentage = (TextView) dialogFwProgress.findViewById(R.id.txt_percentage);
+                txtPercentage.setText("0%");
             }
         });
 
@@ -1123,16 +941,13 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * dismissed the progress bar and update the UI details
      */
     public void onSessionEnd() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (dialogFwProgress != null) {
-                    if (txtPercentage != null) {
-                        txtPercentage.setText("100%");
-                    }
-                    dialogFwProgress.dismiss();
-                    dialogFwProgress = null;
+        runOnUiThread(() -> {
+            if (dialogFwProgress != null) {
+                if (txtPercentage != null) {
+                    txtPercentage.setText("100%");
                 }
+                dialogFwProgress.dismiss();
+                dialogFwProgress = null;
             }
         });
     }
@@ -1147,25 +962,24 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
             dialogFwProgress.dismiss();
             dialogFwProgress = null;
         }
+
         if (dcssdk_result != DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_FIRMWARE_UPDATE_ABORTED) {
             if (dcssdk_result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_FAILURE) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        UpdateStatus(View.VISIBLE, null);
-                    }
-                });
+                runOnUiThread(() -> UpdateStatus(View.VISIBLE, null));
             } else {
                 final String failureReason  = getFlashResponseErrorDescription(dcssdk_result);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        UpdateStatus(View.VISIBLE, failureReason);
-                    }
-                });
+                runOnUiThread(() -> UpdateStatus(View.VISIBLE, failureReason));
             }
-
+        } else{
+            runOnUiThread(() -> {
+                UpdateStatus(View.VISIBLE, null);
+                txtReleaseNoteInfo.append("\nFirmware aborted...");
+                TableRow tbl_row_sms_execution_success = findViewById(R.id.tbl_row_sms_execution_success);
+                tbl_row_sms_execution_success.setVisibility(View.GONE);
+            });
         }
+
+
     }
 
     /**
@@ -1194,6 +1008,9 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                 break;
             case DCSSDK_RESULT_INCOMPATIBLE_CONFIG_FILE:
                 errorDescription = this.getResources().getString(R.string.config_failed_incompatible_config_file);
+                break;
+            default:
+                errorDescription = this.getResources().getString(R.string.update_failed_unknown_error);
                 break;
         }
         return errorDescription;
@@ -1245,13 +1062,35 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * on firmware update session start create progress bar and progress UI objects
      */
     public void onSessionStart() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dialogFwProgress = new Dialog(ExecuteSmsActivity.this);
-                dialogFwProgress.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialogFwProgress.setContentView(R.layout.dialog_fw_progress);
-            }
+        runOnUiThread(() -> {
+            dialogFwProgress = new Dialog(ExecuteSmsActivity.this);
+            dialogFwProgress.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogFwProgress.setContentView(R.layout.dialog_fw_progress);
+            TextView cancelButton = (TextView) dialogFwProgress.findViewById(R.id.btn_cancel);
+            // if decline button is clicked, close the custom dialog
+            cancelButton.setOnClickListener(v -> {
+
+                //Setting message manually and performing action on button click
+                alertDialogForValidateFirmwareUpdate.setMessage(R.string.msg_firmware_update_validation)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.alert_action_title_yes, (dialog, id) -> {
+                            //  Action for 'Yes' Button
+                            String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
+                            MyFirmwareAbortAsyncTask cmdExecTask = new MyFirmwareAbortAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_ABORT_UPDATE_FIRMWARE, null);
+                            cmdExecTask.execute(new String[]{in_xml});
+                            updateLogEndTags("Firmware update cancelled by user");
+                        })
+                        .setNegativeButton(R.string.alert_action_title_no, (dialog, id) -> {
+                            //  Action for 'No' Button
+                            dialog.cancel();
+
+                        });
+                //Creating dialog box
+                AlertDialog alert = alertDialogForValidateFirmwareUpdate.create();
+                //Setting the title manually
+                alert.setTitle(R.string.title_firmware_update_validation);
+                alert.show();
+            });
         });
     }
 
@@ -1274,32 +1113,16 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * Method to open the reboot dialog and change the status
      */
     public void onRebootStarted() {
-
-        try{
-            if(iLogFormat == 0){ //Xml
-                LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                        "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                        "\t\t<message>Scanner Reboot Success</message>\n"+
-                        getXmlAssetDetails()+"\n",logFilePath);
-            }else{ //txt
-                LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" Scanner Reboot Success "+getTxtAssetDetails()+"\n",logFilePath);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        addLogTags("Scanner Reboot Success");
         isWaitingForFWUpdateCompletion = true;
         getIntent().putExtra(Constants.FW_REBOOT, true);
 
         showRebooting();
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                disconnect(fwUpdatingScanner.getScannerID());
-                Application.barcodeData.clear();
-                Application.currentScannerId = Application.SCANNER_ID_NONE;
-                Application.isSMSExecutionInProgress = true;
-            }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            disconnect(fwUpdatingScanner.getScannerID());
+            Application.barcodeData.clear();
+            Application.currentScannerId = Application.SCANNER_ID_NONE;
+            Application.isSMSExecutionInProgress = true;
         }, 2000);
     }
 
@@ -1341,6 +1164,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         if (isWaitingForFWUpdateCompletion) {
             pnpHandler.sendMessageDelayed(pnpHandler.obtainMessage(1), 180000);
         } else {
+            updateLogEndTags("Scanner Disconnected... failed to update SMS Package");
             Application.barcodeData.clear();
             finish();
         }
@@ -1390,26 +1214,12 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         @Override
         protected void onPostExecute(Boolean execCommandStatus) {
             super.onPostExecute(execCommandStatus);
-            String executionStatusMessage = "";
             if (!execCommandStatus) {
-                executionStatusMessage = "SMS Package Execution Failed";
                 Toast.makeText(ExecuteSmsActivity.this, "SMS package execution failed..!", Toast.LENGTH_SHORT).show();
+                updateLogEndTags("SMS Package execution failed... Invalid Package");
             } else {
-                executionStatusMessage = "SMS Package Execution Successful";
+                addLogTags("SMS Package Execution Successful");
             }
-            try{
-                if(iLogFormat == 0){ //Xml
-                    LogFile.writeTxtOrXmlContentToFile("\t<info>\n"+
-                            "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
-                            "\t\t<message>"+executionStatusMessage+"</message>\n"+
-                            getXmlAssetDetails()+"\n",logFilePath);
-                }else{ //txt
-                    LogFile.writeTxtOrXmlContentToFile(sdf.format(new Date())+" "+executionStatusMessage+" "+getTxtAssetDetails()+"\n",logFilePath);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
             turnOffLEDPattern();
         }
     }
@@ -1437,40 +1247,35 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
      * Method to show reboot status dialog
      */
     private void showRebooting() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "Show Rebooting dialog");
-                if (!isFinishing()) {
-                    dialogFwRebooting = new Dialog(ExecuteSmsActivity.this);
-                    dialogFwRebooting.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialogFwRebooting.setContentView(R.layout.dialog_fw_rebooting);
-                    TextView cancelButton = (TextView) dialogFwRebooting.findViewById(R.id.btn_cancel);
-                    // if decline button is clicked, close the custom dialog
-                    cancelButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // Close dialog
-                            dialogFwRebooting.dismiss();
-                            dialogFwRebooting = null;
-                            finish();
-                        }
-                    });
-
-                    dotProgressBar = (DotsProgressBar) dialogFwRebooting.findViewById(R.id.progressBar);
-                    dotProgressBar.setDotsCount(6);
-
-                    Window window = dialogFwRebooting.getWindow();
-                    if (window != null) {
-                        dialogFwRebooting.getWindow().setLayout(getX(), getY());
-                    }
-                    dialogFwRebooting.setCancelable(false);
-                    dialogFwRebooting.setCanceledOnTouchOutside(false);
-                    Log.i(TAG, "Showing dot progress dialog");
-                    dialogFwRebooting.show();
-                } else {
+        runOnUiThread(() -> {
+            Log.i(TAG, "Show Rebooting dialog");
+            if (!isFinishing()) {
+                dialogFwRebooting = new Dialog(ExecuteSmsActivity.this);
+                dialogFwRebooting.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialogFwRebooting.setContentView(R.layout.dialog_fw_rebooting);
+                TextView cancelButton = (TextView) dialogFwRebooting.findViewById(R.id.btn_cancel);
+                // if decline button is clicked, close the custom dialog
+                cancelButton.setOnClickListener(v -> {
+                    updateLogEndTags("Rebooting cancelled by user");
+                    // Close dialog
+                    dialogFwRebooting.dismiss();
+                    dialogFwRebooting = null;
                     finish();
+                });
+
+                dotProgressBar = (DotsProgressBar) dialogFwRebooting.findViewById(R.id.progressBar);
+                dotProgressBar.setDotsCount(6);
+
+                Window window = dialogFwRebooting.getWindow();
+                if (window != null) {
+                    dialogFwRebooting.getWindow().setLayout(getX(), getY());
                 }
+                dialogFwRebooting.setCancelable(false);
+                dialogFwRebooting.setCanceledOnTouchOutside(false);
+                Log.i(TAG, "Showing dot progress dialog");
+                dialogFwRebooting.show();
+            } else {
+                finish();
             }
         });
     }
@@ -1489,6 +1294,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
             TextView cancelButton = (TextView) dialogFwReconnectScanner.findViewById(R.id.btn_cancel);
             // if decline button is clicked, close the custom dialog
             cancelButton.setOnClickListener(v -> {
+                updateLogEndTags("Rebooting cancelled by user");
                 // Close dialog
                 dialogFwReconnectScanner.dismiss();
                 dialogFwReconnectScanner = null;
@@ -1529,6 +1335,44 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
             finish();
         }
     }
+
+    private class MyFirmwareAbortAsyncTask extends AsyncTask<String, Integer, Boolean> {
+        int scannerId;
+        StringBuilder outXML;
+        DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
+        private CustomProgressDialog progressDialog;
+
+        public MyFirmwareAbortAsyncTask(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, StringBuilder outXML) {
+            this.scannerId = scannerId;
+            this.opcode = opcode;
+            this.outXML = outXML;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new CustomProgressDialog(ExecuteSmsActivity.this, "Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            return executeCommand(opcode, strings[0], outXML, scannerId);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            super.onPostExecute(b);
+            if (progressDialog != null && progressDialog.isShowing())
+                progressDialog.dismiss();
+            if (!b) {
+                Toast.makeText(ExecuteSmsActivity.this, "Cannot perform the action", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     /**
      * To get Asset Information from the connected scanner
@@ -1598,6 +1442,8 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                                         }
                                     }
                                     break;
+                                default:
+                                    break;
                             }
                             event = parser.next();
                         }
@@ -1639,6 +1485,81 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
                 "\t\t<protocol>"+comMode+"</protocol>\n"+
                 "\t</info>\n";
     }
+
+    public void addLogTags(String logMessage){
+        if(iLogFormat == 0){
+            LOG_DATA = "\t<info>\n"+
+                    "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
+                    "\t\t<message>"+logMessage+"</message>\n"+
+                    getXmlAssetDetails()+"\n";
+        }else{
+            LOG_DATA = sdf.format(new Date())+"SMS Package Execution Successful"+getTxtAssetDetails()+"\n";
+        }
+        newLogThread.updateTags(LOG_DATA);
+        Log.i(TAG,LOG_DATA);
+    }
+
+    public void updateLogEndTags(String logMessage){
+        if(iLogFormat == 0){
+            LOG_DATA = "\t<info>\n"+
+                    "\t\t<date>"+sdf.format(new Date())+"</date>\n"+
+                    "\t\t<message> "+ logMessage +"</message>\n"+
+                    getXmlAssetDetails()+"\n"+
+                    "</sms_update>\n" +
+                    "<end>SMS Completed Successfully</end>\n"+
+                    "</sms>";
+        }else{
+            LOG_DATA = sdf.format(new Date())+ logMessage+ "\n" +
+                    sdf.format(new Date())+ " SMS Completed Successfully "+ "\n";
+        }
+        newLogThread.updateTags(LOG_DATA);
+        Log.i(TAG,LOG_DATA);
+        newLogThread.threadStop();
+    }
+
+
+    /**
+     * NewLogThread class will do IO Operations in background
+     * This Thread will be live until the log operations ends
+     * isUpdateTags - Whenever we need to update a tag then we need to call UpdateTags()
+     * bStartEndThread - Specifies the thread is running or stopped
+     * threadStop() - Stops th Thread
+     * */
+    public class NewLogThread extends Thread{
+        boolean isUpdateTags = true;
+        String logData = "";
+        boolean bStartEndThread = true;
+
+        @Override
+        public void run() {
+            super.run();
+            while (bStartEndThread){ //Thread will be live until the while loop is false
+                if(isUpdateTags){ //LogFile will execute only when isUpdateTags is True
+                    if(logFilePath == null){
+                        LogFile.initiateLogFile(iLogFormat,""+scannerID,modelNumber,serialNumber,DOM,currentFirmware,configName,comMode);
+                    }else{
+                        try {
+                            LogFile.writeTxtOrXmlContentToFile(logData,logFilePath);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    isUpdateTags = false;
+                }
+            }
+        }
+
+        public void updateTags(String sLogData){
+            logData =  sLogData;
+            isUpdateTags = true;
+        }
+
+        public void threadStop(){
+            bStartEndThread = false;
+            logFilePath = null;
+        }
+    }
+
 
 
 

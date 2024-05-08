@@ -70,15 +70,16 @@
     <string name="menu_item_device_pair">Pair Bluetooth Scanner</string>
     <string name="title_activity_about">App Overview</string>
     <string name="version">Version</string>
-    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2023 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
+    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2024 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
     <string name="title_activity_scanners">Available Device List</string>
+    <string name="title_activity_beacon">Zebra Beacons</string>
     <string name="bt_scanners_not_found">BT scanners not found</string>
     <string name="bt_no_scanners">No scanner found.</string>
 
     <string name="menu_firmware_help">Firmware update help</string>
     <string name="menu_virtual_tether_help">Virtual Tether help</string>
-
     <string name="menu_add_scanner">Refresh device list</string>
+    <string name="menu_beacon_filter">Beacon Filter</string>
     <string name="menu_get_pairing_barcode">Get Pairing Barcode</string>
     <string name="menu_refresh_scanners">Refresh</string>
     <string name="title_activity_scanner_configurations">Connection Help</string>
@@ -558,4 +559,35 @@
     <string name="overlay_instruction_item1">* Click Continue and it will redirect to Settings</string>
     <string name="overlay_instruction_item2">* Now select Scanner Control App and Enable Allow display over other apps</string>
     <string name="overlay_instruction_item3">* Now Press Back twice to continue with Scanner Control App.</string>
+    <string name="update_failed_unknown_error">Update failed unknown error</string>
+
+    <!--  Enable Classic Discoverable  -->
+    <string name="dismiss_btn_text">Close</string>
+    <string name="connect_btn_text">Connect</string>
+    <string name="classic_discoverable_text">SSI BT Classic (Discoverable)</string>
+    <string name="classic_discoverable_heading">Please <b><u>Scan the barcode</u></b> to enable the discoverable mode &amp; Try to connect again.</string>
+
+    <!-- Beacon Filters-->
+    <string name="beacon_filters">BEACON FILTERS</string>
+    <string name="model_number">Model Number</string>
+    <string name="serial_number">Serial Number</string>
+    <string name="company_id">Company ID</string>
+    <string name="beacon_code">Beacon Code</string>
+    <string name="rssi_power_reference">RSSI Power Reference</string>
+    <string name="product_release_name">Product Release Name</string>
+    <string name="configuration_file_name">Configuration File Name</string>
+    <string name="battery">Battery</string>
+    <string name="percentage_0">0%</string>
+    <string name="percentage_100">100%</string>
+    <string name="d_o_m">D.O.M</string>
+    <string name="dd_mm_yy">DD-MM-YY</string>
+    <string name="in_motion">In Motion</string>
+    <string name="in_cradle">In Cradle</string>
+    <string name="battery_charge_status">Battery Charge Status</string>
+    <string name="virtual_tether_alarm_check">Virtual Tether Alarm</string>
+    <string name="reset_filter">Reset Filter</string>
+    <string name="apply_filter">Apply Filter</string>
+    <string name="connected">Connected</string>
+    <string name="btn_txt_beep">BEEP</string>
+    <string name="btn_txt_led">LED</string>
 </resources>
