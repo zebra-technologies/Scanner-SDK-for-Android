@@ -138,6 +138,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -228,6 +229,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -270,6 +272,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -317,7 +320,9 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        }else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         }else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
@@ -397,6 +402,7 @@ public class VibrationFeedback extends BaseActivity implements NavigationView.On
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();

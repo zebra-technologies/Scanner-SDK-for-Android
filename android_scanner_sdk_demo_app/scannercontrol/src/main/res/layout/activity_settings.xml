@@ -341,6 +341,37 @@
             </TableRow>
 
             <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_auto_connection"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auto_connection"/>
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/autoConnection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="18dp" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
 
             <TableRow
                 android:layout_width="match_parent"
@@ -387,6 +418,164 @@
 
             <include layout="@layout/normal_divider" />
 
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/tbl_row_gray">
+
+                <TextView
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="SMS Preference" />
+
+            </TableRow>
+
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_log_format"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="Log File Format"/>
+                </LinearLayout>
+
+                <Spinner
+                    android:id="@+id/spinner_log_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="50"
+                    android:paddingEnd="18dp"/>
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_sms_path"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/set_sms_dir_path"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="50"
+                    android:paddingEnd="18dp">
+
+                    <TextView
+                        android:id="@+id/sms_dir_path_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="/Download"
+                        android:singleLine="true"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit ="marquee_forever"
+                        android:scrollHorizontally="true"
+                        />
+                </LinearLayout>
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/tbl_row_gray">
+
+                <TextView
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/scanner_filteration_title" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_filter_device"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_zebra_devices"/>
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/classicDeviceFiltration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="18dp" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:id="@+id/tableRowAddFriendlyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_add_friendly_name"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/add_customized_friendly_name"/>
+                </LinearLayout>
+
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

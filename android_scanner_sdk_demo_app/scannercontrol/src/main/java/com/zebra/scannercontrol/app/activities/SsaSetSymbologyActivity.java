@@ -345,28 +345,26 @@ public class SsaSetSymbologyActivity extends BaseActivity implements AdapterView
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
             startActivity(intent);
-        }else if (id == R.id.nav_find_cabled_scanner) {
+        }else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-            dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setPositiveButton("Continue", (dialog, arg) -> {
 
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(SsaSetSymbologyActivity.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                finish();
+                Intent intent1 = new Intent(SsaSetSymbologyActivity.this, FindCabledScanner.class);
+                startActivity(intent1);
             });
 
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                }
             });
             dlg.show();
         }else if (id == R.id.nav_connection_help) {
@@ -408,8 +406,6 @@ public class SsaSetSymbologyActivity extends BaseActivity implements AdapterView
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
         this.finish();
         Application.currentScannerId =Application.SCANNER_ID_NONE;
-        Intent intent = new Intent(SsaSetSymbologyActivity.this,HomeActivity.class);
-        startActivity(intent);
         return true;
     }
     @Override

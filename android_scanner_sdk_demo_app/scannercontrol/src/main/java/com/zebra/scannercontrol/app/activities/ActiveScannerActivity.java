@@ -1,6 +1,7 @@
 package com.zebra.scannercontrol.app.activities;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,15 +11,18 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -31,6 +35,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.zebra.barcode.sdk.sms.ConfigurationUpdateEvent;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
 import com.zebra.scannercontrol.app.R;
@@ -49,7 +54,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_ACTION_REBOOT_AND_UN_PAIR;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_ACTION_HIGH_HIGH_LOW_LOW_BEEP;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_DECODE_COUNT_2_OF_5;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_DECODE_COUNT_AZTEC;
@@ -109,6 +113,8 @@ import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_HISTOGRA
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_SSA_HISTOGRAM_UPC;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS;
 import static com.zebra.scannercontrol.app.helpers.Constants.DEBUG_TYPE.TYPE_DEBUG;
+import static com.zebra.scannercontrol.app.helpers.Constants.SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_CONTENT;
+import static com.zebra.scannercontrol.app.helpers.Constants.SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_TITLE;
 
 public class ActiveScannerActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,
         ActionBar.TabListener, ScannerAppEngine.IScannerAppEngineDevEventsDelegate, ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate {
@@ -120,7 +126,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     MenuItem pairNewScannerMenu;
     static int picklistMode;
     public static final String VIRTUAL_TETHER_FEATURE = "Virtual Tether";
-
+    Dialog dialog_overlay;
 
     public boolean isPagerMotorAvailable() {
         return pagerMotorAvailable;
@@ -136,7 +142,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     static MyAsyncTask cmdExecTask = null;
     Button btnFindScanner = null;
     static final int ENABLE_FIND_NEW_SCANNER = 1;
-
+    int ssaStatus = 0;
     List<Integer> ssaSupportedAttribs;
 
 
@@ -175,19 +181,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
 
         addDevConnectionsDelegate(this);
-        scannerID = getIntent().getIntExtra(Constants.SCANNER_ID, -1);
-        BaseActivity.lastConnectedScannerID = scannerID;
-        String scannerName = getIntent().getStringExtra(Constants.SCANNER_NAME);
-        String address = getIntent().getStringExtra(Constants.SCANNER_ADDRESS);
-        scannerType = getIntent().getIntExtra(Constants.SCANNER_TYPE, -1);
-
-        picklistMode = getIntent().getIntExtra(Constants.PICKLIST_MODE, 0);
-
-        pagerMotorAvailable = getIntent().getBooleanExtra(Constants.PAGER_MOTOR_STATUS, false);
-
-        Application.currentScannerId = scannerID;
-        Application.currentScannerName = scannerName;
-        Application.currentScannerAddress = address;
+        getScannerInfoFromIntent();
         // Initilization
         viewPager = (ViewPager) findViewById(R.id.activeScannerPager);
 
@@ -208,11 +202,12 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
             @Override
             public void onPageScrolled(int arg0, float arg1, int arg2) {
-
+                // Overridden abstract method, Not used here.
             }
 
             @Override
             public void onPageScrollStateChanged(int arg0) {
+                // Overridden abstract method, Not used here.
             }
         });
         if (getIntent().getBooleanExtra(Constants.SHOW_BARCODE_VIEW, false))
@@ -233,6 +228,11 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         return true;
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
 
     @Override
     protected void onResume() {
@@ -254,19 +254,81 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         navigationView.getMenu().findItem(R.id.nav_devices).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_connection_help).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_settings).setChecked(false);
+        navigationView.getMenu().findItem(R.id.nav_beacons).setChecked(false);
 
         if (waitingForFWReboot) {
             viewPager.setCurrentItem(ADVANCED_TAB);
             Intent intent = new Intent(this, UpdateFirmware.class);
             intent.putExtra(Constants.SCANNER_ID, scannerID);
-            intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+            intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
             intent.putExtra(Constants.FW_REBOOT, true);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             setWaitingForFWReboot(false);
         }
+        // If backpressed to Active scanner screen from Execute SMS screen after reboot process, select Advanced tab as default
+        if (waitingForFWRebootInSMS) {
+            viewPager.setCurrentItem(ADVANCED_TAB);
+            setWaitingForFWRebootInSMS(false);
+        }
+
+        getScannerInfoFromIntent();
+
+
+        if(getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT, false)){
+            if(getIntent().getBooleanExtra(Constants.IS_DISPLAY_OVERLAY_DIALOG, false)) {
+                viewPager.setAdapter(new ActiveScannerAdapter(getSupportFragmentManager()));
+                //moving to active scanner activity default page and display overlay dialog
+                viewPager.setCurrentItem(0);
+                getIntent().putExtra(Constants.IS_HANDLING_INTENT, false);
+                getIntent().getBooleanExtra(Constants.IS_DISPLAY_OVERLAY_DIALOG, false);
+                openDeviceOverlayActionDialog();// display overlay dialog and directing to permission page
+            }else {
+                ActiveScannerAdapter.handlingIntent = true;
+                viewPager.setAdapter(new ActiveScannerAdapter(getSupportFragmentManager()));
+                //Moving to AdvancedFragment.class inorder to automate the click event of ExecuteSMS Package
+                viewPager.setCurrentItem(2);
+                getIntent().putExtra(Constants.IS_HANDLING_INTENT, false);
+            }
+        } else{
+            ActiveScannerAdapter.handlingIntent = false;
+        }
     }
 
+
+    /**Pop up dialog to display the instructions for Overlay permission*/
+    private void openDeviceOverlayActionDialog(){
+        dialog_overlay = new Dialog(ActiveScannerActivity.this);
+        dialog_overlay.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog_overlay.setContentView(R.layout.dialog_overlay);
+        TextView btn_continue = dialog_overlay.findViewById(R.id.btn_continue);
+        TextView btn_cancel = dialog_overlay.findViewById(R.id.btn_cancel);
+
+        CheckBox chkDontShow = (CheckBox) dialog_overlay.findViewById(R.id.chk_dont_show);
+        chkDontShow.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor settingsEditor = ActiveScannerActivity.this.getSharedPreferences(Constants.PREFS_NAME, 0).edit();
+            if (isChecked) {
+                settingsEditor.putBoolean(Constants.PREF_DONT_SHOW_OVERLAY_INSTRUCTIONS, true).commit(); // Commit is required here. So suppressing warning.
+            }else{
+                settingsEditor.putBoolean(Constants.PREF_DONT_SHOW_OVERLAY_INSTRUCTIONS, false).commit();
+
+            }
+        });
+
+        btn_continue.setOnClickListener(v -> {
+            dialog_overlay.dismiss();
+            dialog_overlay = null;
+            Intent myIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            ActiveScannerActivity.this.startActivity(myIntent);
+        });
+
+        btn_cancel.setOnClickListener(v -> {
+            dialog_overlay.dismiss();
+            dialog_overlay = null;
+        });
+        dialog_overlay.show();
+
+    }
 
     @Override
     protected void onPause() {
@@ -310,38 +372,38 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
+        // Overridden abstract method, Not used here.
     }
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
+        // Overridden abstract method, Not used here.
     }
 
 
     public void startFirmware(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_START_NEW_FIRMWARE, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
     public void abortFirmware(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_ABORT_UPDATE_FIRMWARE, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
     public void loadLedActions(View view) {
         Intent intent = new Intent(this, LEDActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         startActivity(intent);
     }
 
     public void loadBeeperActions(View view) {
         Intent intent = new Intent(this, BeeperActionsActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         intent.putExtra(Constants.BEEPER_VOLUME, getIntent().getIntExtra(Constants.BEEPER_VOLUME, 0));
         startActivity(intent);
     }
@@ -349,54 +411,54 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     public void loadVirtualTetherConfiguration(View view) {
         Intent intent = new Intent(this, VirtualTetherSettings.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         startActivity(intent);
     }
 
     public void loadAssert(View view) {
         Intent intent = new Intent(this, AssertActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         startActivity(intent);
     }
 
     public void symbologiesClicked(View view) {
         Intent intent = new Intent(this, SymbologiesActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         startActivity(intent);
     }
 
     public void enableScanning(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_SCAN_ENABLE, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
     public void disableScanning(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_SCAN_DISABLE, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
 
     public void aimOn(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_AIM_ON, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
     public void aimOff(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_AIM_OFF, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
     public void vibrationFeedback(View view) {
 
         Intent intent = new Intent(this, VibrationFeedback.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         startActivity(intent);
 
 //        String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
@@ -407,13 +469,13 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     public void pullTrigger(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_PULL_TRIGGER, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
     public void releaseTrigger(View view) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_DEVICE_RELEASE_TRIGGER, null);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
     }
 
     /**
@@ -427,10 +489,11 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>" + RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS + "</attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
         cmdExecTask = new MyAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, outXML, VIRTUAL_TETHER_FEATURE);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
         try {
             cmdExecTask.get();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -445,8 +508,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
     //Get the connected scanner communication mode
     //returns communicationMode Scanner communication mode
-    public int getScannerCommunicationMode()
-    {
+    public int getScannerCommunicationMode() {
         int communicationMode = -1;
         communicationMode = getIntent().getIntExtra(Constants.SCANNER_TYPE, -1);
         return communicationMode;
@@ -529,16 +591,22 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
     @Override
     public void scannerFirmwareUpdateEvent(FirmwareUpdateEvent firmwareUpdateEvent) {
-
+        // Overridden abstract method, Not used here.
     }
 
     @Override
     public void scannerImageEvent(byte[] imageData) {
-
+        // Overridden abstract method, Not used here.
     }
 
     @Override
     public void scannerVideoEvent(byte[] videoData) {
+        // Overridden abstract method, Not used here.
+    }
+
+    @Override
+    public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
+        // Overridden abstract method, Not used here.
     }
 
     public void clearList(View view) {
@@ -561,7 +629,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     public void loadScale(View view) {
 
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        new AsyncTaskScaleAvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_READ_WEIGHT, this, ScaleActivity.class).execute(new String[]{in_xml});
+        new AsyncTaskScaleAvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_READ_WEIGHT, this, ScaleActivity.class).execute(in_xml);
 
     }
 
@@ -612,7 +680,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
             Intent intent = new Intent(context, targetClass);
             intent.putExtra(Constants.SCANNER_ID, scannerID);
-            intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+            intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
             intent.putExtra(Constants.SCALE_STATUS, scaleAvailability);
             startActivity(intent);
         }
@@ -667,7 +735,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         Intent intent;
         if (id == R.id.nav_pair_device) {
             Application.currentScannerId = Application.SCANNER_ID_NONE;
-            Application.intentionallyDisconnected = true;
+            Application.setScannerDisconnectedIntention(true);
             disconnect(scannerID);
             Application.barcodeData.clear();
             finish();
@@ -676,7 +744,9 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_find_cabled_scanner) {
 
@@ -689,6 +759,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
                     disconnect(scannerID);
                     Application.barcodeData.clear();
                     Application.currentScannerId = Application.SCANNER_ID_NONE;
+                    Application.setScannerDisconnectedIntention(true);
                     finish();
                     Intent intent = new Intent(ActiveScannerActivity.this, FindCabledScanner.class);
                     startActivity(intent);
@@ -697,7 +768,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
             dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int arg) {
-
+                    // Cancel will do nothing. Other than close dialog
                 }
             });
             dlg.show();
@@ -733,6 +804,15 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         startActivity(intent);
     }
 
+    public void loadSmsExecution(View view) {
+        Intent intent = new Intent(this, ExecuteSmsActivity.class);
+        intent.putExtra(Constants.SCANNER_ID, scannerID);
+        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_TYPE, scannerType);
+        intent.putExtra(Constants.IS_HANDLING_INTENT,ActiveScannerAdapter.handlingIntent);
+        startActivity(intent);
+    }
+
     public void ImageVideo(View view) {
         if (scannerType != 2) {
             String message = "Video feature not supported in bluetooth scanners.";
@@ -740,16 +820,6 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         } else {
             loadImageVideo();
         }
-    }
-
-    /**
-     * Perform check on unpair and reboot feature availability once the button is clicked
-     *
-     * @param view Button view
-     */
-    public void UnPairAndReboot(View view) {
-        String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-        new AsyncTaskUnPairAndRebootAvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL, this, UnPairAndRebootActivity.class).execute(new String[]{in_xml});
     }
 
     private void alertShow(String message, boolean error) {
@@ -770,7 +840,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     private void loadImageVideo() {
         Intent intent = new Intent(this, ImageActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         intent.putExtra(Constants.SCANNER_TYPE, scannerType);
         startActivity(intent);
     }
@@ -778,7 +848,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     public void loadIdc(View view) {
         Intent intent = new Intent(this, IntelligentImageCaptureActivity.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         startActivity(intent);
     }
 
@@ -789,33 +859,92 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     }
 
     /**
+     * This method is to get and validate scanner information in intent
+     */
+    public void getScannerInfoFromIntent() {
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(Constants.SCANNER_ID)) {
+            scannerID = getIntent().getIntExtra(Constants.SCANNER_ID, -1);
+            BaseActivity.lastConnectedScannerID = scannerID;
+            String scannerName = getIntent().getStringExtra(Constants.SCANNER_NAME);
+            String address = getIntent().getStringExtra(Constants.SCANNER_ADDRESS);
+            scannerType = getIntent().getIntExtra(Constants.SCANNER_TYPE, -1);
+
+            picklistMode = getIntent().getIntExtra(Constants.PICKLIST_MODE, 0);
+
+            pagerMotorAvailable = getIntent().getBooleanExtra(Constants.PAGER_MOTOR_STATUS, false);
+
+            Application.currentScannerId = scannerID;
+            Application.currentScannerName = scannerName;
+            Application.currentScannerAddress = address;
+        }
+    }
+
+    /**
      * Navigate to Scan Speed Analytics views
      *
      * @param view
      */
     public void loadScanSpeedAnalytics(View view) {
-        // Scan speed analytics symbology type has set
-        if (SsaSetSymbologyActivity.SSA_SYMBOLOGY_ENABLED_FLAG) {
-            // navigate to scan speed analytics view
-            Intent intent = new Intent(this, ScanSpeedAnalyticsActivity.class);
-            intent.putExtra(Constants.SCANNER_ID, scannerID);
-            intent.putExtra(Constants.SYMBOLOGY_SSA_ENABLED, SsaSetSymbologyActivity.SSA_ENABLED_SYMBOLOGY_OBJECT);
-            intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            int ssaStatus = 0;
-            if (scannerType != 1) {
-                ssaStatus = 2;
-            }
-            intent.putExtra(Constants.SSA_STATUS, ssaStatus);
-
-            getApplicationContext().startActivity(intent);
-
-        } else { // Scan speed analytics symbology type has not set
-            // navigate to Scan speed analytics set view
-            String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
-            new AsyncTaskSSASvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL, this, SsaSetSymbologyActivity.class).execute(new String[]{in_xml});
+        //scannerType is used to identify scanner type whether it is bluetooth scanner or usb scanner
+        //scannerType =2 for usb scanners and rest is for bluetooth scanners.
+        //ssaStatus is used to validate the UI in the SsaSetSymbologyActivity.
+        if (ssaSupportedAttribs.size() == 0) {
+            ssaStatus = 1;
+        } else if (scannerType != 1) {
+            ssaStatus = 2;
         }
+
+        if (null != Application.currentConnectedScanner &&
+                Application.currentConnectedScanner.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_BT_LE) {
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(ActiveScannerActivity.this);
+            dialog.setTitle(SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_TITLE)
+                    .setMessage(SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_CONTENT)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialoginterface, int i) {
+
+                            // Scan speed analytics symbology type has set
+                            if (SsaSetSymbologyActivity.SSA_SYMBOLOGY_ENABLED_FLAG) {
+                                // navigate to scan speed analytics view
+                                Intent intent = new Intent(getApplicationContext(), ScanSpeedAnalyticsActivity.class);
+                                intent.putExtra(Constants.SCANNER_ID, scannerID);
+                                intent.putExtra(Constants.SYMBOLOGY_SSA_ENABLED, SsaSetSymbologyActivity.SSA_ENABLED_SYMBOLOGY_OBJECT);
+                                intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra(Constants.SSA_STATUS, ssaStatus);
+                                getApplicationContext().startActivity(intent);
+
+                            } else {
+                                // Scan speed analytics symbology type has not set
+                                // navigate to Scan speed analytics set view
+                                String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
+                                new AsyncTaskSSASvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL, getApplicationContext(), SsaSetSymbologyActivity.class).execute(in_xml);
+                            }
+                        }
+                    }).show();
+
+        }else {
+            // Scan speed analytics symbology type has set
+            if (SsaSetSymbologyActivity.SSA_SYMBOLOGY_ENABLED_FLAG) {
+                // navigate to scan speed analytics view
+                Intent intent = new Intent(this, ScanSpeedAnalyticsActivity.class);
+                intent.putExtra(Constants.SCANNER_ID, scannerID);
+                intent.putExtra(Constants.SYMBOLOGY_SSA_ENABLED, SsaSetSymbologyActivity.SSA_ENABLED_SYMBOLOGY_OBJECT);
+                intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(Constants.SSA_STATUS, ssaStatus);
+                getApplicationContext().startActivity(intent);
+
+            } else {
+                // Scan speed analytics symbology type has not set
+                // navigate to Scan speed analytics set view
+                String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID></inArgs>";
+                new AsyncTaskSSASvailable(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL, this, SsaSetSymbologyActivity.class).execute(new String[]{in_xml});
+            }
+        }
+
     }
 
     private class AsyncTaskBatteryAvailable extends AsyncTask<String, Integer, Boolean> {
@@ -889,7 +1018,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
 
             Intent intent = new Intent(context, targetClass);
             intent.putExtra(Constants.SCANNER_ID, scannerID);
-            intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+            intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
             intent.putExtra(Constants.BATTERY_STATUS, b);
             startActivity(intent);
         }
@@ -1062,87 +1191,6 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         }
     }
 
-    /**
-     * Check whether the unpair and reboot feature is supported by the scanner
-     */
-    private class AsyncTaskUnPairAndRebootAvailable extends AsyncTask<String, Integer, Boolean> {
-        int scannerId;
-        Context context;
-        Class targetClass;
-        private CustomProgressDialog progressDialog;
-        DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode;
-
-        public AsyncTaskUnPairAndRebootAvailable(int scannerId, DCSSDKDefs.DCSSDK_COMMAND_OPCODE opcode, Context context, Class targetClass) {
-            this.scannerId = scannerId;
-            this.opcode = opcode;
-            this.context = context;
-            this.targetClass = targetClass;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = new CustomProgressDialog(ActiveScannerActivity.this, context.getResources().getString(R.string.please_wait_string));
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-        }
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            StringBuilder sb = new StringBuilder();
-            boolean result = executeCommand(opcode, strings[0], sb, scannerId);
-            if (opcode == DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GETALL) {
-                if (result) {
-                    try {
-                        int i = 0;
-                        XmlPullParser parser = Xml.newPullParser();
-
-                        parser.setInput(new StringReader(sb.toString()));
-                        int event = parser.getEventType();
-                        String text = null;
-                        while (event != XmlPullParser.END_DOCUMENT) {
-                            String name = parser.getName();
-                            switch (event) {
-                                case XmlPullParser.START_TAG:
-                                    break;
-                                case XmlPullParser.TEXT:
-                                    text = parser.getText();
-                                    break;
-
-                                case XmlPullParser.END_TAG:
-                                    if (name.equals(context.getResources().getString(R.string.attribute_string))) {
-                                        if (text != null && text.trim().equals(RMD_ATTR_ACTION_REBOOT_AND_UN_PAIR)) {
-                                            return true;
-                                        }
-                                    }
-                                    break;
-                            }
-                            event = parser.next();
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, e.toString());
-                    }
-                }
-            }
-            return false;
-        }
-
-
-        @Override
-        protected void onPostExecute(Boolean b) {
-            super.onPostExecute(b);
-            if (progressDialog != null && progressDialog.isShowing())
-                progressDialog.dismiss();
-
-            Intent intent = new Intent(context, targetClass);
-            intent.putExtra(Constants.SCANNER_ID, scannerID);
-            intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
-            intent.putExtra(Constants.UNPAIR_AND_REBOOT_STATUS, b);
-            startActivity(intent);
-        }
-
-    }
-
     public void findScanner(View view) {
         btnFindScanner = (Button) findViewById(R.id.btn_find_scanner);
         if (btnFindScanner != null) {
@@ -1154,7 +1202,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     public void loadSampleBarcodes(View view) {
         Intent intent = new Intent(this, SampleBarcodes.class);
         intent.putExtra(Constants.SCANNER_ID, scannerID);
-        intent.putExtra(Constants.SCANNER_NAME, getIntent().getStringExtra(Constants.SCANNER_NAME));
+        intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
         startActivity(intent);
     }
 
@@ -1198,7 +1246,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
             super.onPostExecute(b);
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
-            if (!b &&(null != scannerFeature && scannerFeature.isEmpty())) {
+            if (!b && (null != scannerFeature && scannerFeature.isEmpty())) {
                 Toast.makeText(ActiveScannerActivity.this, "Cannot perform the action" + " " + scannerFeature, Toast.LENGTH_SHORT).show();
             }
         }
@@ -1228,6 +1276,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
             try {
                 Thread.sleep(400);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
             while (System.currentTimeMillis() - t0 < 3000) {
@@ -1235,18 +1284,21 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
                 try {
                     Thread.sleep(400);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     e.printStackTrace();
                 }
                 VibrateScanner();
                 try {
                     Thread.sleep(400);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     e.printStackTrace();
                 }
                 BeepScanner();
                 try {
                     Thread.sleep(400);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     e.printStackTrace();
                 }
                 VibrateScanner();
@@ -1254,6 +1306,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
             try {
                 Thread.sleep(400);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
             TurnOffLEDPattern();

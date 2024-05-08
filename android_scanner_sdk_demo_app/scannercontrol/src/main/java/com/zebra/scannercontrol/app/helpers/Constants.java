@@ -2,6 +2,10 @@ package com.zebra.scannercontrol.app.helpers;
 
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by mfv347 on 6/20/2014.
  * <p/>
@@ -22,7 +26,9 @@ public class Constants {
     //For shared prefs
     public static final String PREF_OPMODE = "MOT_SETTING_OPMODE";
     public static final String PREF_SCANNER_DETECTION = "MOT_SETTING_SCANNER_DETECTION";
+    public static final String PREF_SCANNER_CONNECTION = "MOT_SETTING_SCANNER_CONNECTION";
     public static final String PREF_SCANNER_DISCOVERY = "MOT_SETTING_SCANNER_DISCOVERY";
+    public static final String PREF_SCANNER_CLASSIC_FILTER = "MOT_SETTING_SCANNER_CLASSIC_FILTER";
 
     public static final String PREF_EVENT_ACTIVE = "MOT_SETTING_EVENT_ACTIVE";
     public static final String PREF_EVENT_AVAILABLE = "MOT_SETTING_EVENT_AVAILABLE";
@@ -32,10 +38,11 @@ public class Constants {
     public static final String PREF_EVENT_BINARY_DATA = "MOT_SETTING_EVENT_BINARY_DATA";
 
     public static final String PREF_DONT_SHOW_INSTRUCTIONS = "MOT_SETTING_DONT_SHOW_MSG";
+    public static final String PREF_DONT_SHOW_OVERLAY_INSTRUCTIONS = "MOT_SETTING_OVERLAY_DONT_SHOW_MSG";
 
     public static final String PREF_BT_ADDRESS = "MOT_SETTING_BT_ADDRESS";
 
-
+    public static final String CUSTOM_SMS_DIR = "CUSTOM_SMS_DIR_PATH";
     public static final String PREF_NOTIFY_ACTIVE = "MOT_SETTING_NOTIFICATION_ACTIVE";
     public static final String PREF_NOTIFY_AVAILABLE = "MOT_SETTING_NOTIFICATION_AVAILABLE";
     public static final String PREF_NOTIFY_BARCODE = "MOT_SETTING_NOTIFICATION_BARCODE";
@@ -46,6 +53,8 @@ public class Constants {
     public static final String PREF_PAIRING_BARCODE_TYPE = "MOT_SETTING_PAIRING_BARCODE_TYPE";
     public static final String PREF_PAIRING_BARCODE_CONFIG = "MOT_SETTING_PAIRING_BARCODE_CONFIG";
     public static final String PREF_COMMUNICATION_PROTOCOL_TYPE = "MOT_SETTING_COMMUNICATION_PROTOCOL_TYPE";
+    public static final int COMMUNICATION_PROTOCOL_TYPE_BTLE = 0;
+    public static final int COMMUNICATION_PROTOCOL_TYPE_CLASSIC = 1;
     //Data related to notifications
     public static final String NOTIFICATIONS_TYPE = "notifications_type";
     public static final String NOTIFICATIONS_TEXT = "notifications_text";
@@ -73,10 +82,21 @@ public class Constants {
     public static final String PREF_VIRTUAL_TETHER_HOST_SCREEN_FLASH = "MOT_VIRTUAL_TETHER_HOST_SCREEN_FLASH";
     public static final int VIRTUAL_TETHER_HOST_NOTIFICATION_CHANNEL_ID = 1111;
     public static final String VIRTUAL_TETHER_EVENT_NOTIFY = "intent_virtual_tether_event_notify";
+    public static final String VIRTUAL_TETHER_SCANNER_ENABLE_VALUE = "1";
+    public static final long[] VIRTUAL_TETHER_AUDIO_ALARM_PATTERN = {1500, 800, 800, 800};
 
 
     public static final String PREF_VIRTUAL_TETHER_HOST_BACKGROUND_COLOR  = "backgroundColor";
+    public static final String LOG_FORMAT = "LogFormat";
+    public static final String XML = ".xml";
+    public static final String TXT = ".txt";
     public static final int VIRTUAL_TETHER_HOST_ANIMATION_DURATION = 1000;
+
+
+    //Handling automatic Intent
+    public static final String IS_HANDLING_INTENT = "intent_handling";
+    public static final String LOG_FILE_PATH  = "intent_log_file_path";
+    public static final String IS_DISPLAY_OVERLAY_DIALOG = "intent_display_overlay_dialog";
 
 
     //Intent Data
@@ -110,7 +130,7 @@ public class Constants {
     public static final String BEEPER_VOLUME = "beeper_volume";
     public static final String SSA_STATUS = "ssa_status";
     public static final String SCALE_STATUS = "scale_status";
-    public static final String UNPAIR_AND_REBOOT_STATUS = "unpair_and_reboot_status";
+
 
     public static final String CONNECTION_HELP_TYPE = "connection_help";
     public static final int CONNECTION_HELP_TYPE_CS4070 = 0;
@@ -136,6 +156,7 @@ public class Constants {
     public static final int AUX_SCANNER_CONNECTED = 36;
     public static final int IMAGE_RECEIVED = 37;
     public static final int VIDEO_RECEIVED = 38;
+    public static final int CONFIG_UPDATE_EVENT = 39;
 
     ///---
     public static final String BTH_SCAN_TO_CONNECT = "[BTH_CONNECT]";
@@ -156,6 +177,59 @@ public class Constants {
     public static final String SCALE_STATUS_NON_STABLE_WEIGHT = "Non Stable Weight";
     public static final String SCALE_STATUS_STABLE_ZERO_WEIGHT = "Stable Zero Weight";
     public static final String SCALE_STATUS_STABLE_NON_ZERO_WEIGHT = "Stable NonZero Weight";
+
+    //Scan speed analytics
+    public static final String SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_TITLE = "Image not supported";
+    public static final String SCAN_SPEED_ANALYTICS_BTLE_IMAGE_NOT_SUPPORT_MESSAGE_CONTENT = "Image feature not supported in Bluetooth Low Energy mode";
+
+    //Beacon filters
+    public static final String PREF_BCON_FILTER_MODEL_NUMBER = "PREF_BCON_FILTER_MODEL_NUMBER";
+    public static final String PREF_BCON_FILTER_SERIAL_NUMBER = "PREF_BCON_FILTER_SERIAL_NUMBER";
+    public static final String PREF_BCON_FILTER_RSSI_P_REF = "PREF_BCON_FILTER_RSSI_P_REF";
+    public static final String PREF_BCON_FILTER_BATTERY_PERCENTAGE_CONDITION = "PREF_BCON_FILTER_BATTERY_PERCENTAGE_CONDITION";
+    public static final String PREF_BCON_FILTER_BATTERY_PERCENTAGE = "PREF_BCON_FILTER_BATTERY_PERCENTAGE";
+    public static final String PREF_BCON_FILTER_BATTERY_CHARGE_STATUS = "PREF_BCON_FILTER_BATTERY_CHARGE_STATUS";
+    public static final String PREF_BCON_FILTER_IN_MOTION = "PREF_BCON_FILTER_IN_MOTION";
+    public static final String PREF_BCON_FILTER_IN_CRADLE= "PREF_BCON_FILTER_IN_CRADLE";
+    public static final String PREF_BCON_FILTER_IS_CONNECTED= "PREF_BCON_FILTER_IS_CONNECTED";
+    public static final String PREF_BCON_FILTER_VIRTUAL_TETHER= "PREF_BCON_FILTER_VIRTUAL_TETHER";
+    public static final String PREF_BCON_FILTER_PRODUCT_RELEASE_NAME= "PREF_BCON_FILTER_PRODUCT_RELEASE_NAME";
+    public static final String PREF_BCON_FILTER_DOM_CONDITION= "PREF_BCON_FILTER_DOM_CONDITION";
+    public static final String PREF_BCON_FILTER_DOM= "PREF_BCON_FILTER_DOM";
+    public static final String PREF_BCON_FILTER_CONFIG_FILE_NAME= "PREF_BCON_FILTER_CONFIG_FILE_NAME";
+    public static final String DATE_FORMAT = "dd MMM yyyy";
+
+    public static final String BCON_FILTER_SELECTOR_ALL = "All";
+
+    public static final String BCON_FILTER_SELECTOR_EQUALS = "Equals";
+
+    public static final String BCON_FILTER_SELECTOR_TO_DATE = "To Date";
+
+    public static final String BCON_FILTER_SELECTOR_FROM_DATE = "From Date";
+
+    public static final String  BCON_FILTER_SELECTOR_BETWEEN = "Between";
+
+    public static final String BCON_FILTER_SELECTOR_GRATER_THAN = "Grater than";
+
+    public static final String BCON_FILTER_SELECTOR_LESS_THAN = "Less than";
+
+    public static final String BCON_FILTER_SELECTOR_YES = "Yes";
+
+    public static final String BCON_FILTER_SELECTOR_NO = "No";
+
+    public static final String BCON_FILTER_SELECTOR_ON = "On";
+
+    public static final String BCON_FILTER_SELECTOR_OFF = "Off";
+
+    public static final List<String> SPINNER_DATA_DATE = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL,BCON_FILTER_SELECTOR_EQUALS, BCON_FILTER_SELECTOR_TO_DATE,BCON_FILTER_SELECTOR_FROM_DATE,BCON_FILTER_SELECTOR_BETWEEN));
+
+    public static final List<String> SPINNER_DATA_BATTERY = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL,BCON_FILTER_SELECTOR_EQUALS, BCON_FILTER_SELECTOR_GRATER_THAN,BCON_FILTER_SELECTOR_LESS_THAN,BCON_FILTER_SELECTOR_BETWEEN));
+
+
+    public static final List<String> SPINNER_DATA_YES_NO = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL, BCON_FILTER_SELECTOR_YES, BCON_FILTER_SELECTOR_NO));
+
+    public static final List<String> SPINNER_DATA_ON_OFF = Collections.unmodifiableList(Arrays.asList(BCON_FILTER_SELECTOR_ALL, BCON_FILTER_SELECTOR_ON, BCON_FILTER_SELECTOR_OFF));
+
 
     //Scanner models
     public static final String SCANNER_MODEL_CS4070 = "CS4070";

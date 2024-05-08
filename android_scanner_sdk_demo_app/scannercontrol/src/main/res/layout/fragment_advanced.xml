@@ -225,17 +225,20 @@
             <include layout="@layout/normal_divider" />
 
             <TableRow
+                android:visibility="visible"
+                android:id="@+id/tbl_row_execute_sms"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
-                android:onClick="UnPairAndReboot">
+                android:onClick="loadSmsExecution">
 
                 <TextView
+                    android:id="@+id/txt_execute_sms"
                     style="@style/roboto_medium_16dp"
                     android:layout_height="60dp"
                     android:layout_marginLeft="18dp"
                     android:layout_weight="0"
-                    android:text="@string/unpair_and_reboot" />
+                    android:text="@string/executeSmsPackage" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -245,6 +248,7 @@
                     android:orientation="vertical"></LinearLayout>
 
                 <ImageView
+                    android:id="@+id/image_sms_right_nav_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:layout_gravity="center|right"
@@ -253,41 +257,7 @@
                     android:src="@drawable/right" />
             </TableRow>
 
-
-
-            <include layout="@layout/normal_divider" />
-
-
-<!--            <TableRow-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:background="@android:color/white"-->
-<!--                android:onClick="loadIdc">-->
-
-<!--                <TextView-->
-<!--                    style="@style/roboto_medium_16dp"-->
-<!--                    android:layout_height="60dp"-->
-<!--                    android:layout_marginLeft="18dp"-->
-<!--                    android:layout_weight="0"-->
-<!--                    android:text="@string/IDC" />-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:background="@android:color/white"-->
-<!--                    android:orientation="vertical"></LinearLayout>-->
-
-<!--                <ImageView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="20dp"-->
-<!--                    android:layout_gravity="center|right"-->
-<!--                    android:layout_marginRight="18dp"-->
-<!--                    android:layout_weight="0"-->
-<!--                    android:src="@drawable/right" />-->
-<!--            </TableRow>-->
-
-<!--            <include layout="@layout/normal_divider" />-->
+            <include android:visibility="gone" layout="@layout/normal_divider" />
 
         </LinearLayout>
     </ScrollView>

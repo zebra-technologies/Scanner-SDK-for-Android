@@ -1,7 +1,9 @@
 package com.zebra.scannercontrol.app.activities;
 
+import static com.zebra.scannercontrol.DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_STORE;
+
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -24,6 +26,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.zebra.barcode.sdk.sms.ConfigurationUpdateEvent;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
 import com.zebra.scannercontrol.IDCConfig;
 import com.zebra.scannercontrol.app.R;
@@ -31,8 +34,6 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.barcode.BarcodeTypes;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
-
-import static com.zebra.scannercontrol.DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_STORE;
 
 public class IntelligentImageCaptureActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ScannerAppEngine.IScannerAppEngineDevConnectionsDelegate,ScannerAppEngine.IScannerAppEngineDevEventsDelegate {
 
@@ -55,6 +56,7 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
     String barcode_type = "Barcode Type : ";
     String barcode_data = "Barcode Data:";
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +96,7 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     public void onCheckboxISOData(View view) {
         // Is the view now checked?
         boolean checked = ((CheckBox) view).isChecked();
@@ -109,17 +112,16 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
                 if (checked) {
                     idcConfig.setSendIDCDataAsBinaryEventEnabledFlag(true);
                     Application.sdkHandler.dcssdkSetIDCConfig(idcConfig);
-                }
-            else {
+                } else {
                     idcConfig.setSendIDCDataAsBinaryEventEnabledFlag(false);
                     Application.sdkHandler.dcssdkSetIDCConfig(idcConfig);
-
                 }
                 barcodeIdc.setText("");
                 barcodeTypeIdc.setText("");
                 SnapiImageView.setImageDrawable(null);
                 isoIdc.setText("");
                 break;
+            default: break;
         }
     }
 
@@ -137,8 +139,7 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
 
     }
 
-    private void setUI()
-    {
+    private void setUI() {
         SnapiImageView = (ImageView) findViewById(R.id.imgViewSnapiImage);
         IOSFile = (CheckBox)findViewById(R.id.checkBoxISO);
         barcodeIdc = (TextView) findViewById(R.id.barcodeDataIdc);
@@ -155,10 +156,11 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
         addDevEventsDelegate(this);
     }
 
-    private void Sleep(int time) {
+    private void sleep(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         }
 
@@ -179,27 +181,22 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
             startActivity(intent);
-        }else if (id == R.id.nav_find_cabled_scanner) {
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle(disconnect_current_scanner);
-            dlg.setPositiveButton(continueTxt, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
-
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(IntelligentImageCaptureActivity.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+            dlg.setPositiveButton(continueTxt, (dialog, which) -> {
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                finish();
+                Intent intent_scan = new Intent(IntelligentImageCaptureActivity.this, FindCabledScanner.class);
+                startActivity(intent_scan);
             });
-
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
-
-                }
+            dlg.setNegativeButton("Cancel", (dialog, which) -> {
             });
             dlg.show();
         }else if (id == R.id.nav_connection_help) {
@@ -260,9 +257,9 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
     public void scannerBarcodeEvent(byte[] barcodeData, int barcodeType, int scannerID) {
 
         barcodeIdc = (TextView) findViewById(R.id.barcodeDataIdc);
-        barcodeIdc.setText(barcode_data+(new String(barcodeData)));
+        barcodeIdc.setText(String.format("%s%s", barcode_data, new String(barcodeData)));
         barcodeTypeIdc = (TextView) findViewById(R.id.barcodeTypeIdc);
-        barcodeTypeIdc.setText(barcode_type + BarcodeTypes.getBarcodeTypeName(barcodeType));
+        barcodeTypeIdc.setText(String.format("%s%s", barcode_type, BarcodeTypes.getBarcodeTypeName(barcodeType)));
     }
 
     @Override
@@ -290,6 +287,11 @@ public class IntelligentImageCaptureActivity extends BaseActivity implements Nav
     @Override
     public void  scannerVideoEvent(byte[] videoData) {
 
+    }
+
+    @Override
+    public void scannerConfigurationUpdateEvent(ConfigurationUpdateEvent configurationUpdateEvent) {
+        //Overridden abstract method not used here
     }
 
 

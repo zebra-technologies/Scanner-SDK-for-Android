@@ -1,5 +1,6 @@
 package com.zebra.scannercontrol.app.application;
 
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 
@@ -33,6 +34,8 @@ public class Application extends android.app.Application {
     //Settings for notifications
     public static int MOT_SETTING_OPMODE ;
     public static boolean MOT_SETTING_SCANNER_DETECTION;
+    public static boolean MOT_SETTING_SCANNER_CONNECTION;
+    public static boolean MOT_SETTING_SCANNER_CLASSIC_FILTER;
     public static boolean MOT_SETTING_EVENT_ACTIVE;
     public static boolean MOT_SETTING_EVENT_AVAILABLE;
     public static boolean MOT_SETTING_EVENT_BARCODE;
@@ -53,12 +56,16 @@ public class Application extends android.app.Application {
     public static String currentScannerName ="";
     public static String currentScannerAddress ="";
     public static int currentScannerId =SCANNER_ID_NONE;
+    public static int currentScannerType = -1;
     public static boolean currentAutoReconnectionState =true;
-    public static boolean isAnyScannerConnected = false; //True, if currently connected to any scanner
+    private static boolean isAnyScannerConnected = false; //True, if currently connected to any scanner
     public static int currentConnectedScannerID = -1; //Track scannerId of currently connected Scanner
     public static boolean isFirmwareUpdateInProgress = false;
-    public static boolean intentionallyDisconnected = false;
+    public static boolean isSMSExecutionInProgress = false;
+    public static boolean isScannerConnectedAfterSMS = false;
+    private static boolean intentionallyDisconnected = false;
     public static boolean virtualTetherHostActivated = false;
+    public static boolean virtualTetherEventOccurred = false;
     //Scanners (both available and active)
     public static ArrayList<DCSScannerInfo> mScannerInfoList=new ArrayList<DCSScannerInfo>();
     public static ArrayList<ScannerAppEngine.IScannerAppEngineDevListDelegate> mDevListDelegates=new ArrayList<ScannerAppEngine.IScannerAppEngineDevListDelegate>();
@@ -66,6 +73,8 @@ public class Application extends android.app.Application {
     public static ArrayList<Barcode> barcodeData=new ArrayList<Barcode>();
     public static DCSScannerInfo currentConnectedScanner;
     public static DCSScannerInfo lastConnectedScanner;
+    public static Uri selectedFirmware;
+    public static  File firmwareFile;
 
 
     public static int minScreenWidth = 360;
@@ -74,7 +83,35 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         Foreground.init(this);
-        //this keyword referring to Context of the sample application
-        sdkHandler = new SDKHandler(this, true);
     }
+
+    /**
+     *This method is to get whether app is currently connected to any scanner.
+     * @return true if connected to any scanner.
+     */
+    public static boolean getAnyScannerConnectedStatus() {
+        return isAnyScannerConnected;
+    }
+
+    /**
+     * This method is to keep whether app is currently connected to any scanner.
+     * @param isAnyScannerConnected set true if connected to any scanner.
+     */
+    public static void setAnyScannerConnectedStatus(boolean isAnyScannerConnected) {
+        Application.isAnyScannerConnected = isAnyScannerConnected; }
+
+    /**
+     *This method is to get whether scanner is disconnected intentionally.
+     * @return true if scanner disconnected intentionally.
+     */
+    public static boolean getScannerDisconnectedIntention() {
+        return intentionallyDisconnected;
+    }
+
+    /**
+     *This method is to set whether scanner is disconnected intentionally.
+     * @param intentionallyDisconnected set true if scanner disconnected intentionally.
+     */
+    public static void setScannerDisconnectedIntention(boolean intentionallyDisconnected) {
+        Application.intentionallyDisconnected = intentionallyDisconnected; }
 }

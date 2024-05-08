@@ -87,8 +87,11 @@ public class BarcodeTypes {
     public static final int   ST_MATRIX2OF5_OLD		= 0x71;
     public static final int   ST_CHINESE2OF5		= 0x72;
     public static final int   ST_KOREAN2OF5		    = 0x73;
+    public static final int   ST_DATAMATRIX_PARAM   = 0x74;
+    public static final int   ST_CODEZ		        = 0x75;
     public static final int   ST_UPCA_5				= 0x88;
     public static final int   ST_UPCE0_5			= 0x89;
+    public static final int   ST_MULTI_BARCODE_SSI	= 0x98;
     public static final int   ST_EAN8_5				= 0x8a;
     public static final int   ST_EAN13_5			= 0x8b;
     public static final int   ST_UPCE1_5			= 0x90;
@@ -97,6 +100,8 @@ public class BarcodeTypes {
     public static final int   ST_NEW_COUPON	        = 0xB4;
     public static final int   ST_HAN_XIN	        = 0xB7;
     public static final int   ST_GS1_DATAMATRIX     = 0xC1;
+    public static final int   ST_DOT_CODE           = 0xC4;
+    public static final int   ST_GRID_MATRIX        = 0xC8;
     public static final int   ST_RFID_RAW	        = 0xE0;
     public static final int   ST_RFID_URI	        = 0xE1;
 
@@ -177,6 +182,7 @@ public class BarcodeTypes {
             case ST_CHINESE2OF5: return "Chinese 2 Of 5,";
             case ST_UPCA_5: return "UPCA 5,";
             case ST_UPCE0_5: return "UPCE0 5,";
+            case ST_MULTI_BARCODE_SSI: return "Multi Barcode SSI,";
             case ST_EAN8_5: return "EAN8 5,";
             case ST_EAN13_5: return "EAN13 5,";
             case ST_UPCE1_5: return "UPCE1 5,";
@@ -190,6 +196,8 @@ public class BarcodeTypes {
             case ST_4STATE_US4: return "4 State US4,";
             case ST_CUE_CAT_CODE: return "Cue CAT Code,";
             case ST_KOREAN2OF5: return "Korean 3 Of 5,";
+            case ST_DATAMATRIX_PARAM: return "Datamatrix Parameter,";
+            case ST_CODEZ: return "Code Z,";
             case ST_OCRB	: return "OCRB,";
             case ST_RFID_RAW	: return "RFID Raw,";
             case ST_RFID_URI: return "RFID URI,";
@@ -197,6 +205,8 @@ public class BarcodeTypes {
             case ST_HAN_XIN:return "Han Xin,";
             case ST_NEW_COUPON:return "GS1 Databar Expanded Coupon,";
             case ST_GS1_DATAMATRIX: return "GS1 Datamatrix,";
+            case ST_DOT_CODE: return "DotCode,";
+            case ST_GRID_MATRIX: return "Grid Matrix,";
             default: return "";
         }
     }

@@ -22,8 +22,6 @@ public class HintAdapter extends ArrayAdapter<SSASymbologyType> {
 
     @Override
     public int getCount() {
-        // don't display last item. It is used as hint.
-        int count = super.getCount();
-        return count > 0 ? count : count;
+        return super.getCount();
     }
 }

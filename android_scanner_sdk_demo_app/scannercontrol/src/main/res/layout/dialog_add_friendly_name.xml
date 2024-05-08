@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="25dp"
+    android:layout_marginRight="25dp"
+    android:layout_marginTop="25dp"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/roboto_regular_bold_20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/friendly_name_description_text"
+                android:paddingBottom="0dp"/>
+
+
+            <EditText
+                android:id="@+id/editTextFriendlyName"
+                style="@style/roboto_regular_15dp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="30dp"
+                android:text=""
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:visibility="visible"
+                android:lines="1"
+                android:maxLength="24"
+                android:background="@drawable/border"
+                android:hint="@string/customized_friendly_name"/>
+
+            <include layout="@layout/full_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textViewAdd"
+                    style="@style/roboto_medium_16dp_blue"
+                    android:layout_width="0dp"
+                    android:layout_weight="50"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/add_btn_text"
+                    android:lines="1"
+                    android:paddingBottom="@dimen/app_padding_bottom"
+                    android:paddingLeft="@dimen/app_margin_right"
+                    android:paddingRight="@dimen/app_margin_right"
+                    android:paddingTop="@dimen/app_padding_top"
+                    android:focusable="true" />
+                <TextView
+                    android:id="@+id/textViewCancel"
+                    style="@style/roboto_medium_16dp_blue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="50"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:paddingBottom="@dimen/app_padding_bottom"
+                    android:paddingLeft="@dimen/app_margin_right"
+                    android:paddingRight="@dimen/app_margin_right"
+                    android:paddingTop="@dimen/app_padding_top"
+                    android:text="@string/cancel"
+                    android:focusable="true" />
+
+                </TableRow>
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>

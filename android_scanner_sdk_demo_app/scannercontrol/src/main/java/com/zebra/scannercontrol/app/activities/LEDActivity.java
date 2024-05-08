@@ -174,7 +174,9 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        }else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         }else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);

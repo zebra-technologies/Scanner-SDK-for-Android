@@ -38,7 +38,9 @@ import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.concurrent.TimeUnit;
 
@@ -99,41 +101,33 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
         scaleEnableSwitch = findViewById(R.id.scale_enable_switch);
         scaleEnableSwitch.setChecked(true);
 
-        liveWeightEnableSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (liveWeightEnableSwitch.isChecked()) {
-                    readWeightButton.setEnabled(false);
-                    liveWeightEnable = true;
-                    liveWeight();
-                } else {
-                    readWeightButton.setEnabled(true);
-                    liveWeightEnable = false;
-                }
+        liveWeightEnableSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (liveWeightEnableSwitch.isChecked()) {
+                readWeightButton.setEnabled(false);
+                liveWeightEnable = true;
+                liveWeight();
+            } else {
+                readWeightButton.setEnabled(true);
+                liveWeightEnable = false;
             }
-
         });
 
 
-        scaleEnableSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (scaleEnableSwitch.isChecked()) {
-                    enableScale();
-                    readWeightButton.setEnabled(true);
-                    zeroScaleButton.setEnabled(true);
-                    resetScaleButton.setEnabled(true);
-                    liveWeightEnableSwitch.setEnabled(true);
+        scaleEnableSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (scaleEnableSwitch.isChecked()) {
+                enableScale();
+                readWeightButton.setEnabled(true);
+                zeroScaleButton.setEnabled(true);
+                resetScaleButton.setEnabled(true);
+                liveWeightEnableSwitch.setEnabled(true);
 
-                } else {
-                    disableScale();
-                    liveWeightEnableSwitch.setEnabled(false);
-                    readWeightButton.setEnabled(false);
-                    zeroScaleButton.setEnabled(false);
-                    resetScaleButton.setEnabled(false);
-                }
+            } else {
+                disableScale();
+                liveWeightEnableSwitch.setEnabled(false);
+                readWeightButton.setEnabled(false);
+                zeroScaleButton.setEnabled(false);
+                resetScaleButton.setEnabled(false);
             }
-
         });
 
 
@@ -295,28 +289,26 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
 
         } else if (id == R.id.nav_devices) {
             navigateActivity = new Intent(this, ScannersActivity.class);
-
+            startActivity(navigateActivity);
+        } else if(id == R.id.nav_beacons){
+            navigateActivity = new Intent(this, BeaconActivity.class);
             startActivity(navigateActivity);
         } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
             alertDialog.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-            alertDialog.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            alertDialog.setPositiveButton("Continue", (dialog, arg) -> {
 
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(ScaleActivity.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                finish();
+                Intent intent = new Intent(ScaleActivity.this, FindCabledScanner.class);
+                startActivity(intent);
             });
 
-            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            alertDialog.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                }
             });
             alertDialog.show();
         } else if (id == R.id.nav_connection_help) {
@@ -412,21 +404,11 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
 
                                     if (outXmlElement.equals(WEIGHT_XML_ELEMENT)) {
                                         final String weight = outXmlAttribute.trim();
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                ((TextView) findViewById(R.id.txtWeightMeasured)).setText(weight);
-                                            }
-                                        });
+                                        runOnUiThread(() -> ((TextView) findViewById(R.id.txtWeightMeasured)).setText(weight));
                                         Log.i(TAG, "Weight : " + weight);
                                     } else if (outXmlElement.equals(WEIGHT_MODE_XML_ELEMENT)) {
                                         final String weightMode = outXmlAttribute.trim();
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                ((TextView) findViewById(R.id.txtWeightUnit)).setText(weightMode);
-                                            }
-                                        });
+                                        runOnUiThread(() -> ((TextView) findViewById(R.id.txtWeightUnit)).setText(weightMode));
                                         Log.i(TAG, "Weight Mode : " + weightMode);
                                     } else if (outXmlElement.equals(WEIGHT_STATUS_XML_ELEMENT)) {
                                         int status = Integer.parseInt(outXmlAttribute.trim());
@@ -448,12 +430,7 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
                                         }
 
                                         final String scale = scaleStatus;
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                ((TextView) findViewById(R.id.txtWeightStatus)).setText(scale);
-                                            }
-                                        });
+                                        runOnUiThread(() -> ((TextView) findViewById(R.id.txtWeightStatus)).setText(scale));
                                         Log.i(TAG, "status : " + status);
                                     }
 
@@ -527,21 +504,11 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
 
                                         if (outXmlElement.equals(WEIGHT_XML_ELEMENT)) {
                                             final String weight = outXmlAttribute.trim();
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    ((TextView) findViewById(R.id.txtWeightMeasured)).setText(weight);
-                                                }
-                                            });
+                                            runOnUiThread(() -> ((TextView) findViewById(R.id.txtWeightMeasured)).setText(weight));
                                             Log.i(TAG, "Weight : " + weight);
                                         } else if (outXmlElement.equals(WEIGHT_MODE_XML_ELEMENT)) {
                                             final String weightMode = outXmlAttribute.trim();
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    ((TextView) findViewById(R.id.txtWeightUnit)).setText(weightMode);
-                                                }
-                                            });
+                                            runOnUiThread(() -> ((TextView) findViewById(R.id.txtWeightUnit)).setText(weightMode));
                                             Log.i(TAG, "Weight Mode : " + weightMode);
                                         } else if (outXmlElement.equals("status")) {
                                             int status = Integer.parseInt(outXmlAttribute.trim());
@@ -563,12 +530,7 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
                                             }
 
                                             final String scale = scaleStatus;
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    ((TextView) findViewById(R.id.txtWeightStatus)).setText(scale);
-                                                }
-                                            });
+                                            runOnUiThread(() -> ((TextView) findViewById(R.id.txtWeightStatus)).setText(scale));
                                             Log.i(TAG, "status : " + status);
                                         }
 
@@ -578,8 +540,11 @@ public class ScaleActivity extends BaseActivity implements NavigationView.OnNavi
                             event = parserForOutXml.next();
                         }
                         TimeUnit.SECONDS.sleep(1);
-                    } catch (Exception e) {
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                         Log.e(TAG, e.toString());
+                    } catch (IOException | XmlPullParserException ignored){
+                        Log.e(TAG, ignored.toString());
                     }
 
                 }

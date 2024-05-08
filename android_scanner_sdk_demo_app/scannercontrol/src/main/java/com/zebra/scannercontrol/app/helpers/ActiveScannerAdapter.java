@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+
+import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
@@ -20,6 +22,7 @@ public class ActiveScannerAdapter extends FragmentStatePagerAdapter {
     SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
     String[] tabs = {"Settings","Data View","Advanced"};
+    public static boolean handlingIntent = false;
     /**
      * Constructor. Handles the initialization.
      * @param fm - Fragment Manager to be used for handling fragments.
@@ -39,21 +42,24 @@ public class ActiveScannerAdapter extends FragmentStatePagerAdapter {
      * Return the Fragment associated with a specified position.
      * @param position - tab selected
      */
+    @NonNull
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "1st Tab Selected");
-                return SettingsFragment.newInstance();
+        switch (position){
             case 1:
                 Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "2nd Tab Selected");
                 return BarcodeFargment.newInstance();
             case 2:
                 Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "3rd Tab Selected");
-                return AdvancedFragment.newInstance();
+                AdvancedFragment advancedFragment = new AdvancedFragment();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(Constants.IS_HANDLING_INTENT,handlingIntent);
+                advancedFragment.setArguments(bundle);
+                return advancedFragment;
+           default:
+               Constants.logAsMessage(TYPE_DEBUG, getClass().getSimpleName(), "1st Tab Selected");
+               return SettingsFragment.newInstance();
 
-            default:
-                return null;
         }
     }
 

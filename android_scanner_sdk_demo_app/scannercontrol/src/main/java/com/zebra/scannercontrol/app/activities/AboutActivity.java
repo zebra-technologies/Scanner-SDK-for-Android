@@ -33,6 +33,7 @@ public class AboutActivity extends AppCompatActivity {
         }
         PackageInfo pInfo = null;
         try {
+
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -42,7 +43,7 @@ public class AboutActivity extends AppCompatActivity {
             version = pInfo.versionName;
             ((TextView) findViewById(R.id.about)).setText(getResources().getString(R.string.app_name)+" Application v"+version+"\n\n"+
                     "SDK version "+ Application.sdkHandler.dcssdkGetVersion()+"\n\n"
-                    +"\u00a9 2021 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.");
+                    +"\u00a9 2024 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.");
         }
     }
 
@@ -52,6 +53,7 @@ public class AboutActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.no_items, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will

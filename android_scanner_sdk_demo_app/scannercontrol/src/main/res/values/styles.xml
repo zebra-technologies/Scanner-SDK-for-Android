@@ -23,6 +23,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
@@ -253,6 +260,7 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/blue</item>
     </style>
+
     <style name="roboto_regular_15dp_blue">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">match_parent</item>
@@ -261,7 +269,6 @@
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/blue</item>
     </style>
-
 
 
     <style name="roboto_regular_16dp_blue">

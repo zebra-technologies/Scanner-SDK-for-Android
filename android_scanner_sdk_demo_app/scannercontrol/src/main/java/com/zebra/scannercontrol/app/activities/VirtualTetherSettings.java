@@ -3,8 +3,8 @@ package com.zebra.scannercontrol.app.activities;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -18,7 +18,6 @@ import android.util.Log;
 import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -36,7 +35,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
-import com.zebra.scannercontrol.app.helpers.BackgroundSoundService;
+import com.zebra.scannercontrol.app.services.BackgroundSoundService;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
@@ -51,9 +50,11 @@ import static com.zebra.scannercontrol.RMDAttributes.ACTION_COMMAND_VIRTUAL_TETH
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_VIRTUAL_TETHER_ALARM_DISABLE;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_VIRTUAL_TETHER_ALARM_ENABLE;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS;
+import static com.zebra.scannercontrol.app.application.Application.virtualTetherEventOccurred;
 import static com.zebra.scannercontrol.app.application.Application.virtualTetherHostActivated;
+import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_AUDIO_ALARM_PATTERN;
 import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_EVENT_NOTIFY;
-
+import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_SCANNER_ENABLE_VALUE;
 
 
 /**
@@ -66,7 +67,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     int scannerID;
     Menu menu;
     SwitchCompat enableVirtualTetherSwitch;
-    SwitchCompat simluationSwitch;
+    SwitchCompat simulationSwitch;
     SwitchCompat virtualTetherHostFeedback;
     SwitchCompat virtualTetherHostVibrate;
     SwitchCompat virtualTetherHostAudioAlarm;
@@ -80,15 +81,14 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     boolean isOnPause = false;
     int pauseDuration = 3000;
     int simulationDuration = 5000;
-    Boolean virtualTetherEventOccurred;
     Boolean virtualTetherSimulationOccurred;
     Boolean virtualTetherAlarmStopped;
     LinearLayout linearLayoutVirtualThether;
     ValueAnimator colorAnimation;
     private NavigationView navigationView;
-    private boolean settingsFetched;
     AlertDialog alertDialogVirtualTetherPopupMessage;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,7 +134,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         scannerID = getIntent().getIntExtra(Constants.SCANNER_ID, -1);
 
 
-        simluationSwitch = (SwitchCompat) findViewById(R.id.switch_simulation);
+        simulationSwitch = (SwitchCompat) findViewById(R.id.switch_simulation);
         enableVirtualTetherSwitch = (SwitchCompat) findViewById(R.id.switch_enable_virtual_tether);
         virtualTetherHostFeedback = (SwitchCompat) findViewById(R.id.virtual_tether_host_feedback);
         virtualTetherHostVibrate = (SwitchCompat) findViewById(R.id.virtual_tether_host_vibrate);
@@ -150,71 +150,65 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         pauseAlarmHandler = new Handler();
         loadSavedSettings();
         virtualTetherEventOccurred = getIntent().getBooleanExtra(VIRTUAL_TETHER_EVENT_NOTIFY, false);
-        if (virtualTetherEventOccurred || virtualTetherHostActivated) {
-            stopAlarmVirtualTetherButton.setEnabled(true);
-            virtualTetherAlarmStopped = false;
-            showVirtualTetherPopUpMessage();
-            enableFlashScreen();
+      if(virtualTetherEventOccurred || virtualTetherHostActivated) {
+                virtualTetherHostActivated = false;
+                stopAlarmVirtualTetherButton.setEnabled(true);
+                virtualTetherAlarmStopped = false;
+                showVirtualTetherPopUpMessage();
+                enableFlashScreen();
+                startVirtualTetherAudioAlarmFunction();
+                startVirtualTetherVibrateAlarm();
 
         }
 
 
-        stopAlarmVirtualTetherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean hasVibrator = vibrator.hasVibrator();
-                if (virtualTetherEventOccurred || virtualTetherHostActivated ||virtualTetherSimulationOccurred) {
-                    if (hasVibrator) {
-                        vibrator.cancel();
-                    }
-                    stopVirtualTetherAudioAlarm();
-                    stopAlarmVirtualTetherButton.setEnabled(false);
-                    virtualTetherHostActivated=false;
-                    virtualTetherAlarmStopped = true;
-
-                    if (colorAnimation != null) {
-                        linearLayoutVirtualThether.setBackgroundColor(getResources().getColor(R.color.clear_color));
-                        colorAnimation.removeAllListeners();
-                        colorAnimation.cancel();
-                    }
-
-
+        stopAlarmVirtualTetherButton.setOnClickListener(v -> {
+            boolean hasVibrator = vibrator.hasVibrator();
+            if (virtualTetherEventOccurred || virtualTetherHostActivated ||virtualTetherSimulationOccurred) {
+                if (hasVibrator) {
+                    vibrator.cancel();
                 }
-            }
-        });
+                stopVirtualTetherAudioAlarmFunction();
+                stopAlarmVirtualTetherButton.setEnabled(false);
+                virtualTetherHostActivated=false;
+                virtualTetherAlarmStopped = true;
 
-        pauseAlarmVirtualTetherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isOnPause = true;
-                simulationHandler.removeCallbacksAndMessages(null);
-                stopVirtualTetherSimulation();
-                pauseAlarmVirtualTetherButton.setEnabled(false);
-                simluationSwitch.setClickable(false);
-
-                pauseAlarmHandler.postDelayed(new Runnable() {
-                    public void run() {
-                        pauseAlarmVirtualTetherButton.setEnabled(true);
-
-                        initiateVirtualTetherSimulation();
-
-                    }
-                }, pauseDuration);
+                if (colorAnimation != null) {
+                    linearLayoutVirtualThether.setBackgroundColor(getResources().getColor(R.color.clear_color));
+                    colorAnimation.removeAllListeners();
+                    colorAnimation.cancel();
+                }
 
 
             }
         });
-        enableVirtualTetherSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if (isChecked) {
-                    settingAttributesInScanner(RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS, 1);
-                    enableHostFeedback();
-                } else {
-                    settingAttributesInScanner(RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS, 0);
-                    disableHostFeedback();
+        pauseAlarmVirtualTetherButton.setOnClickListener(v -> {
+            isOnPause = true;
+            simulationHandler.removeCallbacksAndMessages(null);
+            stopVirtualTetherSimulation();
+            pauseAlarmVirtualTetherButton.setEnabled(false);
+            simulationSwitch.setClickable(false);
+
+            pauseAlarmHandler.postDelayed(new Runnable() {
+                public void run() {
+                    pauseAlarmVirtualTetherButton.setEnabled(true);
+
+                    initiateVirtualTetherSimulation();
+
                 }
+            }, pauseDuration);
+
+
+        });
+        enableVirtualTetherSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+            if (isChecked) {
+                enableVirtualTetherAlarm();
+                enableHostFeedback();
+            } else {
+                disableVirtualTetherAlarm();
+                disableHostFeedback();
             }
         });
 
@@ -227,11 +221,9 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
 
                 if (isChecked) {
                     settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_FEEDBACK, true).apply();
-                    if (virtualTetherHostVibrate.isChecked() || virtualTetherHostAudioAlarm.isChecked() || virtualTetherHostFlashingScreen.isChecked() || virtualTetherHostPopUPMessage.isChecked()) {
-
-
-                    } else {
+                    if (!virtualTetherHostVibrate.isChecked() || !virtualTetherHostAudioAlarm.isChecked() || !virtualTetherHostFlashingScreen.isChecked() || !virtualTetherHostPopUPMessage.isChecked()) {
                         enableHostFeedbackOptions();
+
                     }
 
                 } else {
@@ -250,77 +242,58 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
 
                 if (isChecked) {
                     settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_VIBRATION_ALARM, true).apply();
-                    disableHostFeedbackSwitch();
                 } else {
                     settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_VIBRATION_ALARM, false).apply();
                     boolean hasVibrator = vibrator.hasVibrator();
                     if (hasVibrator) {
                         vibrator.cancel();
                     }
-                    disableHostFeedbackSwitch();
                 }
+                disableHostFeedbackSwitch();
             }
         });
-        virtualTetherHostAudioAlarm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
-                if (isChecked) {
-                    settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, true).apply();
-                    disableHostFeedbackSwitch();
-                } else {
-                    settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, false).apply();
-                    disableHostFeedbackSwitch();
-                }
+        virtualTetherHostAudioAlarm.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
+            if (isChecked) {
+                settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, true).apply();
+            } else {
+                settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, false).apply();
             }
+            disableHostFeedbackSwitch();
         });
-        virtualTetherHostFlashingScreen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
+        virtualTetherHostFlashingScreen.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
 
-                if (isChecked) {
-                    settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_SCREEN_FLASH, true).apply();
+            if (isChecked) {
+                settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_SCREEN_FLASH, true).apply();
 
-                    disableHostFeedbackSwitch();
-                } else {
-                    settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_SCREEN_FLASH, false).apply();
-                    disableHostFeedbackSwitch();
-                }
+            } else {
+                settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_SCREEN_FLASH, false).apply();
             }
+            disableHostFeedbackSwitch();
         });
-        virtualTetherHostPopUPMessage.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
-                if (isChecked) {
-                    settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_POPUP_MESSAGE, true).apply();
-                    disableHostFeedbackSwitch();
-                } else {
-                    settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_POPUP_MESSAGE, false).apply();
-                    disableHostFeedbackSwitch();
-                }
+        virtualTetherHostPopUPMessage.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
+            if (isChecked) {
+                settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_POPUP_MESSAGE, true).apply();
+            } else {
+                settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_POPUP_MESSAGE, false).apply();
             }
+            disableHostFeedbackSwitch();
         });
 
-        simluationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        simulationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
-                if (isChecked) {
-                    pauseAlarmHandler.removeCallbacksAndMessages(null);
-                    initiateVirtualTetherSimulation();
+            if (isChecked) {
+                pauseAlarmHandler.removeCallbacksAndMessages(null);
+                initiateVirtualTetherSimulation();
 
-                    simulateVirtualTetherHostFeedback();
-                    virtualTetherSimulationOccurred=true;
-                    stopVirtualTetherHostFeedbackSimulation();
-                }else {
-
-                }
-
+                simulateVirtualTetherHostFeedback();
+                virtualTetherSimulationOccurred=true;
+                stopVirtualTetherHostFeedbackSimulation();
             }
-        });
 
+        });
 
 
     }
@@ -428,13 +401,13 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         pauseAlarmVirtualTetherButton.setEnabled(true);
         pauseAlarmVirtualTetherButton.setClickable(true);
 
-        simluationSwitch.setChecked(true);
-        simluationSwitch.setClickable(false);
+        simulationSwitch.setChecked(true);
+        simulationSwitch.setClickable(false);
 
 
         String in_xml_for_simulation = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-int>" + ACTION_COMMAND_VIRTUAL_TETHER_START_SIMULATION + "</arg-int></cmdArgs></inArgs>";
         cmdExecTask = new VirtualTetherAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_SET_ACTION);
-        cmdExecTask.execute(new String[]{in_xml_for_simulation});
+        cmdExecTask.execute(in_xml_for_simulation);
 
 
     }
@@ -447,15 +420,15 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
 
         String in_xml_for_simulation = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-int>" + ACTION_COMMAND_VIRTUAL_TETHER_STOP_SIMULATION + "</arg-int></cmdArgs></inArgs>";
         cmdExecTask = new VirtualTetherAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_SET_ACTION);
-        cmdExecTask.execute(new String[]{in_xml_for_simulation});
+        cmdExecTask.execute(in_xml_for_simulation);
 
         pauseAlarmVirtualTetherButton.setEnabled(false);
         pauseAlarmVirtualTetherButton.setClickable(false);
 
-        if (isOnPause == false) {
+        if (!isOnPause) {
 
-            simluationSwitch.setChecked(false);
-            simluationSwitch.setClickable(true);
+            simulationSwitch.setChecked(false);
+            simulationSwitch.setClickable(true);
 
         }
 
@@ -472,14 +445,17 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
             @Override
             public void run() {
 
-                alertDialogVirtualTetherPopupMessage.dismiss();
+
 
                 boolean hasVibrator = vibrator.hasVibrator();
                 if (virtualTetherEventOccurred ||virtualTetherSimulationOccurred) {
+                  if(virtualTetherHostPopUPMessage.isChecked()) {
+                      alertDialogVirtualTetherPopupMessage.dismiss();
+                  }
                     if (hasVibrator) {
                         vibrator.cancel();
                     }
-                    stopVirtualTetherAudioAlarm();
+                    stopVirtualTetherAudioAlarmFunction();
                     stopAlarmVirtualTetherButton.setEnabled(false);
                     virtualTetherHostActivated = false;
                     virtualTetherAlarmStopped = true;
@@ -504,13 +480,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         isOnPause = false;
         startVirtualTetherSimulation();
 
-        simulationHandler.postDelayed(new Runnable() {
-            public void run() {
-
-                stopVirtualTetherSimulation();
-
-            }
-        }, simulationDuration);
+        simulationHandler.postDelayed(() -> stopVirtualTetherSimulation(), simulationDuration);
 
     }
 
@@ -525,15 +495,15 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         }
         //simulate host vibration
         if(virtualTetherHostVibrate.isChecked()) {
-            long[] pattern = {1500, 800, 800, 800};
+
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 AudioAttributes attributes = new AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .setUsage(AudioAttributes.USAGE_ALARM)
                         .build();
-                vibrator.vibrate(pattern, 0, attributes);
+                vibrator.vibrate(VIRTUAL_TETHER_AUDIO_ALARM_PATTERN, 0, attributes);
             } else {
-                vibrator.vibrate(pattern, 0);
+                vibrator.vibrate(VIRTUAL_TETHER_AUDIO_ALARM_PATTERN, 0);
             }
         }
         //simulate host audio alarm
@@ -562,25 +532,23 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
             //Setting message manually and performing action on button click
             alertDialogForVirtualTetherPopupMessage.setMessage(R.string.virtual_tether_host_pop_up_message_description)
                     .setCancelable(false)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            boolean hasVibrator = vibrator.hasVibrator();
-                            if (virtualTetherEventOccurred ||virtualTetherSimulationOccurred) {
-                                if (hasVibrator) {
-                                    vibrator.cancel();
-                                }
-                                stopVirtualTetherAudioAlarm();
-                                stopAlarmVirtualTetherButton.setEnabled(false);
-                                virtualTetherHostActivated = false;
-                                virtualTetherAlarmStopped = true;
-
-                                if (colorAnimation != null) {
-                                    linearLayoutVirtualThether.setBackgroundColor(getResources().getColor(R.color.clear_color));
-                                    colorAnimation.removeAllListeners();
-                                    colorAnimation.cancel();
-                                }
-
+                    .setPositiveButton(R.string.ok, (dialog, id) -> {
+                        boolean hasVibrator = vibrator.hasVibrator();
+                        if (virtualTetherEventOccurred ||virtualTetherSimulationOccurred) {
+                            if (hasVibrator) {
+                                vibrator.cancel();
                             }
+                            stopVirtualTetherAudioAlarmFunction();
+                            stopAlarmVirtualTetherButton.setEnabled(false);
+                            virtualTetherHostActivated = false;
+                            virtualTetherAlarmStopped = true;
+
+                            if (colorAnimation != null) {
+                                linearLayoutVirtualThether.setBackgroundColor(getResources().getColor(R.color.clear_color));
+                                colorAnimation.removeAllListeners();
+                                colorAnimation.cancel();
+                            }
+
                         }
                     });
 
@@ -591,6 +559,41 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         }
     }
 
+    /**
+     * Method to start background sound service
+     */
+    private void startVirtualTetherAudioAlarmFunction() {
+
+        SharedPreferences virtualTetherSavedSettings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        if (virtualTetherSavedSettings.getBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, false)) {
+            Intent musicintent = new Intent(getApplicationContext(), BackgroundSoundService.class);
+            startService(musicintent);
+        }
+    }
+
+    /**
+     * Method to start background vibration
+     */
+    private void startVirtualTetherVibrateAlarm() {
+
+        SharedPreferences virtualTetherSavedSettings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        if (virtualTetherSavedSettings.getBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_VIBRATION_ALARM, false)) {
+            boolean hasVibrator = vibrator.hasVibrator();
+            if (!hasVibrator) {
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    AudioAttributes attributes = new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .build();
+                    vibrator.vibrate(VIRTUAL_TETHER_AUDIO_ALARM_PATTERN, 0, attributes);
+                } else {
+                    vibrator.vibrate(VIRTUAL_TETHER_AUDIO_ALARM_PATTERN, 0);
+                }
+            }
+
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -629,7 +632,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
             if (hasVibrator) {
                 vibrator.cancel();
             }
-            stopVirtualTetherAudioAlarm();
+            stopVirtualTetherAudioAlarmFunction();
             stopAlarmVirtualTetherButton.setEnabled(false);
             virtualTetherHostActivated= false;
             virtualTetherAlarmStopped = true;
@@ -650,12 +653,16 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
             super.onBackPressed();
         }
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         addDevConnectionsDelegate(this);
-
     }
 
     @Override
@@ -663,6 +670,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         int id = item.getItemId();
         Intent intent;
         if (id == R.id.nav_pair_device) {
+            Application.setScannerDisconnectedIntention(true);
             disconnect(scannerID);
             Application.barcodeData.clear();
             Application.currentScannerId = Application.SCANNER_ID_NONE;
@@ -672,28 +680,27 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
+            startActivity(intent);
+        } else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
-            dlg.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setPositiveButton("Continue", (dialog, arg) -> {
 
-                    disconnect(scannerID);
-                    Application.barcodeData.clear();
-                    Application.currentScannerId = Application.SCANNER_ID_NONE;
-                    finish();
-                    Intent intent = new Intent(VirtualTetherSettings.this, FindCabledScanner.class);
-                    startActivity(intent);
-                }
+                disconnect(scannerID);
+                Application.barcodeData.clear();
+                Application.currentScannerId = Application.SCANNER_ID_NONE;
+                Application.setScannerDisconnectedIntention(true);
+                finish();
+                Intent intent_virtual = new Intent(VirtualTetherSettings.this, FindCabledScanner.class);
+                startActivity(intent_virtual);
             });
 
-            dlg.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg) {
+            dlg.setNegativeButton("Cancel", (dialog, arg) -> {
 
-                }
             });
             dlg.show();
         } else if (id == R.id.nav_connection_help) {
@@ -753,20 +760,20 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     public void settingAttributesInScanner(int attributeID, int attributeIDValue) {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>" + attributeID + "</id><datatype>B</datatype><value>" + attributeIDValue + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
         String inXml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>"+RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS+"</attrib_list></arg-xml></cmdArgs></inArgs>";
-        cmdExecTask = new VirtualTetherAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_SET);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask = new VirtualTetherAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_STORE);
+        cmdExecTask.execute(in_xml);
 
     }
 
     /**
      * This method is responsible for enabling the Virtual Tether alarm in the scanner
      *
-     * @param view
+
      */
-    public void enableVirtualTetherAlarm(View view) {
+    public void enableVirtualTetherAlarm() {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>" + RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS + "</id><datatype>B</datatype><value>" + RMD_ATTR_VALUE_VIRTUAL_TETHER_ALARM_ENABLE + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
         cmdExecTask = new VirtualTetherAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_STORE);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
 
 
     }
@@ -774,12 +781,12 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     /**
      * This method is responsible for disabling the Virtual Tether alarm in the scanner
      *
-     * @param view
+     *
      */
-    public void disableVirtualTetherAlarm(View view) {
+    public void disableVirtualTetherAlarm() {
         String in_xml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list><attribute><id>" + RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS + "</id><datatype>B</datatype><value>" + RMD_ATTR_VALUE_VIRTUAL_TETHER_ALARM_DISABLE + "</value></attribute></attrib_list></arg-xml></cmdArgs></inArgs>";
         cmdExecTask = new VirtualTetherAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_STORE);
-        cmdExecTask.execute(new String[]{in_xml});
+        cmdExecTask.execute(in_xml);
 
 
     }
@@ -790,18 +797,16 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         String inXml = "<inArgs><scannerID>" + scannerID + "</scannerID><cmdArgs><arg-xml><attrib_list>"+RMD_ATTR_VIRTUAL_TETHER_ALARM_STATUS+"</attrib_list></arg-xml></cmdArgs></inArgs>";
         StringBuilder outXML = new StringBuilder();
         myAsyncTask = new VirtualTetherAttributeGetAsyncTask(scannerID, DCSSDKDefs.DCSSDK_COMMAND_OPCODE.DCSSDK_RSM_ATTR_GET, outXML);
-        myAsyncTask.execute(new String[]{inXml});
-        boolean attrVal = false;
+        myAsyncTask.execute(inXml);
+        boolean attributeValue = false;
         try {
             myAsyncTask.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         }
         try {
             XmlPullParser parser = Xml.newPullParser();
-
             parser.setInput(new StringReader(outXML.toString()));
             int event = parser.getEventType();
             String text = null;
@@ -816,8 +821,10 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
 
                     case XmlPullParser.END_TAG:
                         if (name.equals("value") && text != null) {
-                            attrVal = Boolean.parseBoolean(text.trim());
-
+                            if(text.trim().equals(VIRTUAL_TETHER_SCANNER_ENABLE_VALUE))
+                                attributeValue = true;
+                            else
+                                attributeValue = false;
                         }
                         break;
                 }
@@ -826,7 +833,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-        return attrVal;
+        return attributeValue;
     }
 
     /**
@@ -835,14 +842,13 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
 
     private void loadSavedSettings() {
 
-         boolean virtualTetherScannerStatus = getVirtualTetherScannerStatus();
-        
+        boolean virtualTetherScannerStatus = getVirtualTetherScannerStatus();
 
         SharedPreferences virtualTetherSharedPreferences = getSharedPreferences(Constants.PREFS_NAME, 0);
 
         if (virtualTetherScannerStatus && !virtualTetherSharedPreferences.getBoolean(Constants.PREF_VIRTUAL_TETHER_SCANNER_SETTINGS, false)) {
             enableHostFeedback();
-            enableVirtualTetherSwitch.setChecked(virtualTetherScannerStatus);
+            enableVirtualTetherSwitch.setChecked(true);
 
             SharedPreferences.Editor settingsEditor = getSharedPreferences(Constants.PREFS_NAME, 0).edit();
             settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_SCANNER_SETTINGS, true).apply();
@@ -853,7 +859,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
             settingsEditor.putBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_SCREEN_FLASH, true).apply();
 
         } else if (virtualTetherScannerStatus && virtualTetherSharedPreferences.getBoolean(Constants.PREF_VIRTUAL_TETHER_SCANNER_SETTINGS, false)) {
-            enableVirtualTetherSwitch.setChecked(virtualTetherScannerStatus);
+            enableVirtualTetherSwitch.setChecked(true);
             virtualTetherHostFeedback.setChecked(virtualTetherSharedPreferences.getBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_FEEDBACK, false));
             virtualTetherHostVibrate.setChecked(virtualTetherSharedPreferences.getBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_VIBRATION_ALARM, false));
             virtualTetherHostAudioAlarm.setChecked(virtualTetherSharedPreferences.getBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, false));
@@ -862,7 +868,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         } else if (!virtualTetherScannerStatus && !virtualTetherSharedPreferences.getBoolean(Constants.PREF_VIRTUAL_TETHER_SCANNER_SETTINGS, false)) {
             disableHostFeedbackSwitch();
             disableHostFeedback();
-            enableVirtualTetherSwitch.setChecked(virtualTetherScannerStatus);
+            enableVirtualTetherSwitch.setChecked(false);
 
         }
 
@@ -871,7 +877,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     /**
      * This method is to shop the audio alarm background service
      */
-    private void stopVirtualTetherAudioAlarm() {
+    private void stopVirtualTetherAudioAlarmFunction() {
         Intent intent = new Intent(getApplicationContext(), BackgroundSoundService.class);
         stopService(intent);
     }
@@ -895,8 +901,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         @Override
         protected Boolean doInBackground(String... strings) {
             StringBuilder sb = new StringBuilder();
-            boolean result = executeCommand(opcode, strings[0], sb, scannerId);
-            return result;
+            return executeCommand(opcode, strings[0], sb, scannerId);
 
         }
 

@@ -1,5 +1,6 @@
 package com.zebra.scannercontrol.app.activities;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -12,11 +13,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.navigation.NavigationView;
+
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -58,6 +64,8 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
     private int CREATE = 3;
 
     static boolean launchFromFCS = false;
+
+    private static int  checkedScanner = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +109,7 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
      }
 
 
+    @SuppressLint("HandlerLeak")
     private final Handler UpdateScannersHandler = new Handler() {
 
         public void handleMessage(Message msg) {
@@ -209,8 +218,10 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
                             Application.currentScannerAddress = lastConnectedScannerList.get(0).getScannerAddress();
                             Application.currentScannerId = lastConnectedScannerList.get(0).getScannerId();
                             Application.currentAutoReconnectionState = lastConnectedScannerList.get(0).isAutoReconnection();
+                            Application.currentScannerType = lastConnectedScannerList.get(0).getConnectionType().value;
                             Intent intent = new Intent(ScannersActivity.this, ActiveScannerActivity.class);
                             intent.putExtra(Constants.SCANNER_NAME, Application.currentScannerName);
+                            intent.putExtra(Constants.SCANNER_TYPE, lastConnectedScannerList.get(0).getConnectionType().value);
                             intent.putExtra(Constants.SCANNER_ADDRESS, Application.currentScannerAddress);
                             intent.putExtra(Constants.SCANNER_ID, Application.currentScannerId);
                             intent.putExtra(Constants.AUTO_RECONNECTION, Application.currentAutoReconnectionState);
@@ -327,7 +338,7 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
 
     @Override
     public void onBackPressed() {
-        if(Application.isAnyScannerConnected){
+        if(Application.getAnyScannerConnectedStatus()){
             Intent intent = new Intent(ScannersActivity.this, ActiveScannerActivity.class);
             intent.putExtra(Constants.SCANNER_NAME, curAvailableScanner.getScannerName());
             intent.putExtra(Constants.SCANNER_ADDRESS, curAvailableScanner.getScannerAddress());
@@ -363,9 +374,10 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
         public void onItemClick(AdapterView<?> av, View v, int position, long id) {
             // Cancel discovery because it's costly and we're about to connect
             // Get the device MAC address, which is the last 17 chars in the View
+            checkedScanner = position;
             AvailableScanner availableScanner = scannersList.get(position);
 
-            ConnectToScanner(availableScanner);
+            ConnectToScanner(availableScanner,scannersList);
         }
     };
 
@@ -374,13 +386,14 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
         public void onItemClick(AdapterView<?> av, View v, int position, long id) {
             // Cancel discovery because it's costly and we're about to connect
             // Get the device MAC address, which is the last 17 chars in the View
+            checkedScanner = position;
             AvailableScanner availableScanner = lastConnectedScannerList.get(position);
 
-            ConnectToScanner(availableScanner);
+            ConnectToScanner(availableScanner, lastConnectedScannerList);
         }
     };
 
-    private void ConnectToScanner(AvailableScanner availableScanner) {
+    private void ConnectToScanner(AvailableScanner availableScanner, ArrayList<AvailableScanner> scanners) {
         for(DCSScannerInfo device:getActualScannersList()) {
             if(device.getScannerID() == availableScanner.getScannerId()){
                 availableScanner.setIsAutoReconnection(device.isAutoCommunicationSessionReestablishment());
@@ -394,7 +407,7 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
                     if (curAvailableScanner.isConnected())
                         disconnect(curAvailableScanner.getScannerId());
                 }
-                cmdExecTask=new MyAsyncTask(availableScanner);
+                cmdExecTask=new MyAsyncTask(availableScanner, scanners);
                 cmdExecTask.execute();
 
             } else {
@@ -433,8 +446,10 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
 
     private class MyAsyncTask extends AsyncTask<Void,AvailableScanner,Boolean> {
         private AvailableScanner  scanner;
-        public MyAsyncTask(AvailableScanner scn){
-            this.scanner=scn;
+        private ArrayList<AvailableScanner> scanners;
+        public MyAsyncTask(AvailableScanner availableScanner, ArrayList<AvailableScanner> scanners){
+            this.scanner=availableScanner;
+            this.scanners = scanners;
         }
         @Override
         protected void onPreExecute() {
@@ -470,19 +485,46 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
         }
 
         @Override
-        protected void onPostExecute(Boolean b) {
-            super.onPostExecute(b);
-            if (progressDialog != null && progressDialog.isShowing())
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.dismiss();
-            Intent returnIntent = new Intent(getApplicationContext(),HomeActivity.class);
-            if(!b){
-                returnIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(returnIntent);
-                setResult(RESULT_CANCELED, returnIntent);
+            }
+            if(!result){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showEnableClassicDiscoverable(scanners);
+                    }
+                });
                 Toast.makeText(getApplicationContext(),"Unable to communicate with scanner",Toast.LENGTH_SHORT).show();
                 scannersListHasBeenUpdated();
             }
-
         }
+    }
+
+    /**
+     * message to show popup with the barcode to enable discoverable mode
+     */
+    public void showEnableClassicDiscoverable(ArrayList<AvailableScanner> scanners) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater layoutInflater = getLayoutInflater();
+        View customView = layoutInflater.inflate(R.layout.dialog_classic_discoverable, null);
+        builder.setView(customView);
+        builder.create();
+        AlertDialog alertDialog = builder.show();
+
+        Button dismissBtn = (Button)  customView.findViewById(R.id.btn_dismiss);
+        dismissBtn.setOnClickListener(v -> alertDialog.dismiss());
+
+        Button connectBtn = (Button)  customView.findViewById(R.id.btn_connect);
+        connectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AvailableScanner availableScanner = scanners.get(checkedScanner);
+                ConnectToScanner(availableScanner,scanners);
+                alertDialog.dismiss();
+            }
+        });
     }
 }

@@ -6,10 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:keepScreenOn="true"
     tools:openDrawer="start">
 
     <include
-        layout="@layout/app_bar_unpair_and_reboot"
+        layout="@layout/app_bar_execute_sms"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -22,6 +22,6 @@
     <color name="yellow">#FFD200</color>
     <color name="enable_disable_color">#333D47</color>
     <color name="firmware_updated" >#8cc34b</color>
-
+    <color name="black">#000000</color>
 
 </resources>

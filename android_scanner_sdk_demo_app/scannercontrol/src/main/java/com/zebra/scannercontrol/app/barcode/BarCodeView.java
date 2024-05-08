@@ -138,8 +138,8 @@ public class BarCodeView extends View {
             previousYSize = currentYSize = barcodeHeight;
         }
 
-        float posX = (canvas.getWidth() - barcodeWidth - leftBorder - rightBorder) / 2 + leftBorder;
-        float posY = (canvas.getHeight() - barcodeHeight - topBorder - bottomBorder) / 2 + topBorder;
+        float posX = ((canvas.getWidth() - barcodeWidth - leftBorder - rightBorder) / 2f) + leftBorder;
+        float posY = ((canvas.getHeight() - barcodeHeight - topBorder - bottomBorder) / 2f) + topBorder;
 
         for (int symbol: zebra) {
             for (int i=0; i<6; i++, symbol>>=2) {
@@ -168,8 +168,8 @@ public class BarCodeView extends View {
     public boolean onTouchEvent(MotionEvent event) {
 
         boolean retVal = mScaleGestureDetector.onTouchEvent(event);
-        retVal = mGestureDetector.onTouchEvent(event) | retVal;
-        return retVal | super.onTouchEvent(event);
+        retVal = mGestureDetector.onTouchEvent(event) || retVal;
+        return retVal || super.onTouchEvent(event);
     }
 
     private final ScaleGestureDetector.OnScaleGestureListener mScaleGestureListener = new ScaleGestureDetector.OnScaleGestureListener() {
@@ -190,14 +190,14 @@ public class BarCodeView extends View {
 
             if ((prevSpan-currSpan) > 0) {
                 // Decreasing size
-                currentXSize -= Math.round(((float) currentXSize) * (prevSpan - currSpan) * 2 / getWidth());
-                currentYSize -= Math.round(((float) currentYSize) * (prevSpan - currSpan) * 2 / getWidth());
+                currentXSize -= Math.round((currentXSize) * (prevSpan - currSpan) * 2 / getWidth());
+                currentYSize -= Math.round((currentYSize) * (prevSpan - currSpan) * 2 / getWidth());
                 isScaled = true;
             }
             else if ((prevSpan-currSpan) < 0) {
                 // Increasing size
-                currentXSize += Math.round(((float) currentXSize) * (currSpan - prevSpan) * 2 / getWidth());
-                currentYSize += Math.round(((float) currentYSize) * (currSpan - prevSpan) * 2 / getWidth());
+                currentXSize += Math.round((currentXSize) * (currSpan - prevSpan) * 2 / getWidth());
+                currentYSize += Math.round((currentYSize) * (currSpan - prevSpan) * 2 / getWidth());
                 isScaled = true;
             }
             invalidate();

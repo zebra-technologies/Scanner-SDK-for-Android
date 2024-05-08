@@ -213,7 +213,7 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
         point = point + seekbarpoints;
         canvas.drawLine(point, 100, point, 0, paint);
         point = point + seekbarpoints;
-        canvas.drawLine(point-(indent*2), 100, point-(indent*2), 0, paint);
+        canvas.drawLine(point-(indent*2f), 100, point-(indent*2f), 0, paint);
 
 
         //Create a new Drawable
@@ -281,9 +281,11 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
 
         } else if (id == R.id.nav_devices) {
             intent = new Intent(this, ScannersActivity.class);
-
             startActivity(intent);
-        }else if (id == R.id.nav_find_cabled_scanner) {
+        }else if(id == R.id.nav_beacons){
+            intent = new Intent(this, BeaconActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_find_cabled_scanner) {
             AlertDialog.Builder dlg = new  AlertDialog.Builder(this);
             dlg.setTitle("This will disconnect your current scanner");
             //dlg.setIcon(android.R.drawable.ic_dialog_alert);
@@ -359,9 +361,9 @@ public class BeeperActionsActivity extends BaseActivity implements NavigationVie
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         int mProgress = seekBar.getProgress();
-        if(mProgress >= 0 & mProgress < 26) {
+        if(mProgress >= 0 && mProgress < 26) {
             seekBar.setProgress(SEEK_BAR_PROGRESS_MIN);
-        } else if(mProgress > 25 & mProgress < 76) {
+        } else if(mProgress > 25 && mProgress < 76) {
             seekBar.setProgress(SEEK_BAR_PROGRESS_MEDIUM);
         } else seekBar.setProgress(SEEK_BAR_PROGRESS_MAX);
 

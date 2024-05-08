@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.zebra.scannercontrol.app.activities.UnPairAndRebootActivity">
+    tools:context="com.zebra.scannercontrol.app.activities.UpdateFirmware">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -27,6 +27,6 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_unpair_and_reboot" />
+    <include layout="@layout/content_execute_sms" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
