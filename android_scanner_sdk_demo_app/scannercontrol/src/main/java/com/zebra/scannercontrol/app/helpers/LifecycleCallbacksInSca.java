@@ -7,22 +7,22 @@ import android.os.Bundle;
 /**
  * Created by pndv47 on 4/29/2016.
  */
-public class Foreground implements Application.ActivityLifecycleCallbacks {
+public class LifecycleCallbacksInSca implements Application.ActivityLifecycleCallbacks {
 
-    private static Foreground instance;
+    private static LifecycleCallbacksInSca instance;
 
     public static void init(Application app){
         if (instance == null){
-            instance = new Foreground();
+            instance = new LifecycleCallbacksInSca();
             app.registerActivityLifecycleCallbacks(instance);
         }
     }
 
-    public static Foreground get(){
+    public static LifecycleCallbacksInSca get(){
         return instance;
     }
 
-    private Foreground(){}
+    private LifecycleCallbacksInSca(){}
     private boolean foreground;
 
     public boolean isForeground(){

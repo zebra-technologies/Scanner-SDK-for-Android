@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,27 +16,21 @@ import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 public class AvailableScannerActivity extends BaseActivity {
 
     private String address;
     int scannerId;
+    LinearLayout linearAvailableScanner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_available_scanner);
-
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        linearAvailableScanner = findViewById(R.id.linear_available_scanner);
+        UIEnhancer.enableEdgeToEdge(linearAvailableScanner);
+        UIEnhancer.configureOrientation(this);
 
         String scannerName = getIntent().getStringExtra(Constants.SCANNER_NAME);
         address = getIntent().getStringExtra(Constants.SCANNER_ADDRESS);

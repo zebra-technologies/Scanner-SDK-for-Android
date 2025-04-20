@@ -53,6 +53,9 @@ public class Constants {
     public static final String PREF_PAIRING_BARCODE_TYPE = "MOT_SETTING_PAIRING_BARCODE_TYPE";
     public static final String PREF_PAIRING_BARCODE_CONFIG = "MOT_SETTING_PAIRING_BARCODE_CONFIG";
     public static final String PREF_COMMUNICATION_PROTOCOL_TYPE = "MOT_SETTING_COMMUNICATION_PROTOCOL_TYPE";
+    public static final String PREF_THROW_OR_LOG_EXCEPTIONS = "MOT_SETTING_THROW_OR_LOG_EXCEPTIONS";
+    public static final String PREF_REMOVE_POPUP_PAIR_REQUEST = "MOT_SETTINGS_REMOVE_POPUP_PAIR_REQUEST";
+
     public static final int COMMUNICATION_PROTOCOL_TYPE_BTLE = 0;
     public static final int COMMUNICATION_PROTOCOL_TYPE_CLASSIC = 1;
     //Data related to notifications
@@ -84,6 +87,7 @@ public class Constants {
     public static final String VIRTUAL_TETHER_EVENT_NOTIFY = "intent_virtual_tether_event_notify";
     public static final String VIRTUAL_TETHER_SCANNER_ENABLE_VALUE = "1";
     public static final long[] VIRTUAL_TETHER_AUDIO_ALARM_PATTERN = {1500, 800, 800, 800};
+    public static final String WORK_NAME = "Virtual_Tether_Background_Sound";
 
 
     public static final String PREF_VIRTUAL_TETHER_HOST_BACKGROUND_COLOR  = "backgroundColor";

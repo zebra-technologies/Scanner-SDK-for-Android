@@ -48,6 +48,7 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -69,17 +70,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battery_statistics);
-
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -100,6 +91,7 @@ public class BatteryStatistics extends BaseActivity implements NavigationView.On
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         scannerID = getIntent().getIntExtra(Constants.SCANNER_ID, -1);
         menu = navigationView.getMenu();

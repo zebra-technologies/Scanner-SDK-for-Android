@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -30,19 +31,25 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
-import com.zebra.scannercontrol.app.services.BackgroundSoundService;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
+import com.zebra.scannercontrol.app.helpers.LifecycleCallbacksInSca;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
+import com.zebra.scannercontrol.app.work.BackgroundSoundWorker;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.StringReader;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.zebra.scannercontrol.RMDAttributes.ACTION_COMMAND_VIRTUAL_TETHER_START_SIMULATION;
@@ -55,6 +62,7 @@ import static com.zebra.scannercontrol.app.application.Application.virtualTether
 import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_AUDIO_ALARM_PATTERN;
 import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_EVENT_NOTIFY;
 import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_SCANNER_ENABLE_VALUE;
+import static com.zebra.scannercontrol.app.helpers.Constants.WORK_NAME;
 
 
 /**
@@ -87,23 +95,15 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     ValueAnimator colorAnimation;
     private NavigationView navigationView;
     AlertDialog alertDialogVirtualTetherPopupMessage;
+    private UUID workRequestId;
+    OneTimeWorkRequest workRequest;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_virtual_tether_settings);
-
-        Configuration configuration = getResources().getConfiguration();
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (configuration.screenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -127,6 +127,7 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         linearLayoutVirtualThether = findViewById(R.id.linearLayoutVirtualThether);
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
@@ -508,8 +509,9 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
         }
         //simulate host audio alarm
         if(virtualTetherHostAudioAlarm.isChecked()) {
-            Intent playAudio = new Intent(getApplicationContext(), BackgroundSoundService.class);
-            startService(playAudio);
+            workRequest = new OneTimeWorkRequest.Builder(BackgroundSoundWorker.class).build();
+            WorkManager.getInstance(this).enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, workRequest);
+            workRequestId = workRequest.getId();
         }
         //simulate host Pop-Up message
         if(virtualTetherHostPopUPMessage.isChecked()) {
@@ -560,14 +562,15 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     }
 
     /**
-     * Method to start background sound service
+     * Method to start background sound using work manager
      */
     private void startVirtualTetherAudioAlarmFunction() {
 
         SharedPreferences virtualTetherSavedSettings = getSharedPreferences(Constants.PREFS_NAME, 0);
         if (virtualTetherSavedSettings.getBoolean(Constants.PREF_VIRTUAL_TETHER_HOST_AUDIO_ALARM, false)) {
-            Intent musicintent = new Intent(getApplicationContext(), BackgroundSoundService.class);
-            startService(musicintent);
+            workRequest = new OneTimeWorkRequest.Builder(BackgroundSoundWorker.class).build();
+            WorkManager.getInstance(this).enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, workRequest);
+            workRequestId = workRequest.getId();
         }
     }
 
@@ -740,6 +743,11 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     @Override
     public boolean scannerHasConnected(int scannerID) {
         pairNewScannerMenu.setTitle(R.string.menu_item_device_disconnect);
+        //Once the scanner is reconnected, Cancel the work manager task.
+        if(workRequestId!=null){
+            WorkManager.getInstance(getApplicationContext()).cancelAllWork();
+        }
+        this.finish();
         return false;
     }
 
@@ -875,11 +883,10 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
     }
 
     /**
-     * This method is to shop the audio alarm background service
+     * This method is to stop the audio alarm using work manager
      */
     private void stopVirtualTetherAudioAlarmFunction() {
-        Intent intent = new Intent(getApplicationContext(), BackgroundSoundService.class);
-        stopService(intent);
+        WorkManager.getInstance(this).cancelWorkById(workRequestId);
     }
 
     private class VirtualTetherAsyncTask extends AsyncTask<String, Integer, Boolean> {
@@ -947,5 +954,18 @@ public class VirtualTetherSettings extends BaseActivity implements NavigationVie
                 progressDialog.dismiss();
 
         }
+    }
+
+    @Override
+    public boolean isInBackgroundMode(Context context) {
+        return LifecycleCallbacksInSca.get().isBackground();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(alertDialogVirtualTetherPopupMessage!= null && alertDialogVirtualTetherPopupMessage.isShowing()){
+            alertDialogVirtualTetherPopupMessage.dismiss();
+        }
+        super.onDestroy();
     }
 }

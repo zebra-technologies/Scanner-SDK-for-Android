@@ -4,30 +4,25 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
-import com.zebra.scannercontrol.app.helpers.Foreground;
+import com.zebra.scannercontrol.app.helpers.LifecycleCallbacksInSca;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 public class SupportedScanners extends AppCompatActivity {
 
+    LinearLayout linearSupportScanners;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_supported_scanners);
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        linearSupportScanners = findViewById(R.id.linear_support_scanners);
+        UIEnhancer.enableEdgeToEdge(linearSupportScanners);
+        UIEnhancer.configureOrientation(this);
     }
 
     @Override
@@ -38,6 +33,6 @@ public class SupportedScanners extends AppCompatActivity {
         }
     }
     public boolean isInBackgroundMode(final Context context) {
-        return Foreground.get().isBackground();
+        return LifecycleCallbacksInSca.get().isBackground();
     }
 }

@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
 
-
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
@@ -18,13 +17,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <permission android:name="com.zebra.scannercontrol.SERVICE_LAUNCH_PERMISSION"
         android:description="@string/perm_desc_service_launch_permission"
@@ -46,16 +42,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service
-            android:foregroundServiceType="mediaPlayback"
-            android:name=".services.BackgroundSoundService"
-            android:enabled="true"
-            android:permission="com.zebra.scannercontrol.SERVICE_LAUNCH_PERMISSION"
-            android:exported="true" />
-
-        <service
-            android:foregroundServiceType="dataSync"
-            android:name=".services.FileObserverService"/>
         <receiver android:name=".receivers.SMSBroadcastReceiver"
             android:enabled="true"
             android:exported="true">

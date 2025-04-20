@@ -64,6 +64,7 @@ import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.DotsProgressBar;
 import com.zebra.scannercontrol.app.helpers.SSASymbologyType;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -149,17 +150,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_speed_analytics);
-
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp< Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -199,6 +190,7 @@ public class ScanSpeedAnalyticsActivity extends  BaseActivity implements  Naviga
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);

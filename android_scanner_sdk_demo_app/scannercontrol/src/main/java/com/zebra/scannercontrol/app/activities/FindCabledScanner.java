@@ -27,6 +27,7 @@ import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import java.util.ArrayList;
 
@@ -37,21 +38,14 @@ public class FindCabledScanner extends BaseActivity implements ScannerAppEngine.
     private static CustomProgressDialog progressDialog;
     private static ArrayList<DCSScannerInfo> mSNAPIList=new ArrayList<DCSScannerInfo>();
     Dialog dialog;
+    LinearLayout linearFindCabledScanner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_cabled_scanner);
-
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        linearFindCabledScanner = findViewById(R.id.linear_find_cabled_scanner);
+        UIEnhancer.enableEdgeToEdge(linearFindCabledScanner);
+        UIEnhancer.configureOrientation(this);
 
         mSNAPIList.clear();
         updateScannersList();
@@ -92,6 +86,7 @@ public class FindCabledScanner extends BaseActivity implements ScannerAppEngine.
             // Only one SNAPI scanner available
             if(mSNAPIList.get(0).isActive()){
                 // Available scanner is active. Navigate to active scanner
+                HomeActivity.isSystemBTShown = true;
                 finish();
             }else{
                 // Try to connect available scanner
@@ -153,6 +148,7 @@ public class FindCabledScanner extends BaseActivity implements ScannerAppEngine.
         super.onPause();
         removeDevListDelegate(this);
         if (isInBackgroundMode(getApplicationContext())) {
+            HomeActivity.isSystemBTShown = true;
             finish();
         }
     }
@@ -268,6 +264,7 @@ public class FindCabledScanner extends BaseActivity implements ScannerAppEngine.
             // Only one SNAPI scanner available
             if (mSNAPIList.get(0).isActive()) {
                 // Available scanner is active. Navigate to active scanner
+                HomeActivity.isSystemBTShown = true;
                 finish();
             } else {
                 // Try to connect available scanner

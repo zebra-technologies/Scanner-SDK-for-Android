@@ -13,25 +13,21 @@ import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.barcode.BarCodeView;
 import com.zebra.scannercontrol.app.barcode.GenerateBarcode128B;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
+
+import java.util.Objects;
 
 public class PairingInstructionsAll extends AppCompatActivity {
     private FrameLayout llBarcode;
+    LinearLayout linearPairAll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pairing_instructions_all);
-
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        linearPairAll = findViewById(R.id.linear_pair_all);
+        UIEnhancer.enableEdgeToEdge(linearPairAll);
+        UIEnhancer.configureOrientation(this);
 
         reloadBarcode();
     }

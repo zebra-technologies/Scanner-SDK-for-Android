@@ -27,6 +27,7 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.R;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import static com.zebra.scannercontrol.app.helpers.Constants.SCANNER_MODEL_CS4070;
 
@@ -42,17 +43,7 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_led);
-
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -73,6 +64,7 @@ public class LEDActivity extends BaseActivity implements NavigationView.OnNaviga
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);

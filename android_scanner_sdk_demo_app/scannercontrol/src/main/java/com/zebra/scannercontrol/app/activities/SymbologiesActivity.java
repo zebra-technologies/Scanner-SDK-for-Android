@@ -32,6 +32,7 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.Symbology;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import java.util.ArrayList;
 
@@ -63,17 +64,7 @@ public class SymbologiesActivity extends BaseActivity implements  NavigationView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_symbologies);
-
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,6 +85,7 @@ public class SymbologiesActivity extends BaseActivity implements  NavigationView
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);

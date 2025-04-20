@@ -1,17 +1,15 @@
 package com.zebra.scannercontrol.app.application;
 
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 
 import com.zebra.scannercontrol.DCSScannerInfo;
 import com.zebra.scannercontrol.SDKHandler;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
 import com.zebra.scannercontrol.app.helpers.Barcode;
-import com.zebra.scannercontrol.app.helpers.Foreground;
+import com.zebra.scannercontrol.app.helpers.LifecycleCallbacksInSca;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -82,7 +80,7 @@ public class Application extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Foreground.init(this);
+        LifecycleCallbacksInSca.init(this);
     }
 
     /**

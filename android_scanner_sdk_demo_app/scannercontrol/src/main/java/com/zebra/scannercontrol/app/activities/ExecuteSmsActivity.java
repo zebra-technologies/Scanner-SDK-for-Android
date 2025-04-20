@@ -71,9 +71,9 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.DotsProgressBar;
-import com.zebra.scannercontrol.app.services.FileObserverService;
 import com.zebra.scannercontrol.app.helpers.LogFile;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -125,7 +125,6 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
     String SMS_DIR = "/ZebraSMS";
     String SMS_LOG_DIR = "/logs";
     String CUSTOM_SMS_DIR;
-    boolean bServiceRunning = false;
     Button btn_execute_sms;
     Dialog dialog_overlay;
     AlertDialog.Builder alertDialogForValidateFirmwareUpdate;
@@ -152,6 +151,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_execute_sms);
+        UIEnhancer.configureOrientation(this);
         alertDialogForValidateFirmwareUpdate = new AlertDialog.Builder(this);
         btn_execute_sms = findViewById(R.id.btn_execute_sms);
         preferences = getSharedPreferences(Constants.PREFS_NAME, 0);
@@ -161,17 +161,6 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         if(!getIntent().getBooleanExtra(Constants.IS_HANDLING_INTENT,false)){
             logFile = new LogFile(this);
             iLogFormat = preferences.getInt(Constants.LOG_FORMAT,0);
-        }
-
-        Configuration configuration = getResources().getConfiguration();
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (configuration.screenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
         }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -193,6 +182,7 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
@@ -434,7 +424,6 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
             toLocation = Environment.getExternalStorageDirectory().getPath()+ CUSTOM_SMS_DIR + filePath;
         }
         File directory = new File(toLocation);
-        startFileObserverService(directory.getAbsolutePath());
         if (!directory.exists()) {
             return (directory.mkdir());
         } else {
@@ -442,18 +431,6 @@ public class ExecuteSmsActivity extends BaseActivity implements NavigationView.O
         }
     }
 
-    /**
-     * To Start the Service to Observe the ZebraSMS Directory for any changes
-     * */
-    private void startFileObserverService(String folderPath){
-        if(!bServiceRunning){
-            Intent serviceIntent = new Intent(this, FileObserverService.class);
-            serviceIntent.putExtra("INTENT_EXTRA_FILEPATH", folderPath);
-            startService(serviceIntent);
-            bServiceRunning = true;
-        }
-
-    }
 
     @Override
     public void onActivityResult(int paramInt1, int paramInt2, Intent paramIntent) {

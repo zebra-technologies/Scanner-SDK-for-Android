@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/bluetooth_turned_off_title"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                style="@style/roboto_regular_20dp"
+                android:gravity="center"/>
+
+            <View
+                android:layout_marginVertical="5dp"
+                android:background="@color/blue"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+
+
+
+            <TextView
+                android:layout_marginHorizontal="5dp"
+                style="@style/roboto_regular_15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/message_denied" />
+
+
+
+
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btn_retry_bt"
+                    style="@style/roboto_medium_16dp_blue"
+                    android:padding="6dp"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/txt_retry_bt" />
+
+                <View
+                    android:background="@color/light_gray"
+                    android:layout_width="0.5dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    android:id="@+id/btn_dismiss"
+                    style="@style/roboto_medium_16dp_blue"
+                    android:padding="6dp"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/txt_dismiss" />
+
+
+            </LinearLayout>
+
+
+
+
+</LinearLayout>

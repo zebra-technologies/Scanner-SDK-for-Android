@@ -9,28 +9,24 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
-import com.zebra.scannercontrol.app.helpers.Foreground;
+import com.zebra.scannercontrol.app.helpers.LifecycleCallbacksInSca;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 public class AboutActivity extends AppCompatActivity {
+    LinearLayout linearAbout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        linearAbout = findViewById(R.id.linear_about);
+        UIEnhancer.enableEdgeToEdge(linearAbout);
+        UIEnhancer.configureOrientation(this);
         PackageInfo pInfo = null;
         try {
 
@@ -43,7 +39,7 @@ public class AboutActivity extends AppCompatActivity {
             version = pInfo.versionName;
             ((TextView) findViewById(R.id.about)).setText(getResources().getString(R.string.app_name)+" Application v"+version+"\n\n"+
                     "SDK version "+ Application.sdkHandler.dcssdkGetVersion()+"\n\n"
-                    +"\u00a9 2024 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.");
+                    +"\u00a9 2025 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.");
         }
     }
 
@@ -76,6 +72,6 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
     public boolean isInBackgroundMode(final Context context) {
-        return Foreground.get().isBackground();
+        return LifecycleCallbacksInSca.get().isBackground();
     }
 }

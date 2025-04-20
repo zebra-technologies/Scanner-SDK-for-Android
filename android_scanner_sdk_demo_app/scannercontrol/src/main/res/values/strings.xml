@@ -70,7 +70,7 @@
     <string name="menu_item_device_pair">Pair Bluetooth Scanner</string>
     <string name="title_activity_about">App Overview</string>
     <string name="version">Version</string>
-    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2024 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
+    <string name="version_info">Zebra Scanner Control Application v1.0\n\n©2025 Zebra Technologies Corp. and/or its affiliates.  All rights reserved.\n</string>
     <string name="title_activity_scanners">Available Device List</string>
     <string name="title_activity_beacon">Zebra Beacons</string>
     <string name="bt_scanners_not_found">BT scanners not found</string>
@@ -87,11 +87,13 @@
     <string name="scanner_detection_title">Scanner Detection</string>
     <string name="scanner_discovery_title">Bluetooth Scanner Discovery</string>
     <string name="scanner_filteration_title">Classic mode Scanner Filtration</string>
+    <string name="other_settings_title">Other Settings</string>
     <string name="auto_detection">Auto Detection</string>
     <string name="auto_connection">Auto Connect To Last BLE Scanner</string>
     <string name="discover_bluetooth_scanners">Discover Bluetooth Scanners</string>
     <string name="set_sms_dir_path">SMS folder location</string>
     <string name="filter_zebra_devices">Filter Zebra Devices</string>
+    <string name="exceptions_throw">Throw Exceptions</string>
     <string name="add_customized_friendly_name">Add customized friendly name</string>
     <string name="pairing_barcode_title">Pair New Scanner (STC) Barcode</string>
     <string name="pairing_barcode_type">Barcode Type</string>
@@ -230,6 +232,8 @@
     <string name="image_saved">Image Successfully Saved into Download/Scanner Directory</string>
     <string name="continue_txt">Continue</string>
     <string name="instruction_snapi">Attach your cabled scanner to your device and scan the barcode to connect with this app.</string>
+    <string name="instruction_snapi_unplug">If your USB scanner is already connected with the device, please unplug it and then replug it.</string>
+    <string name="instruction_bt_reconnect">To connect with Bluetooth kindly close and reopen the app.</string>
     <string name="instruction">Scan barcode to pair your cordless scanner to this app.</string>
     <string name="pick_list_mode">Picklist Mode</string>
     <string name="stop_bluetooth_scanner_discovery">Stop Bluetooth Scanner Discovery</string>
@@ -527,6 +531,8 @@
     <string name="virtual_tether_notification_channel_description">Virtual Tether Notification Channel is used to alarm the user when the virtual tether event occurs.</string>
     <string name="virtual_tether_host_pop_up_message_description">Zebra Virtual Tether alarm activated </string>
     <string name="virtual_tether_host_pop_up_message_cancel">Stop Alarm on Host </string>
+    <string name="virtual_tether_permission_not_granted">Notification permission not granted</string>
+
 
     <string name="set_pause_alarm_duration">SET PAUSE DURATION</string>
     <string name="do_not_defeat_alarm">Do Not Defeat Alarm</string>
@@ -590,4 +596,10 @@
     <string name="connected">Connected</string>
     <string name="btn_txt_beep">BEEP</string>
     <string name="btn_txt_led">LED</string>
+    <string name="txt_dismiss">Dismiss</string>
+    <string name="txt_retry_bt">Retry BT</string>
+    <string name="com_protocol_snapi">Com Protocol = SNAPI</string>
+    <string name="message_denied">The app now functions only with USB scanners due to denied Bluetooth permissions.\n\nSelect “Retry BT” to enable Bluetooth or click “Dismiss” to continue with USB.</string>
+    <string name="bluetooth_turned_off_title">Bluetooth Turned Off</string>
+    <string name="remove_popup_pair_request_ble">Remove BLE Pairing Request</string>
 </resources>

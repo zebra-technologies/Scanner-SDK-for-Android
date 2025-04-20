@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -37,6 +38,7 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.AvailableScanner;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 import com.zebra.scannercontrol.app.receivers.NotificationsReceiver;
 
 import java.util.ArrayList;
@@ -66,21 +68,15 @@ public class ScannersActivity extends BaseActivity implements NavigationView.OnN
     static boolean launchFromFCS = false;
 
     private static int  checkedScanner = -1;
+    LinearLayout linearScanners;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         setContentView(R.layout.activity_scanners);
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        setContentView(R.layout.activity_scanners);
+        linearScanners = findViewById(R.id.linear_scanners);
+        UIEnhancer.enableEdgeToEdge(linearScanners);
+        UIEnhancer.configureOrientation(this);
         addDevListDelegate(this);
         configureNotificationAvailable(true);
 

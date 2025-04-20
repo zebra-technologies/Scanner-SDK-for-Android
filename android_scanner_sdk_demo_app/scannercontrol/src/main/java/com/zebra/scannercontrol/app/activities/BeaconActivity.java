@@ -25,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,7 @@ import com.zebra.scannercontrol.app.adapters.BeaconListAdapter;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.AvailableScanner;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 import com.zebra.scannercontrol.beacon.BeaconManager;
 import com.zebra.scannercontrol.beacon.IDcsBeaconEvents;
 import com.zebra.scannercontrol.beacon.entities.ZebraBeacon;
@@ -73,21 +75,15 @@ public class BeaconActivity extends BaseActivity implements IDcsBeaconEvents {
     Button btnResetFilter, btnApplyFilter , beepButton, ledButton;
     static BeaconConnectAsyncTask cmdExecTask=null;
     private CustomProgressDialog progressDialog;
+    LinearLayout linearBeacons;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beacon);
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp< Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        linearBeacons = findViewById(R.id.linear_beacons);
+        UIEnhancer.enableEdgeToEdge(linearBeacons);
+        UIEnhancer.configureOrientation(this);
         try {
             Application.sdkHandler.setiDcsBeaconEvents(this);
         }catch (Exception e){

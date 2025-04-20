@@ -19,6 +19,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import android.provider.DocumentsContract;
 
@@ -35,14 +38,17 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zebra.scannercontrol.DCSSDKDefs;
+import com.zebra.scannercontrol.SDKHandler;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -70,23 +76,17 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     private static int MANAGE_ALL_FILE_ACCESS = 129;
     Uri persistedUri;
     TextView btnSMSDir;
+    LinearLayout linearSettings;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        linearSettings = findViewById(R.id.linear_settings);
+        UIEnhancer.enableEdgeToEdge(linearSettings);
+        UIEnhancer.configureOrientation(this);
         SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
-        Configuration configuration = getResources().getConfiguration();
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (configuration.screenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
         btnResetDefaults = (Button) findViewById(R.id.btnResetAppDefaults);
         tableRowAddFriendlyName = findViewById(R.id.tableRowAddFriendlyName);
         tableRowAddFriendlyName.setOnClickListener(this);
@@ -113,7 +113,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             optBarcodeEvent.setOnCheckedChangeListener(this);
         }
 
-
         SwitchCompat autoDetection = (SwitchCompat) findViewById(R.id.autoDetection);
         if (autoDetection != null) {
             autoDetection.setOnCheckedChangeListener(this);
@@ -139,6 +138,32 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             classicDeviceFiltration.setOnCheckedChangeListener(this);
         }
 
+        SwitchCompat exceptionThrow = (SwitchCompat) findViewById(R.id.throwExceptions);
+        if (exceptionThrow != null) {
+            exceptionThrow.setOnCheckedChangeListener(this);
+        }
+
+        SwitchCompat pairPopupRemove = (SwitchCompat) findViewById(R.id.pairPopupRemove);
+        if (pairPopupRemove != null) {
+            pairPopupRemove.setOnCheckedChangeListener(this);
+        }
+
+        TextView textViewExceptionThrow = (TextView) findViewById(R.id.txt_exceptions_throw);
+        if(SDKHandler.getBoolExceptionThrowEnable()){
+            if (exceptionThrow != null) {
+                exceptionThrow.setChecked(true);
+                settings.edit().putBoolean(Constants.PREF_THROW_OR_LOG_EXCEPTIONS, true).apply();
+                textViewExceptionThrow.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+            }
+        }else{
+            if (exceptionThrow != null) {
+                exceptionThrow.setChecked(false);
+            }
+            settings.edit().putBoolean(Constants.PREF_THROW_OR_LOG_EXCEPTIONS, false).apply();
+            textViewExceptionThrow.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+        }
+
+
 
         comProtocol = (Spinner) findViewById(R.id.spinner_com_protocol);
         logFormat = (Spinner) findViewById(R.id.spinner_log_format);
@@ -148,10 +173,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 
         // Edit(2018/01/02) : SSDK_6172_Remove legacy barcode type
         // save barcode type value to 0(ScanToConnect Suite)
-        SharedPreferences.Editor settingsEditor = settings.edit();
-
-        settingsEditor.putInt(Constants.PREF_PAIRING_BARCODE_TYPE, BARCODE_TYPE_SCANTOCONNECT).commit();// Commit is required here. So suppressing warning.
-
+        settings.edit().putInt(Constants.PREF_PAIRING_BARCODE_TYPE, BARCODE_TYPE_SCANTOCONNECT).apply();
         protocolAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, protocolList);
         protocolAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -431,7 +453,37 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 settingsEditor.putBoolean(Constants.PREF_SCANNER_CLASSIC_FILTER,isChecked).apply();
                 break;
             }
+            case R.id.throwExceptions: {
+                TextView textView = (TextView) findViewById(R.id.txt_exceptions_throw);
+                if (textView != null) {
+                    if (isChecked) {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                        SDKHandler.setBoolExceptionThrowEnable(true);
+                        settingsEditor.putBoolean(Constants.PREF_THROW_OR_LOG_EXCEPTIONS, true).apply();
+                    } else {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                        SDKHandler.setBoolExceptionThrowEnable(false);
+                        settingsEditor.putBoolean(Constants.PREF_THROW_OR_LOG_EXCEPTIONS, false).apply();
+                    }
+                }
+                break;
+            }
+            case R.id.pairPopupRemove:{
+                TextView textView = (TextView) findViewById(R.id.txt_popup_pair_remove);
+                if (textView != null) {
+                    if (isChecked) {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                        Application.sdkHandler.setBoolRemovePopupPairRequest(true);
+                        settingsEditor.putBoolean(Constants.PREF_REMOVE_POPUP_PAIR_REQUEST, true).apply();
+                    } else {
+                        textView.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                        Application.sdkHandler.setBoolRemovePopupPairRequest(false);
+                        settingsEditor.putBoolean(Constants.PREF_REMOVE_POPUP_PAIR_REQUEST, false).apply();
+                    }
+                }
 
+            }
+            break;
         }
 
         if (SettingsChangedFromDefaults()) {
@@ -440,7 +492,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             btnResetDefaults.setEnabled(false);
         }
         initializeDcsSdkWithAppSettings();
-
     }
 
     @Override
@@ -501,8 +552,6 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 //show popup Incompatible folder Selected
                 showAlertDialogTONavigatePermission(smsFolderPathString);
             }
-
-
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -808,6 +857,20 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             }
         }
 
+        SwitchCompat pairPopupRemove = (SwitchCompat) findViewById(R.id.pairPopupRemove);
+        if (pairPopupRemove != null) {
+            pairPopupRemove.setChecked(settings.getBoolean(Constants.PREF_REMOVE_POPUP_PAIR_REQUEST, false));
+
+            TextView textViewPopupPairRemove = (TextView) findViewById(R.id.txt_popup_pair_remove);
+            if(textViewPopupPairRemove!=null) {
+                if (pairPopupRemove.isChecked()) {
+                    textViewPopupPairRemove.setTextColor(ContextCompat.getColor(this, R.color.font_color));
+                } else {
+                    textViewPopupPairRemove.setTextColor(ContextCompat.getColor(this, R.color.inactive_text));
+                }
+            }
+        }
+
         /* Edit(2018/01/02) : SSDK_6172_Remove legacy barcode type
         int barcode = settings.getInt(Constants.PREF_PAIRING_BARCODE_TYPE, 0);
         barcodeType = (Spinner)findViewById(R.id.spinner_type);
@@ -879,6 +942,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         SwitchCompat activeScanner = (SwitchCompat) findViewById(R.id.activeScanner);
         SwitchCompat barcodeEvent = (SwitchCompat) findViewById(R.id.barcodeEvent);
         SwitchCompat setDefaults = (SwitchCompat) findViewById(R.id.set_factory_defaults);
+        SwitchCompat pairPopupRemove = (SwitchCompat) findViewById(R.id.pairPopupRemove);
         //Spinner barcodeType = (Spinner)findViewById(R.id.spinner_type);
         Spinner comProtocol = (Spinner)findViewById(R.id.spinner_com_protocol);
         Spinner logFormat = (Spinner) findViewById(R.id.spinner_log_format);
@@ -908,6 +972,11 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         if (setDefaults != null) {
             settingsEditor.putBoolean(Constants.PREF_PAIRING_BARCODE_CONFIG, setDefaults.isChecked()).commit();
         }
+
+        if (pairPopupRemove != null) {
+            settingsEditor.putBoolean(Constants.PREF_REMOVE_POPUP_PAIR_REQUEST, pairPopupRemove.isChecked()).commit();
+        }
+
         /*  Edit(2018/01/02) : SSDK_6172_Remove legacy barcode type
         // save barcode type value to 0(ScanToConnect Suite)
         if (barcodeType != null) {

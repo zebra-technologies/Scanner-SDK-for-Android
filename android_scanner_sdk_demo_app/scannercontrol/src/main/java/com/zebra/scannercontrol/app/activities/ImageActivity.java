@@ -49,6 +49,7 @@ import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -89,17 +90,7 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
-
-        Configuration configuration = getResources().getConfiguration();
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (configuration.screenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -153,6 +144,7 @@ public class ImageActivity extends BaseActivity implements NavigationView.OnNavi
         saveImageButton =findViewById(R.id.saveImageButton);
         radioButtonGroup = findViewById(R.id.radioButtonGroup);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         videoMode = findViewById(R.id.videoMode);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();

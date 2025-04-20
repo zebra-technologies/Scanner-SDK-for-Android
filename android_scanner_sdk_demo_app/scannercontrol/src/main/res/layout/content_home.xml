@@ -15,6 +15,7 @@
     tools:showIn="@layout/app_bar_home">
 
     <TextView
+        android:id="@+id/instruction"
         style="@style/roboto_medium_16dp"
         android:text="@string/instruction"
         android:layout_marginLeft="@dimen/app_margin_left"

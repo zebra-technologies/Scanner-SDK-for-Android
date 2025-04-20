@@ -3,6 +3,7 @@ package com.zebra.scannercontrol.app.activities;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -45,6 +46,7 @@ import com.zebra.scannercontrol.app.helpers.ActiveScannerAdapter;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.CustomProgressDialog;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 import com.zebra.scannercontrol.app.receivers.NotificationsReceiver;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -150,18 +152,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_scanner);
-
-        Configuration configuration = getResources().getConfiguration();
-
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (configuration.screenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
 
         ssaSupportedAttribs = new ArrayList<Integer>();
 
@@ -175,6 +166,7 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
@@ -725,7 +717,13 @@ public class ActiveScannerActivity extends BaseActivity implements NavigationVie
     public boolean scannerHasDisconnected(int scannerID) {
         Application.barcodeData.clear();
         pairNewScannerMenu.setTitle(R.string.menu_item_device_pair);
-        this.finish();
+        if(mBluetoothAdapter.isEnabled()){
+            this.finish();
+        }else{
+            Intent intent = new Intent(ActiveScannerActivity.this, HomeActivity.class);
+            startActivity(intent);
+            this.finish();
+        }
         return true;
     }
 

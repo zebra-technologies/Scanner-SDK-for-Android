@@ -3,18 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/colorPrimary"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/app_margin_left"
-    android:paddingLeft="@dimen/app_margin_left"
-    android:paddingRight="@dimen/app_margin_right"
-    android:paddingTop="@dimen/app_margin_left"
+    android:id="@+id/linear_support_scanners"
     tools:context="com.zebra.scannercontrol.app.activities.SupportedScanners">
     <ScrollView
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:padding="18dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">

@@ -2,11 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray"
+    android:background="@color/colorPrimary"
     android:orientation="vertical"
+    android:id="@+id/linear_settings"
     tools:context="com.zebra.scannercontrol.app.activities.SettingsActivity">
 
     <ScrollView
+        android:background="@color/light_gray"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -372,6 +374,37 @@
             </TableRow>
 
             <include layout="@layout/normal_divider" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_weight="85"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_popup_pair_remove"
+                        style="@style/roboto_medium_16dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/remove_popup_pair_request_ble"/>
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/pairPopupRemove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="25"
+                    android:paddingEnd="18dp" />
+            </TableRow>
+
+            <include layout="@layout/normal_divider" />
 
             <TableRow
                 android:layout_width="match_parent"
@@ -574,8 +607,52 @@
                 </LinearLayout>
 
             </TableRow>
-
             <include layout="@layout/normal_divider" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/tbl_row_gray">
+
+                <TextView
+                    style="@style/roboto_regular_16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/app_margin_left"
+                    android:text="@string/other_settings_title" />
+
+            </TableRow>
+        <include layout="@layout/normal_divider" />
+
+        <TableRow
+            android:id="@+id/tableRowOther"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="18dp"
+                android:layout_weight="85"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/txt_exceptions_throw"
+                    style="@style/roboto_medium_16dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exceptions_throw"/>
+            </LinearLayout>
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/throwExceptions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="25"
+                android:paddingEnd="18dp" />
+        </TableRow>
+
+        <include layout="@layout/normal_divider" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

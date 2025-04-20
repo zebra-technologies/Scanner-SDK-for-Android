@@ -9,29 +9,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.zebra.scannercontrol.app.application.Application;
-import com.zebra.scannercontrol.app.helpers.Foreground;
+import com.zebra.scannercontrol.app.helpers.LifecycleCallbacksInSca;
 
 import com.zebra.scannercontrol.app.R;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 public class ConnectionHelpActivity2 extends AppCompatActivity{
+    LinearLayout linearHelp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection_help2);
+        linearHelp = findViewById(R.id.linear_help);
+        UIEnhancer.enableEdgeToEdge(linearHelp);
+        UIEnhancer.configureOrientation(this);
 
 
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
     }
 
     @Override
@@ -49,7 +45,7 @@ public class ConnectionHelpActivity2 extends AppCompatActivity{
         }
     }
     public boolean isInBackgroundMode(final Context context) {
-        return Foreground.get().isBackground();
+        return LifecycleCallbacksInSca.get().isBackground();
     }
 
     @Override

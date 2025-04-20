@@ -10,6 +10,7 @@ import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_AUDI
 import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_EVENT_NOTIFY;
 import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_HOST_BACKGROUND_MODE_NOTIFICATION;
 import static com.zebra.scannercontrol.app.helpers.Constants.VIRTUAL_TETHER_HOST_NOTIFICATION_CHANNEL_ID;
+import static com.zebra.scannercontrol.app.helpers.Constants.WORK_NAME;
 import static com.zebra.scannercontrol.app.helpers.Constants.logAsMessage;
 
 import android.annotation.SuppressLint;
@@ -17,6 +18,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -36,6 +38,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.zebra.barcode.sdk.sms.ConfigurationUpdateEvent;
 import com.zebra.scannercontrol.DCSSDKDefs;
@@ -49,14 +54,15 @@ import com.zebra.scannercontrol.app.helpers.AvailableScanner;
 
 import com.zebra.scannercontrol.app.helpers.Barcode;
 import com.zebra.scannercontrol.app.helpers.Constants;
-import com.zebra.scannercontrol.app.helpers.Foreground;
+import com.zebra.scannercontrol.app.helpers.LifecycleCallbacksInSca;
 import com.zebra.scannercontrol.app.helpers.ManagedVibrator;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
-import com.zebra.scannercontrol.app.services.BackgroundSoundService;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
+import com.zebra.scannercontrol.app.work.BackgroundSoundWorker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 public class BaseActivity extends AppCompatActivity implements ScannerAppEngine, IDcsSdkApiDelegate {
     protected static String TAG;
@@ -78,34 +84,30 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
     SharedPreferences sharedPreferences;
     static boolean waitingForBeaconBeep = false;
     static boolean waitingForBeaconLED = false;
+    private static UUID workRequestId;
+    BluetoothAdapter mBluetoothAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Configuration configuration = getResources().getConfiguration();
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (configuration.screenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
         mScannerInfoList = Application.mScannerInfoList;
         mOfflineScannerInfoList = new ArrayList<DCSScannerInfo>();
         TAG = getClass().getSimpleName();
+
+        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        virtualTetherEnable =  settings.getBoolean(Constants.PREF_VIRTUAL_TETHER_SCANNER_SETTINGS, false);
+
         if (Application.sdkHandler == null) {
-            Application.sdkHandler = new SDKHandler(this, true);
+            Application.sdkHandler = new SDKHandler(this, true, settings.getBoolean(Constants.PREF_THROW_OR_LOG_EXCEPTIONS, false));
         }
         virtualTetherEventOccurred = getIntent().getBooleanExtra(VIRTUAL_TETHER_EVENT_NOTIFY, false);
         Application.sdkHandler.dcssdkSetDelegate(this);
         initializeDcsSdkWithAppSettings();
 
-        SharedPreferences virtualTetherSettings = getSharedPreferences(Constants.PREFS_NAME, 0);
-        virtualTetherEnable =  virtualTetherSettings.getBoolean(Constants.PREF_VIRTUAL_TETHER_SCANNER_SETTINGS, false);
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
     }
 
     private Handler initializeHandler() {
@@ -242,7 +244,7 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
 
     @Override
     public boolean isInBackgroundMode(final Context context) {
-        return Foreground.get().isBackground();
+        return LifecycleCallbacksInSca.get().isBackground();
     }
 
     /* ###################################################################### */
@@ -282,7 +284,7 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
     }
 
     @Override
-    public void removeDevEventsDelegate(ScannerAppEngine.IScannerAppEngineDevEventsDelegate delegate) {
+    public void removeDevEventsDelegate(IScannerAppEngineDevEventsDelegate delegate) {
         if (mDevEventsDelegates != null)
             mDevEventsDelegates.remove(delegate);
     }
@@ -520,8 +522,11 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
     @Override
     public void dcssdkEventCommunicationSessionTerminated(int scannerID) {
         dataHandler.obtainMessage(Constants.SESSION_TERMINATED, scannerID).sendToTarget();
-        virtualTetherHostAlarm(scannerID);
-
+        Log.d("BaseActivity","dcssdkEventCommunicationSessionTerminated Triggered!");
+        if(mBluetoothAdapter.isEnabled()) {
+            Log.d("BaseActivity","Virtual Tether Alarm Triggered!");
+            virtualTetherHostAlarm(scannerID);
+        }
     }
 
     @Override
@@ -602,7 +607,7 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
                     if (isInBackgroundMode(getApplicationContext())) {
                         createNotificationChannel();
 
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             AudioAttributes attributes = new AudioAttributes.Builder()
                                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                                     .setUsage(AudioAttributes.USAGE_ALARM)
@@ -618,7 +623,7 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
                         virtualTetherHostActivated = true;
                         intent.putExtra(Constants.VIRTUAL_TETHER_EVENT_NOTIFY, true);
 
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             AudioAttributes attributes = new AudioAttributes.Builder()
                                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                                     .setUsage(AudioAttributes.USAGE_ALARM)
@@ -694,12 +699,14 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
         }
     }
 
+
     /**
-     * Method to start background sound service
+     * Method to start background sound using Work Manager
      */
     private void startVirtualTetherAudioAlarm() {
-        Intent intent_music = new Intent(getApplicationContext(), BackgroundSoundService.class);
-        startService(intent_music);
+        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(BackgroundSoundWorker.class).build();
+        WorkManager.getInstance(this).enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, workRequest);
+        workRequestId = workRequest.getId();
     }
 
     /**
@@ -779,11 +786,14 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
     }
 
     /**
-     * This method is to stop the audio alarm background service
+     * This method is to stop the audio alarm using Work Manager
      */
     private void stopVirtualTetherAudioAlarm() {
-        Intent intent = new Intent(getApplicationContext(), BackgroundSoundService.class);
-        stopService(intent);
+        if(workRequestId!=null){
+            WorkManager.getInstance(this).cancelWorkById(workRequestId);
+        }else{
+            WorkManager.getInstance(this).cancelAllWork();
+        }
     }
 
     /**
@@ -1053,7 +1063,7 @@ public class BaseActivity extends AppCompatActivity implements ScannerAppEngine,
                         scannerHasAppearedOnStart(availableScanner);
                         if(availableScanner.getConnectionType() == DCSSDK_CONNTYPE_USB_SNAPI ||
                                 availableScanner.getConnectionType() == DCSSDK_CONNTYPE_USB_CDC) {
-                            connect(availableScanner.getScannerID());
+                                connect(availableScanner.getScannerID());
                         }
                     }
 

@@ -12,7 +12,7 @@
             android:title="Available Device List" />
         <item
             android:id="@+id/nav_beacons"
-            android:icon="@drawable/nav_beacon"
+            android:icon="@drawable/nav_beacons"
             android:title="Beacons" />
         <item
             android:id="@+id/nav_find_cabled_scanner"

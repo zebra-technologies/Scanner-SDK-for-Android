@@ -23,9 +23,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.work.WorkManager;
 
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,16 +113,9 @@ public class SplashScreenActivity extends AppCompatActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_splash_screen);
-        Configuration configuration = getResources().getConfiguration();
-        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            if(configuration.smallestScreenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }else{
-            if(configuration.screenWidthDp<Application.minScreenWidth){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        UIEnhancer.configureOrientation(this);
+        //If the app is manually closed by the user, the work manager task has been removed by this call
+        cancelAllWork();
 
         permissionsList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -146,7 +141,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 /* Create an Intent that will start the Menu-Activity. */
                 Intent mainIntent = new Intent(SplashScreenActivity.this, HomeActivity.class);
                 startActivity(mainIntent);
-                SplashScreenActivity.this.finish();;
+                SplashScreenActivity.this.finish();
 
             }
         }, SPLASH_DISPLAY_LENGTH);
@@ -211,4 +206,9 @@ public class SplashScreenActivity extends AppCompatActivity {
     private boolean hasPermission(Context context, String permissionStr) {
         return ContextCompat.checkSelfPermission(context, permissionStr) == PackageManager.PERMISSION_GRANTED;
     }
+
+    private void cancelAllWork(){
+        WorkManager.getInstance(this).cancelAllWork();
+    }
+
 }

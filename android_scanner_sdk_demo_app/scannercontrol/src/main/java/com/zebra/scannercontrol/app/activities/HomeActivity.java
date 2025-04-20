@@ -1,6 +1,7 @@
 package com.zebra.scannercontrol.app.activities;
 
-import static com.zebra.scannercontrol.DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_ACTION_HIGH_HIGH_LOW_LOW_BEEP;
 import static com.zebra.scannercontrol.RMDAttributes.RMD_ATTR_VALUE_ACTION_LED_OTHER_ON;
 
@@ -15,7 +16,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -23,6 +23,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.Html;
@@ -68,11 +70,13 @@ import com.zebra.scannercontrol.BarCodeView;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.IDcsScannerEventsOnReLaunch;
 import com.zebra.scannercontrol.DCSScannerInfo;
+import com.zebra.scannercontrol.SDKHandler;
 import com.zebra.scannercontrol.app.R;
 import com.zebra.scannercontrol.app.application.Application;
 import com.zebra.scannercontrol.app.helpers.AvailableScanner;
 import com.zebra.scannercontrol.app.helpers.Constants;
 import com.zebra.scannercontrol.app.helpers.ScannerAppEngine;
+import com.zebra.scannercontrol.app.helpers.UIEnhancer;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -95,16 +99,20 @@ public class HomeActivity extends BaseActivity
     static String btAddress;
     static String userEnteredBluetoothAddress;
     static AvailableScanner curAvailableScanner = null;
+    TextView txtScannerConfiguration;
+    TextView txtInstruction;
+    TextView txtBarcodeType;
+    static boolean isSystemBTShown = false;
 
     Menu menu;
     MenuItem pairNewScannerMenu;
     Dialog dialog;
     Dialog dialogBTAddress;
+    Dialog dialogDenied;
     private FrameLayout llBarcode;
     private NavigationView navigationView;
     private GoogleApiClient googleApiClient;
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
-
     AlertDialog alertDialog;
     ArrayList<String> permissionsList;
     int permissionsCount = 0;
@@ -174,30 +182,36 @@ public class HomeActivity extends BaseActivity
                             }
                         }
                     });
-    ProgressDialog progressDialog;
 
+
+
+    // Declare the launcher for bluetooth
+    ActivityResultLauncher<Intent> enableBluetoothLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            isSystemBTShown = false;
+                            txtBarcodeType.setVisibility(VISIBLE);
+                            txtInstruction.setText(R.string.instruction);
+                            generatePairingBarcode();
+                            initialize();
+                        } else {
+                            initDeniedDialog();
+                        }
+                    }
+            );
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
         googleApiClient = getAPIClientInstance();
         if (googleApiClient != null) {
             googleApiClient.connect();
         }
-
-        Configuration configuration = getResources().getConfiguration();
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (configuration.smallestScreenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (configuration.screenWidthDp < Application.minScreenWidth) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
-
+        UIEnhancer.configureOrientation(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -207,7 +221,11 @@ public class HomeActivity extends BaseActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        txtScannerConfiguration = (TextView) findViewById(R.id.scan_to_connect_scanner_config);
+        txtBarcodeType = (TextView) findViewById(R.id.scan_to_connect_barcode_type);
+        txtInstruction = (TextView) findViewById(R.id.instruction);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        UIEnhancer.enableEdgeForNavigationDrawer(navigationView, this);
         navigationView.setNavigationItemSelectedListener(this);
         menu = navigationView.getMenu();
         pairNewScannerMenu = menu.findItem(R.id.nav_pair_device);
@@ -225,6 +243,10 @@ public class HomeActivity extends BaseActivity
         askForPermissions(permissionsList);
 
         Application.sdkHandler.setiDcsScannerEventsOnReLaunch(this);
+
+        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        SDKHandler.setBoolExceptionThrowEnable(settings.getBoolean(Constants.PREF_THROW_OR_LOG_EXCEPTIONS, false));
+        Application.sdkHandler.setBoolRemovePopupPairRequest(settings.getBoolean(Constants.PREF_REMOVE_POPUP_PAIR_REQUEST,false));
     }
 
     /**
@@ -332,13 +354,16 @@ public class HomeActivity extends BaseActivity
         });
     }
 
+    private void checkBluetoothStatus(){
+        if(!mBluetoothAdapter.isEnabled() && !isSystemBTShown) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            enableBluetoothLauncher.launch(enableBtIntent);
+            isSystemBTShown = true;
+        }
+    }
+
     @SuppressLint("MissingPermission")
     private void initialize() {
-        if(!mBluetoothAdapter.isEnabled())
-        {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
         initializeDcsSdk();
         llBarcode = (FrameLayout) findViewById(R.id.scan_to_connect_barcode);
         addDevConnectionsDelegate(this);
@@ -403,9 +428,11 @@ public class HomeActivity extends BaseActivity
 
     private void initializeDcsSdk() {
         Application.sdkHandler.dcssdkEnableAvailableScannersDetection(true);
-        Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
+        if(mBluetoothAdapter.isEnabled()){
+            Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
+            Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_LE);
+        }
         Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_SNAPI);
-        Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_LE);
         Application.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_USB_CDC);
     }
 
@@ -415,6 +442,7 @@ public class HomeActivity extends BaseActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            isSystemBTShown = false;
             super.onBackPressed();
         }
     }
@@ -512,6 +540,7 @@ public class HomeActivity extends BaseActivity
     protected void onStart() {
         super.onStart();
         requestDeviceLocationSettings();
+        checkBluetoothStatus();
     }
 
     @Override
@@ -527,8 +556,6 @@ public class HomeActivity extends BaseActivity
         navigationView.getMenu().findItem(R.id.nav_settings).setChecked(false);
         navigationView.getMenu().findItem(R.id.nav_find_cabled_scanner).setChecked(false);
         SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
-        TextView txtBarcodeType = (TextView) findViewById(R.id.scan_to_connect_barcode_type);
-        TextView txtScannerConfiguration = (TextView) findViewById(R.id.scan_to_connect_scanner_config);
         String sourceString = "";
         txtBarcodeType.setText(Html.fromHtml(sourceString));
         txtScannerConfiguration.setText("");
@@ -621,6 +648,15 @@ public class HomeActivity extends BaseActivity
 
         if(Application.isScannerConnectedAfterSMS && Application.currentConnectedScannerID != -1) {
             scannerHasConnected(Application.currentConnectedScannerID);
+        }
+
+        if(!mBluetoothAdapter.isEnabled()){
+            txtBarcodeType.setVisibility(GONE);
+            String joinedString = String.join("\n\n", getString(R.string.instruction_snapi), getString(R.string.instruction_snapi_unplug), getString(R.string.instruction_bt_reconnect));
+            txtInstruction.setText(joinedString);
+            txtScannerConfiguration.setText(R.string.com_protocol_snapi);
+        }else{
+            txtBarcodeType.setVisibility(VISIBLE);
         }
 
     }
@@ -917,7 +953,9 @@ public class HomeActivity extends BaseActivity
             return false;
         } else {
             SsaSetSymbologyActivity.resetScanSpeedAnalyticSettings();
-
+            if(!mBluetoothAdapter.isEnabled()){
+                isSystemBTShown = true;
+            }
             ArrayList<DCSScannerInfo> activeScanners = new ArrayList<DCSScannerInfo>();
             Application.sdkHandler.dcssdkGetActiveScannersList(activeScanners);
             Intent intent = new Intent(HomeActivity.this, ActiveScannerActivity.class);
@@ -1112,4 +1150,77 @@ public class HomeActivity extends BaseActivity
             }
         }
     }
+
+
+    private void getSnapiBarcode() {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-1, -1);
+        BarCodeView barCodeView = Application.sdkHandler.dcssdkGetUSBSNAPIWithImagingBarcode();
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        int orientation =this.getResources().getConfiguration().orientation;
+        int x = width * 9 / 10;
+        int y = x / 3;
+        if(getDeviceScreenSize()>6){ // TODO: Check 6 is ok or not
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                x =  width /2;
+                y = x/3;
+            }else {
+                x =  width *2/3;
+                y = x/3;
+            }
+        }
+        barCodeView.setSize(x, y);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                llBarcode.addView(barCodeView, layoutParams);
+            }
+        },500);
+
+
+    }
+
+    /**Pop up dialog to display the instructions for bluetooth deny permission*/
+    @SuppressLint("DefaultLocale")
+    private void initDeniedDialog() {
+        dialogDenied = new Dialog(HomeActivity.this);
+        dialogDenied.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogDenied.setCancelable(false);
+        dialogDenied.setContentView(R.layout.dialog_bluetooth_denied);
+
+        // Set the width of the dialog
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(dialogDenied.getWindow().getAttributes());
+        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT; // or a specific width, e.g., 600
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT; // or another specific height
+
+        dialogDenied.getWindow().setAttributes(layoutParams);
+
+        TextView btn_retry_bt = dialogDenied.findViewById(R.id.btn_retry_bt);
+        TextView btn_dismiss = dialogDenied.findViewById(R.id.btn_dismiss);
+
+        btn_retry_bt.setOnClickListener(view -> {
+            isSystemBTShown = false;
+            dialogDenied.dismiss();
+            dialogDenied = null;
+            checkBluetoothStatus();
+        });
+
+        btn_dismiss.setOnClickListener(view -> {
+            txtBarcodeType.setVisibility(GONE);
+            String joinedString = String.join("\n\n", getString(R.string.instruction_snapi), getString(R.string.instruction_snapi_unplug), getString(R.string.instruction_bt_reconnect));
+            txtInstruction.setText(joinedString);
+            txtScannerConfiguration.setText(R.string.com_protocol_snapi);
+            getSnapiBarcode();
+            isSystemBTShown = false;
+            dialogDenied.dismiss();
+            dialogDenied = null;
+        });
+
+        dialogDenied.show();
+    }
+
 }

@@ -3,16 +3,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/light_gray"
+    android:background="@color/colorPrimary"
+        android:id="@+id/linear_scanners"
         tools:context="com.zebra.scannercontrol.app.activities.ScannersActivity">
 
-    <TableRow
-        android:id="@+id/tbl_row_last_connected_scanner"
+    <LinearLayout
+        android:background="@color/light_gray"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" android:orientation="vertical">
+        <TableRow
+            android:id="@+id/tbl_row_last_connected_scanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/light_gray">
 
-        <TextView
+            <TextView
                 style="@style/roboto_regular_16dp"
                 android:id="@+id/txt_last_connected_scanner"
                 android:layout_width="match_parent"
@@ -20,12 +25,12 @@
                 android:text="@string/last_connected_scanner"
                 android:gravity="center_vertical"
                 android:layout_marginLeft="@dimen/app_margin_left" />
-    </TableRow>
-    <LinearLayout android:orientation="vertical"
+        </TableRow>
+        <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal">
-        <ListView
+            <ListView
                 android:id="@+id/last_connected_scanner"
                 android:scrollbars = "vertical"
                 android:layout_width="match_parent"
@@ -38,16 +43,16 @@
                 android:fastScrollEnabled="false"
                 android:fastScrollAlwaysVisible="false"
                 style ="@style/style_scrollbar"
-            tools:targetApi="m" />
-    </LinearLayout>
-    <include layout="@layout/normal_divider" />
+                tools:targetApi="m" />
+        </LinearLayout>
+        <include layout="@layout/normal_divider" />
 
-    <TableRow
+        <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/light_gray">
 
-        <TextView
+            <TextView
                 style="@style/roboto_regular_16dp"
                 android:id="@+id/txt_other_scanners"
                 android:layout_width="match_parent"
@@ -55,12 +60,12 @@
                 android:text="@string/other_scanners"
                 android:gravity="center_vertical"
                 android:layout_marginLeft="@dimen/app_margin_left" />
-    </TableRow>
-    <LinearLayout android:orientation="vertical"
+        </TableRow>
+        <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal">
-        <ListView
+            <ListView
                 android:id="@+id/other_scanners"
                 android:scrollbars = "vertical"
                 android:layout_width="match_parent"
@@ -73,20 +78,20 @@
                 android:fastScrollEnabled="false"
                 android:fastScrollAlwaysVisible="false"
                 style ="@style/style_scrollbar"
-            android:choiceMode="singleChoice"
-            android:clickable="true"
-            tools:targetApi="m" />
-    </LinearLayout>
-    <include layout="@layout/normal_divider" />
+                android:choiceMode="singleChoice"
+                android:clickable="true"
+                tools:targetApi="m" />
+        </LinearLayout>
+        <include layout="@layout/normal_divider" />
 
-    <LinearLayout
+        <LinearLayout
             android:id="@+id/noScannersMessage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:visibility="gone"
             android:gravity="center">
-        <TextView
+            <TextView
                 android:id="@+id/msgNoScanners"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,13 +100,16 @@
                 android:text="@string/bt_no_scanners"
                 />
 
-        <Button
+            <Button
                 android:id="@+id/btnConnHelp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Follow tutorial >> "
                 android:onClick="OnConnHelp"
                 android:gravity="center"/>
+        </LinearLayout>
+
     </LinearLayout>
+
 
 </LinearLayout>
